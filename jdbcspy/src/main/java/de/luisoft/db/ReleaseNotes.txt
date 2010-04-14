@@ -1,0 +1,31 @@
+Release 1.0.0: initial release including execution listeners
+Release 1.0.1: - including oracle driver
+               - connection listener (ConnectionStatisticListener)
+Release 1.0.2: bugfixes
+Release 1.0.3: - display the method in which the resource was opened if
+                 a ResourceException is thrown
+               - added dbIgnoreSizeEvaluation property
+Release 1.0.4: - no size evaluation by default
+               - do not print size if size is 0
+               - do not block output
+               - do not add more than 100 batch entries
+               - add SpecialStatementListener
+               - improved batch printing
+Release 1.1.0: - introduced new Statistic interface
+               - redesign toString of Statement
+               - ExecutionFailedListener
+               - change size calculation
+Release 1.1.1: - xml configuration file
+               - trace depth
+Release 1.2.0: - MBean included
+               - added ConnectionDumpListener
+               - getStatistics, clearStatistics now DataSource related functions
+               - rename properties
+               - solve memory leak
+Release 1.2.1: - execution time listener correct time printout
+               - correct time on failure
+               - jboss 4 compatible
+               - fix execution statistic/time listener
+               - implement DynamicMBean interface
+Release 1.3.0: - implement DriverWrapper as a wrapper for any driver
+

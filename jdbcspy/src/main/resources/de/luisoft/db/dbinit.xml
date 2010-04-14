@@ -1,0 +1,61 @@
+<dbproxy>
+    <property name="DriverClass" value="com.ibm.db2.jcc.DB2Driver"/>
+
+    <property name="EnableProxyInitially" value="true"/>
+
+    <property name="ResultSetNextTimeThreshold" value="120000"/>
+    <property name="ResultSetTotalTimeThreshold" value="300000"/>
+    <property name="ResultSetTotalSizeThreshold" value="20000000"/>
+
+    <property name="StmtExecuteTimeThreshold" value="3000"/>
+    <property name="StmtTotalTimeThreshold" value="10000"/>
+    <property name="StmtTotalSizeThreshold" value="1000000"/>
+
+    <property name="ConnTotalTimeThreshold" value="20000"/>
+    <property name="ConnTotalSizeThreshold" value="10000000"/>
+
+    <property name="DisplaySqlStringMaxlen" value="0"/>
+
+    <property name="DisplayEntityBeans" value="false"/>
+    <property name="RemoveHints" value="false"/>
+    <property name="IgnoreNotClosedObjects" value="false"/>
+    <property name="IgnoreDoubleClosedObjects" value="false"/>
+    <property name="EnableSizeEvaluation" value="false"/>
+
+    <property name="StmtDebugClassExp" value=""/>
+    <property name="StmtHistorizeClassExp" value=""/>
+    <property name="StmtDebugSQLExp" value=""/>
+    <property name="StmtHistorizeSQLExp" value=""/>
+
+    <property name="TraceDepth" value="3"/>
+
+    <property name="DumpAfterShutdown" value="false"/>
+    <property name="DumpInterval" value="0"/>
+
+    <listeners>
+
+    	<executionlistener class="de.luisoft.db.proxy.listener.impl.ExecutionTimeListener">
+		    <property name="longExecutionThreshold" value="180"/>
+    	</executionlistener>
+    	<executionlistener class="de.luisoft.db.proxy.listener.impl.ExecutionLastStatementListener">
+		    <property name="lastStatementMaxHistory" value="3"/>
+    		<property name="lastStatementExecutionThreshold" value="500"/>
+        </executionlistener>
+    	<executionlistener class="de.luisoft.db.proxy.listener.impl.ExecutionRepeatCountListener">
+    	    <property name="repeatCountStmtSize" value="500"/>
+    		<property name="repeatCountThreshold" value="5000"/>
+    	</executionlistener>
+    	<executionlistener class="de.luisoft.db.proxy.listener.impl.ExecutionResourceListener">
+    	    <property name="ThrowWarnings" value="false"/>
+    	</executionlistener>
+    	<executionlistener class="de.luisoft.db.proxy.listener.impl.ExecutionStatisticListener"/>
+    	<executionlistener class="de.luisoft.db.proxy.listener.impl.SpecialStatementListener"/>
+
+    	<executionfailedlistener class="de.luisoft.db.proxy.listener.impl.ExecutionFailedHistoryListener"/>
+
+    	<connectionlistener class="de.luisoft.db.proxy.listener.impl.ConnectionDumpListener">
+		    <property name="connDumpCloseClassExp" value=""/>
+    	</connectionlistener>
+    	<connectionlistener class="de.luisoft.db.proxy.listener.impl.ConnectionStatisticListener"/>
+    </listeners>
+</dbproxy>
