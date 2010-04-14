@@ -1,0 +1,34 @@
+<dbproxy>
+    <property name="DriverClass" value="de.luisoft.jdbc.testdriver.MyDriver"/>
+
+    <property name="EnableProxyInitially" value="true"/>
+
+    <property name="ResultSetNextTimeThreshold" value="120000"/>
+    <property name="ResultSetTotalTimeThreshold" value="300000"/>
+    <property name="ResultSetTotalSizeThreshold" value="20000000"/>
+
+    <property name="StmtExecuteTimeThreshold" value="3000"/>
+    <property name="StmtTotalTimeThreshold" value="10000"/>
+    <property name="StmtTotalSizeThreshold" value="1000000"/>
+
+    <property name="ConnTotalTimeThreshold" value="20000"/>
+    <property name="ConnTotalSizeThreshold" value="10000000"/>
+
+    <property name="DisplaySqlStringMaxlen" value="0"/>
+
+    <property name="DisplayEntityBeans" value="false"/>
+    <property name="RemoveHints" value="false"/>
+    <property name="IgnoreNotClosedObjects" value="false"/>
+    <property name="IgnoreDoubleClosedObjects" value="false"/>
+    <property name="EnableSizeEvaluation" value="false"/>
+
+    <property name="StmtDebugClassExp" value=""/>
+    <property name="StmtHistorizeClassExp" value=""/>
+    <property name="StmtDebugSQLExp" value=""/>
+    <property name="StmtHistorizeSQLExp" value=""/>
+
+    <property name="TraceDepth" value="3"/>
+
+    <property name="DumpAfterShutdown" value="true"/>
+    <property name="DumpInterval" value="0"/>
+</dbproxy>
