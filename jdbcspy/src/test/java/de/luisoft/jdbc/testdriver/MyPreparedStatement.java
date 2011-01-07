@@ -9,13 +9,16 @@ import java.sql.Blob;
 import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.Date;
+import java.sql.NClob;
 import java.sql.ParameterMetaData;
 import java.sql.PreparedStatement;
 import java.sql.Ref;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
+import java.sql.RowId;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
+import java.sql.SQLXML;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Calendar;
@@ -466,4 +469,123 @@ public class MyPreparedStatement implements PreparedStatement {
 
 	}
 
+	public boolean isClosed() throws SQLException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	public boolean isPoolable() throws SQLException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	public void setPoolable(boolean arg0) throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public boolean isWrapperFor(Class arg0) throws SQLException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	public Object unwrap(Class arg0) throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void setAsciiStream(int arg0, InputStream arg1, long arg2)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setAsciiStream(int arg0, InputStream arg1) throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setBinaryStream(int arg0, InputStream arg1, long arg2)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setBinaryStream(int arg0, InputStream arg1) throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setBlob(int arg0, InputStream arg1, long arg2)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setBlob(int arg0, InputStream arg1) throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setCharacterStream(int arg0, Reader arg1, long arg2)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setCharacterStream(int arg0, Reader arg1) throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setClob(int arg0, Reader arg1, long arg2) throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setClob(int arg0, Reader arg1) throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setNCharacterStream(int arg0, Reader arg1, long arg2)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setNCharacterStream(int arg0, Reader arg1) throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setNClob(int arg0, NClob arg1) throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setNClob(int arg0, Reader arg1, long arg2) throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setNClob(int arg0, Reader arg1) throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setNString(int arg0, String arg1) throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setRowId(int arg0, RowId arg1) throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setSQLXML(int arg0, SQLXML arg1) throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
 }

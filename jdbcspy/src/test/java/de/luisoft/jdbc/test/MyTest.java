@@ -7,9 +7,9 @@ import java.sql.ResultSet;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
-import de.luisoft.db.proxy.ConnectionStatistics;
-import de.luisoft.db.proxy.ResultSetStatistics;
-import de.luisoft.db.proxy.StatementStatistics;
+import de.luisoft.jdbcspy.proxy.ConnectionStatistics;
+import de.luisoft.jdbcspy.proxy.ResultSetStatistics;
+import de.luisoft.jdbcspy.proxy.StatementStatistics;
 
 public class MyTest extends TestCase {
 
@@ -26,7 +26,7 @@ public class MyTest extends TestCase {
 
 	public void testStmtWith100000rsa() throws Exception {
 		int cnt = 100000;
-		Class.forName("de.luisoft.db.DBProxyDriver");
+		Class.forName("de.luisoft.jdbcspy.DBProxyDriver");
 		System.out.println("starting ...");
 		Connection c = DriverManager.getConnection(
 			"proxy:db:xxy&rscnt=" + cnt + "&itertime=1000&exectime=500");
@@ -88,7 +88,7 @@ public class MyTest extends TestCase {
 
 	public void testStmtWith1000000rs() throws Exception {
 		int cnt = 1000000;
-		Class.forName("de.luisoft.db.DBProxyDriver");
+		Class.forName("de.luisoft.jdbcspy.DBProxyDriver");
 		System.out.println("starting " + cnt + " rs...");
 		Connection c = DriverManager.getConnection(
 			"proxy:db:xxy&rscnt=" + cnt + "&itertime=1000&exectime=500");
@@ -127,7 +127,7 @@ public class MyTest extends TestCase {
 
 	public void testStmtWith100000rs() throws Exception {
 		int cnt = 100000;
-		Class.forName("de.luisoft.db.DBProxyDriver");
+		Class.forName("de.luisoft.jdbcspy.DBProxyDriver");
 		System.out.println("starting " + cnt + " rs...");
 		Connection c = DriverManager.getConnection(
 			"proxy:db:xxy&rscnt=" + cnt + "&itertime=1000&exectime=500");
@@ -166,7 +166,7 @@ public class MyTest extends TestCase {
 
 	public void testStmtWith10000rs() throws Exception {
 		int cnt = 10000;
-		Class.forName("de.luisoft.db.DBProxyDriver");
+		Class.forName("de.luisoft.jdbcspy.DBProxyDriver");
 		System.out.println("starting " + cnt + " rs...");
 		Connection c = DriverManager.getConnection(
 			"proxy:db:xxy&rscnt=" + cnt + "&itertime=1000&exectime=500");
@@ -204,7 +204,7 @@ public class MyTest extends TestCase {
 
 	public void testStmtWith100rs() throws Exception {
 		int cnt = 100;
-		Class.forName("de.luisoft.db.DBProxyDriver");
+		Class.forName("de.luisoft.jdbcspy.DBProxyDriver");
 		System.out.println("starting " + cnt + " rs...");
 		Connection c = DriverManager.getConnection(
 			"proxy:db:xxy&rscnt=" + cnt + "&itertime=1000&exectime=500");
@@ -237,7 +237,7 @@ public class MyTest extends TestCase {
 	}
 
 	public void test100StmtWith1rs() throws Exception {
-		Class.forName("de.luisoft.db.DBProxyDriver");
+		Class.forName("de.luisoft.jdbcspy.DBProxyDriver");
 		Connection c = DriverManager.getConnection(
 			"proxy:db:xxy&rscnt=1&itertime=0&exectime=0");
 		long start = System.currentTimeMillis();
@@ -277,7 +277,7 @@ public class MyTest extends TestCase {
 	}
 
 	public void test10000StmtWith1rs() throws Exception {
-		Class.forName("de.luisoft.db.DBProxyDriver");
+		Class.forName("de.luisoft.jdbcspy.DBProxyDriver");
 		Connection c = DriverManager.getConnection(
 			"proxy:db:xxy&rscnt=1&itertime=0&exectime=0");
 		long start = System.currentTimeMillis();
@@ -317,7 +317,7 @@ public class MyTest extends TestCase {
 	}
 
 	public void test10000StmtWith1rs2() throws Exception {
-		Class.forName("de.luisoft.db.DBProxyDriver");
+		Class.forName("de.luisoft.jdbcspy.DBProxyDriver");
 		Connection c = DriverManager.getConnection(
 			"proxy:db:xxy&rscnt=1&itertime=0&exectime=0");
 		long start = System.currentTimeMillis();
@@ -358,7 +358,7 @@ public class MyTest extends TestCase {
 	}
 
 	public void test10000StmtWith1rs3() throws Exception {
-		Class.forName("de.luisoft.db.DBProxyDriver");
+		Class.forName("de.luisoft.jdbcspy.DBProxyDriver");
 		Connection c = DriverManager.getConnection(
 			"proxy:db:xxy&rscnt=5&itertime=0&exectime=0");
 		long start = System.currentTimeMillis();
@@ -404,7 +404,7 @@ public class MyTest extends TestCase {
 	}
 
 	public void testDump() throws Exception {
-		Class.forName("de.luisoft.db.DBProxyDriver");
+		Class.forName("de.luisoft.jdbcspy.DBProxyDriver");
 		Connection c = DriverManager.getConnection(
 			"proxy:db:xxy&rscnt=1&itertime=0&exectime=0");
 
