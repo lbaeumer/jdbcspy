@@ -40,7 +40,7 @@ public final class ClientProperties {
     private static final Log mTrace = LogFactory.getLog(ClientProperties.class);
 
     /** the db init file */
-    private static final String DBINIT_FILE = "/de/luisoft/db/dbinit.xml";
+    private static final String DBINIT_FILE = "/de/luisoft/jdbcspy/dbinit.xml";
 
     /** enable the proxy */
     public static final String DB_ENABLE_PROXY_INITIALLY = "EnableProxyInitially";
