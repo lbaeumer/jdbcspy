@@ -86,6 +86,22 @@ public class MyTest extends TestCase {
 
 	}
 
+	public void minimal() throws Exception {
+		 Class.forName("de.luisoft.jdbcspy.DBProxyDriver");
+	        Connection c = DriverManager.getConnection(
+	                "proxy:mytestdb&rscnt=100&itertime=1000&exectime=500");
+
+	        PreparedStatement p = c.prepareStatement("select * from test");
+	        ResultSet rs = p.executeQuery();
+
+	        while (rs.next()) {
+	                // read result set
+	        }
+	        rs.close();
+	        p.close();
+	        c.close();
+	}
+
 	public void testStmtWith1000000rs() throws Exception {
 		int cnt = 1000000;
 		Class.forName("de.luisoft.jdbcspy.DBProxyDriver");
