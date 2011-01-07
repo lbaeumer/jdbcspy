@@ -248,4 +248,28 @@ public class MyStatement implements Statement {
 		
 	}
 
+	public boolean isWrapperFor(Class arg0) throws SQLException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	public Object unwrap(Class arg0) throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public boolean isClosed() throws SQLException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	public boolean isPoolable() throws SQLException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	public void setPoolable(boolean poolable) throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
 }

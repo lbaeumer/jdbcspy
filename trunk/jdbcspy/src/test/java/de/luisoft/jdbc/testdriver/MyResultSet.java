@@ -8,11 +8,14 @@ import java.sql.Array;
 import java.sql.Blob;
 import java.sql.Clob;
 import java.sql.Date;
+import java.sql.NClob;
 import java.sql.Ref;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
+import java.sql.RowId;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
+import java.sql.SQLXML;
 import java.sql.Statement;
 import java.sql.Time;
 import java.sql.Timestamp;
@@ -750,4 +753,275 @@ public class MyResultSet implements ResultSet {
 		return false;
 	}
 
+	public boolean isWrapperFor(Class arg0) throws SQLException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	public Object unwrap(Class arg0) throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public int getHoldability() throws SQLException {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	public Reader getNCharacterStream(int arg0) throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Reader getNCharacterStream(String arg0) throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public NClob getNClob(int arg0) throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public NClob getNClob(String arg0) throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public String getNString(int arg0) throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public String getNString(String arg0) throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public RowId getRowId(int arg0) throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public RowId getRowId(String arg0) throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public SQLXML getSQLXML(int arg0) throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public SQLXML getSQLXML(String arg0) throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public boolean isClosed() throws SQLException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	public void updateAsciiStream(int arg0, InputStream arg1, long arg2)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void updateAsciiStream(int arg0, InputStream arg1)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void updateAsciiStream(String arg0, InputStream arg1, long arg2)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void updateAsciiStream(String arg0, InputStream arg1)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void updateBinaryStream(int arg0, InputStream arg1, long arg2)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void updateBinaryStream(int arg0, InputStream arg1)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void updateBinaryStream(String arg0, InputStream arg1, long arg2)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void updateBinaryStream(String arg0, InputStream arg1)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void updateBlob(int arg0, InputStream arg1, long arg2)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void updateBlob(int arg0, InputStream arg1) throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void updateBlob(String arg0, InputStream arg1, long arg2)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void updateBlob(String arg0, InputStream arg1) throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void updateCharacterStream(int arg0, Reader arg1, long arg2)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void updateCharacterStream(int arg0, Reader arg1)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void updateCharacterStream(String arg0, Reader arg1, long arg2)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void updateCharacterStream(String arg0, Reader arg1)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void updateClob(int arg0, Reader arg1, long arg2)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void updateClob(int arg0, Reader arg1) throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void updateClob(String arg0, Reader arg1, long arg2)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void updateClob(String arg0, Reader arg1) throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void updateNCharacterStream(int arg0, Reader arg1, long arg2)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void updateNCharacterStream(int arg0, Reader arg1)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void updateNCharacterStream(String arg0, Reader arg1, long arg2)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void updateNCharacterStream(String arg0, Reader arg1)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void updateNClob(int arg0, NClob arg1) throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void updateNClob(int arg0, Reader arg1, long arg2)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void updateNClob(int arg0, Reader arg1) throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void updateNClob(String arg0, NClob arg1) throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void updateNClob(String arg0, Reader arg1, long arg2)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void updateNClob(String arg0, Reader arg1) throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void updateNString(int arg0, String arg1) throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void updateNString(String arg0, String arg1) throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void updateRowId(int arg0, RowId arg1) throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void updateRowId(String arg0, RowId arg1) throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void updateSQLXML(int arg0, SQLXML arg1) throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void updateSQLXML(String arg0, SQLXML arg1) throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
 }
