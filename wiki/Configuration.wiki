@@ -24,8 +24,7 @@ There are several properties to control the execution and to manage the data tha
 ||IgnoreNotClosedObjects||ignore result sets or statements that  are not closed||boolean||
 ||IgnoreDoubleClosedObjects||ignore result sets or statements that are not closed more than one time||boolean||
 ||EnableSizeEvaluation||enable the size evaluation||boolean||
-||StmtDebugClassExp||display statement if class.method:linenumber
-matched by any of the regular expressions||list of regular expression||
+||StmtDebugClassExp||display statement if class.method:linenumber matched by any of the regular expressions||list of regular expression||
 ||StmtHistorizeClassExp||display statement if class.method:linenumber matched by any of the regular expressions||list of regular expression||
 ||StmtDebugSQLExp||display statement if the SQL statement is matched by any of the regular expressions<br>e.g. .*\sget\sall\smes\s.* will filter all SQL statements that contain the string ' get all mes '.||list of regular expression||
 ||StmtHistorizeSQLExp||display statement if the SQL statement is matched by any of the regular expressions<br>e.g. .*\sget\sall\smes\s.* will filter all SQL statements that contain the string ' get all mes '.||list of regular expression||
