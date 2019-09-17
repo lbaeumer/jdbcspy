@@ -5,7 +5,9 @@ import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.DriverPropertyInfo;
 import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 public class MyDriver implements Driver {
 
@@ -74,5 +76,11 @@ public class MyDriver implements Driver {
 	public boolean jdbcCompliant() {
 		// TODO Auto-generated method stub
 		return true;
+	}
+
+	@Override
+	public Logger getParentLogger() throws SQLFeatureNotSupportedException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

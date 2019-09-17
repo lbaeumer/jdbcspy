@@ -272,4 +272,16 @@ public class MyStatement implements Statement {
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public void closeOnCompletion() throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean isCloseOnCompletion() throws SQLException {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }
