@@ -4,32 +4,21 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
-import junit.framework.TestCase;
-import de.luisoft.jdbcspy.ProxyConnection;
+import org.junit.Assert;
+import org.junit.Test;
+
 import de.luisoft.jdbcspy.proxy.StatementStatistics;
 
 /**
  * Some simple tests.
  *
  */
-public abstract class AbstractStatementTest extends TestCase {
+public abstract class AbstractStatementTest {
 
-    private Connection conn;
+    protected Connection conn;
     private static final boolean debug = false;
-    
-    public AbstractStatementTest(String name) {
-        super(name);
-    }
 
-    protected void setUp(Connection conn) throws Exception {
-    	this.conn = conn;
-    }
-
-    protected void tearDown(Connection conn) throws Exception {
-    	this.conn = conn;
-    	conn.close();
-    }
-
+    @Test
 	public void testExecute() throws Exception {
 		int cnt=10;
     	long start = System.currentTimeMillis();
@@ -43,15 +32,15 @@ public abstract class AbstractStatementTest extends TestCase {
         			&& conn instanceof ProxyConnection) {
         		StatementStatistics st = (StatementStatistics) s;
         		System.out.println(i + ":" + s);
-        		assertTrue("exec time must be 1000 != "
+        		Assert.assertTrue("exec time must be 1000 != "
         				+ st.getExecutionTime(),
         				Math.abs(st.getExecutionTime() - 1000) < 10);
-        		assertTrue("#items must be 0!=" + st.getItemCount(),
+        		Assert.assertTrue("#items must be 0!=" + st.getItemCount(),
         				st.getItemCount() == 0);
-        		assertTrue("duration must be equal execution time " 
+        		Assert.assertTrue("duration must be equal execution time " 
         				+ st.getExecutionTime() + "!=" + st.getDuration(),
         				st.getExecutionTime() == st.getDuration());
-        		assertTrue(b);
+        		Assert.assertTrue(b);
         	}
     	}
 
@@ -60,6 +49,7 @@ public abstract class AbstractStatementTest extends TestCase {
        	System.out.println(1000*(end-start-cnt*1000)/cnt + "ms/1000stmts");
     }
 
+    @Test
 	public void testExecuteQuery() throws Exception {
 		int cnt=10;
 		int sleep = 100;
@@ -80,13 +70,13 @@ public abstract class AbstractStatementTest extends TestCase {
         			&& conn instanceof ProxyConnection) {
         		StatementStatistics st = (StatementStatistics) s;
         		System.out.println(i + ":" + s);
-        		assertTrue("exec time must be 1000 !="
+        		Assert.assertTrue("exec time must be 1000 !="
         				+ st.getExecutionTime(),
         				Math.abs(st.getExecutionTime() - 1000) < 10);
-        		assertTrue("#items must be " + rsCount
+        		Assert.assertTrue("#items must be " + rsCount
         				+ "!=" + st.getItemCount(),
         				st.getItemCount() == rsCount);
-        		assertTrue("duration must be greater execution time " 
+        		Assert.assertTrue("duration must be greater execution time " 
         				+ st.getExecutionTime() + "!=" + st.getDuration(),
         				st.getDuration() - st.getExecutionTime() <= 7);
         	}
@@ -96,7 +86,9 @@ public abstract class AbstractStatementTest extends TestCase {
         System.out.println("executeQuery: total time=" + (end-start) + "ms");
        	System.out.println(1000*(end-start-cnt*sleep)/cnt + "ms/1000stmts");
     }
-	public void testExecuteQueryRSDelay() throws Exception {
+
+    @Test
+    public void testExecuteQueryRSDelay() throws Exception {
 		int cnt=10;
 		int sleep = 100;
 		int rsCount = 100;
@@ -119,13 +111,13 @@ public abstract class AbstractStatementTest extends TestCase {
         			&& conn instanceof ProxyConnection) {
         		StatementStatistics st = (StatementStatistics) s;
         		System.out.println(i + ":" + s);
-        		assertTrue("exec time must be " + sleep + "!="
+        		Assert.assertTrue("exec time must be " + sleep + "!="
         				+ st.getExecutionTime(),
         				Math.abs(st.getExecutionTime() - sleep) < 10);
-        		assertTrue("#items must be " + rsCount
+        		Assert.assertTrue("#items must be " + rsCount
         				+ "!=" + st.getItemCount(),
         				st.getItemCount() == rsCount);
-        		assertTrue("duration must be greater execution time " 
+        		Assert.assertTrue("duration must be greater execution time " 
         				+ st.getExecutionTime() + "!=" + st.getDuration(),
         				st.getDuration() - (st.getExecutionTime()+cnt*delay*rsCount) <= 5);
         	}
@@ -136,6 +128,7 @@ public abstract class AbstractStatementTest extends TestCase {
        	System.out.println(1000*(end-start-cnt*sleep-cnt*rsCount*delay)/cnt + "ms/1000stmts");
     }
 
+    @Test
 	public void testExecuteRsQuery() throws Exception {
 		int cnt=1;
 		int rsCount = 100000;
@@ -156,7 +149,7 @@ public abstract class AbstractStatementTest extends TestCase {
         			&& conn instanceof ProxyConnection) {
         		StatementStatistics st = (StatementStatistics) s;
         		System.out.println(i + ":" + s);
-        		assertTrue("#items must be " + rsCount
+        		Assert.assertTrue("#items must be " + rsCount
         				+ "!=" + st.getItemCount(),
         				st.getItemCount() == rsCount);
         	}

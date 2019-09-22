@@ -5,13 +5,14 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-import junit.framework.Assert;
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.Test;
+
 import de.luisoft.jdbcspy.proxy.ConnectionStatistics;
 import de.luisoft.jdbcspy.proxy.ResultSetStatistics;
 import de.luisoft.jdbcspy.proxy.StatementStatistics;
 
-public class MyTest extends TestCase {
+public class MyTest {
 
 	private static final int MAX_OVERHEAD = 80;  // resultsets/ms
 	private static final int MIN_OVERHEAD = 140;  // resultsets/ms
@@ -19,11 +20,7 @@ public class MyTest extends TestCase {
 	private static final int MAX_PST_OVERHEAD = 800;  // prepared stmt/s
 	private static final int MIN_PST_OVERHEAD = 1200;  // prepared stmt/s
 
-	public MyTest(String name) {
-		super(name);
-		// TODO Auto-generated constructor stub
-	}
-
+	@Test
 	public void testStmtWith100000rsa() throws Exception {
 		int cnt = 100000;
 		Class.forName("de.luisoft.jdbcspy.DBProxyDriver");
@@ -86,6 +83,7 @@ public class MyTest extends TestCase {
 
 	}
 
+	@Test
 	public void minimal() throws Exception {
 		 Class.forName("de.luisoft.jdbcspy.DBProxyDriver");
 	        Connection c = DriverManager.getConnection(
@@ -102,6 +100,7 @@ public class MyTest extends TestCase {
 	        c.close();
 	}
 
+	@Test
 	public void testStmtWith1000000rs() throws Exception {
 		int cnt = 1000000;
 		Class.forName("de.luisoft.jdbcspy.DBProxyDriver");
@@ -141,6 +140,7 @@ public class MyTest extends TestCase {
 		Assert.assertTrue("time is " + end, Math.abs(end-1500) >= cnt/150);
 	}
 
+	@Test
 	public void testStmtWith100000rs() throws Exception {
 		int cnt = 100000;
 		Class.forName("de.luisoft.jdbcspy.DBProxyDriver");
@@ -180,6 +180,7 @@ public class MyTest extends TestCase {
 		Assert.assertTrue("time is " + end, Math.abs(end-1500) >= cnt/150);
 	}
 
+	@Test
 	public void testStmtWith10000rs() throws Exception {
 		int cnt = 10000;
 		Class.forName("de.luisoft.jdbcspy.DBProxyDriver");
@@ -218,6 +219,7 @@ public class MyTest extends TestCase {
 		Assert.assertTrue("time is " + end, Math.abs(end-1500) >= cnt/150);
 	}
 
+	@Test
 	public void testStmtWith100rs() throws Exception {
 		int cnt = 100;
 		Class.forName("de.luisoft.jdbcspy.DBProxyDriver");
@@ -252,6 +254,7 @@ public class MyTest extends TestCase {
 			 && end - 1500 < cnt/10);
 	}
 
+	@Test
 	public void test100StmtWith1rs() throws Exception {
 		Class.forName("de.luisoft.jdbcspy.DBProxyDriver");
 		Connection c = DriverManager.getConnection(
@@ -292,6 +295,7 @@ public class MyTest extends TestCase {
 
 	}
 
+	@Test
 	public void test10000StmtWith1rs() throws Exception {
 		Class.forName("de.luisoft.jdbcspy.DBProxyDriver");
 		Connection c = DriverManager.getConnection(
@@ -332,6 +336,7 @@ public class MyTest extends TestCase {
 
 	}
 
+	@Test
 	public void test10000StmtWith1rs2() throws Exception {
 		Class.forName("de.luisoft.jdbcspy.DBProxyDriver");
 		Connection c = DriverManager.getConnection(
@@ -373,6 +378,7 @@ public class MyTest extends TestCase {
 
 	}
 
+	@Test
 	public void test10000StmtWith1rs3() throws Exception {
 		Class.forName("de.luisoft.jdbcspy.DBProxyDriver");
 		Connection c = DriverManager.getConnection(
@@ -419,6 +425,7 @@ public class MyTest extends TestCase {
 
 	}
 
+	@Test
 	public void testDump() throws Exception {
 		Class.forName("de.luisoft.jdbcspy.DBProxyDriver");
 		Connection c = DriverManager.getConnection(

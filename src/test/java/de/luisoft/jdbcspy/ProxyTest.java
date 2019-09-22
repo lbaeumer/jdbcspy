@@ -6,41 +6,35 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
 import de.luisoft.jdbc.testdriver.MyConnection;
-import de.luisoft.jdbcspy.ConnectionFactory;
-import de.luisoft.jdbcspy.ProxyConnection;
 
 /**
  * Some simple tests.
  *
  */
-public class ProxyTest extends TestCase {
+public class ProxyTest {
 
     Connection conn;
     ProxyConnection proxyConn;
     ConnectionFactory connFac;
-    
-    public ProxyTest(String name) {
-        super(name);
-    }
 
-    public static Test suite() {
-        return new TestSuite(ProxyTest.class);
-    }
-
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
     	conn = new MyConnection(10000, 0, 0);
     	connFac = new ConnectionFactory();
     	proxyConn = (ProxyConnection) connFac.getConnection(conn);
     }
 
-    protected void tearDown() throws Exception {
+    @After
+    public void tearDown() throws Exception {
     	System.out.println(connFac.dumpStatistics());
     }
 
+    @Test
     public void testExecute() throws Exception {
     	int cnt = 10000;
     	System.out.println("execute(" + cnt + ") statements");
@@ -76,6 +70,7 @@ public class ProxyTest extends TestCase {
         return (end-start);
     }
     
+    @Test
     public void testExecutePrep() throws Exception {
     	int cnt = 10000;
     	System.out.println("executePrep(" + cnt + ") statements");
@@ -112,6 +107,7 @@ public class ProxyTest extends TestCase {
         return end-start;
     }
     
+    @Test
     public void testExecuteQuery() throws Exception {
 
     	int cnt = 100000;
@@ -151,6 +147,7 @@ public class ProxyTest extends TestCase {
         }
     }
 
+    @Test
     public void testExecutePrepQuery() throws Exception {
 
     	int cnt = 10000;
