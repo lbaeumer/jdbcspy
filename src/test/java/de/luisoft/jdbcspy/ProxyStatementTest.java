@@ -11,18 +11,18 @@ import de.luisoft.jdbc.testdriver.MyConnection;
  */
 public class ProxyStatementTest extends AbstractStatementTest {
 
-    ProxyConnection proxyConn;
-    ConnectionFactory connFac;
-    
-    @Before
-    public void setUp() throws Exception {
-    	conn = new MyConnection(10000, 1000, 5000);
-    	connFac = new ConnectionFactory();
-    	proxyConn = (ProxyConnection) connFac.getConnection(conn);
-    }
+	ProxyConnection proxyConn;
+	ConnectionFactory connFac;
 
-    @After
-    public void tearDown() throws Exception {
-    	proxyConn.close();
-    }
+	@Before
+	public void setUp() throws Exception {
+		conn = new MyConnection(10000, 1000, 5000);
+		connFac = new ConnectionFactory();
+		proxyConn = (ProxyConnection) connFac.getConnection(conn);
+	}
+
+	@After
+	public void tearDown() throws Exception {
+		proxyConn.close();
+	}
 }

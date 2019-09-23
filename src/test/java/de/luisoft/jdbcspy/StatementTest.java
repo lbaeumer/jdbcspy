@@ -12,12 +12,12 @@ import de.luisoft.jdbc.testdriver.MyConnection;
 public class StatementTest extends AbstractStatementTest {
 
 	@Before
-    public void setUp() throws Exception {
-    	conn = new MyConnection(10000, 1000, 5000);
-    }
+	public void setUp() throws Exception {
+		conn = new MyConnection(10000, 1000, 5000);
+	}
 
 	@After
-    public void tearDown() throws Exception {
-    	conn.close();
-    }
+	public void tearDown() throws Exception {
+		conn.close();
+	}
 }

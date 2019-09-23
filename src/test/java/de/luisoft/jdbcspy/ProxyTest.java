@@ -18,172 +18,172 @@ import de.luisoft.jdbc.testdriver.MyConnection;
  */
 public class ProxyTest {
 
-    Connection conn;
-    ProxyConnection proxyConn;
-    ConnectionFactory connFac;
+	Connection conn;
+	ProxyConnection proxyConn;
+	ConnectionFactory connFac;
 
-    @Before
-    public void setUp() throws Exception {
-    	conn = new MyConnection(10000, 0, 0);
-    	connFac = new ConnectionFactory();
-    	proxyConn = (ProxyConnection) connFac.getConnection(conn);
-    }
+	@Before
+	public void setUp() throws Exception {
+		conn = new MyConnection(10000, 0, 0);
+		connFac = new ConnectionFactory();
+		proxyConn = (ProxyConnection) connFac.getConnection(conn);
+	}
 
-    @After
-    public void tearDown() throws Exception {
-    	System.out.println(connFac.dumpStatistics());
-    }
+	@After
+	public void tearDown() throws Exception {
+		System.out.println(connFac.dumpStatistics());
+	}
 
-    @Test
-    public void testExecute() throws Exception {
-    	int cnt = 10000;
-    	System.out.println("execute(" + cnt + ") statements");
+	@Test
+	public void testExecute() throws Exception {
+		int cnt = 10000;
+		System.out.println("execute(" + cnt + ") statements");
 
-    	long l1 = execute(conn, cnt);
-    	conn.close();
+		long l1 = execute(conn, cnt);
+		conn.close();
 
-    	long l2 = execute(proxyConn, cnt);
-    	proxyConn.close();
+		long l2 = execute(proxyConn, cnt);
+		proxyConn.close();
 
-    	System.out.println((1000*(proxyConn.getDuration()-l1)/cnt)+"ms/1000rs dur. overhead");
-    	System.out.println(proxyConn.dump());
-    	System.out.println("finished execute()");
-    	System.out.println("\n*****************************************");
-    }
+		System.out.println((1000 * (proxyConn.getDuration() - l1) / cnt) + "ms/1000rs dur. overhead");
+		System.out.println(proxyConn.dump());
+		System.out.println("finished execute()");
+		System.out.println("\n*****************************************");
+	}
 
-    private long execute(Connection conn, int cnt) throws SQLException {
-    	long start = System.currentTimeMillis();
+	private long execute(Connection conn, int cnt) throws SQLException {
+		long start = System.currentTimeMillis();
 
-    	for (int i = 0; i < cnt; i++) {
-        	Statement s = conn.createStatement();         
-            s.execute("select * from ? ");
-        	s.close();
-    	}
+		for (int i = 0; i < cnt; i++) {
+			Statement s = conn.createStatement();
+			s.execute("select * from ? ");
+			s.close();
+		}
 
-    	long end = System.currentTimeMillis();
-        System.out.println((end-start) + "ms");
+		long end = System.currentTimeMillis();
+		System.out.println((end - start) + "ms");
 
-        if (conn instanceof ProxyConnection) {
-        	System.out.println(1000*(end-start)/cnt + "ms/1000stmts");
-        }
-        
-        return (end-start);
-    }
-    
-    @Test
-    public void testExecutePrep() throws Exception {
-    	int cnt = 10000;
-    	System.out.println("executePrep(" + cnt + ") statements");
+		if (conn instanceof ProxyConnection) {
+			System.out.println(1000 * (end - start) / cnt + "ms/1000stmts");
+		}
 
-    	long l1 = executePrepQuery(conn, cnt);
-    	conn.close();
+		return (end - start);
+	}
 
-    	long l2 = executePrepQuery(proxyConn, cnt);
-    	proxyConn.close();
+	@Test
+	public void testExecutePrep() throws Exception {
+		int cnt = 10000;
+		System.out.println("executePrep(" + cnt + ") statements");
 
-    	System.out.println((1000*(proxyConn.getDuration()-l1)/cnt)+"ms/1000rs dur. overhead");
-    	System.out.println(proxyConn.dump());
-    	System.out.println("finished execute()");
-    	System.out.println("\n*****************************************");
-    }
+		long l1 = executePrepQuery(conn, cnt);
+		conn.close();
 
-    private long executePrepQuery(Connection conn, int cnt) throws SQLException {
-    	long start = System.currentTimeMillis();
+		long l2 = executePrepQuery(proxyConn, cnt);
+		proxyConn.close();
 
-    	PreparedStatement s = conn.prepareStatement("select * from ? ");         
-    	for (int i = 0; i < cnt; i++) {
-    		s.setInt(1, i);
-            s.execute();
-        	s.close();
-    	}
+		System.out.println((1000 * (proxyConn.getDuration() - l1) / cnt) + "ms/1000rs dur. overhead");
+		System.out.println(proxyConn.dump());
+		System.out.println("finished execute()");
+		System.out.println("\n*****************************************");
+	}
 
-    	long end = System.currentTimeMillis();
-        System.out.println((end-start) + "ms");
+	private long executePrepQuery(Connection conn, int cnt) throws SQLException {
+		long start = System.currentTimeMillis();
 
-        if (conn instanceof ProxyConnection) {
-        	System.out.println(1000*(end-start)/cnt + "ms/1000stmts");
-        }
-        
-        return end-start;
-    }
-    
-    @Test
-    public void testExecuteQuery() throws Exception {
+		PreparedStatement s = conn.prepareStatement("select * from ? ");
+		for (int i = 0; i < cnt; i++) {
+			s.setInt(1, i);
+			s.execute();
+			s.close();
+		}
 
-    	int cnt = 100000;
-    	System.out.println("executeQuery with (" + cnt + ") resultsets");
+		long end = System.currentTimeMillis();
+		System.out.println((end - start) + "ms");
 
-    	executeQuery(conn, cnt);
-    	conn.close();
+		if (conn instanceof ProxyConnection) {
+			System.out.println(1000 * (end - start) / cnt + "ms/1000stmts");
+		}
 
-        executeQuery(proxyConn, cnt);
-    	proxyConn.close();
+		return end - start;
+	}
 
-    	System.out.println(proxyConn.dump());
-    	System.out.println("finished executeQuery()");
-    	System.out.println("\n*****************************************");
-    }
-    
-    private void executeQuery(Connection conn, int cnt) throws SQLException {
+	@Test
+	public void testExecuteQuery() throws Exception {
 
-    	Statement s = conn.createStatement();         
+		int cnt = 100000;
+		System.out.println("executeQuery with (" + cnt + ") resultsets");
 
-    	long start = System.currentTimeMillis();
+		executeQuery(conn, cnt);
+		conn.close();
 
-    	ResultSet r = s.executeQuery(""+cnt);
-        int i = 0;
-        while (r.next()) {
-        	i++;
-        	r.getInt(1);
-        }
-        r.close();
-        long end = System.currentTimeMillis();
-        System.out.println((end-start) + "ms");
-        s.close();
+		executeQuery(proxyConn, cnt);
+		proxyConn.close();
 
-        if (conn instanceof ProxyConnection) {
-        	System.out.println(s);
-        	System.out.println(1000*(end-start)/cnt + "ms/1000rows");
-        }
-    }
+		System.out.println(proxyConn.dump());
+		System.out.println("finished executeQuery()");
+		System.out.println("\n*****************************************");
+	}
 
-    @Test
-    public void testExecutePrepQuery() throws Exception {
+	private void executeQuery(Connection conn, int cnt) throws SQLException {
 
-    	int cnt = 10000;
-    	System.out.println("updatePrepQuery(" + cnt + ") * update");
+		Statement s = conn.createStatement();
 
-    	updatePrepQuery(conn, cnt);
-    	conn.close();
+		long start = System.currentTimeMillis();
 
-        updatePrepQuery(proxyConn, cnt);
-    	proxyConn.close();
+		ResultSet r = s.executeQuery("" + cnt);
+		int i = 0;
+		while (r.next()) {
+			i++;
+			r.getInt(1);
+		}
+		r.close();
+		long end = System.currentTimeMillis();
+		System.out.println((end - start) + "ms");
+		s.close();
 
-    	System.out.println(proxyConn.dump());
-    	System.out.println("finished updatePrepQuery()");
-    	System.out.println("\n*****************************************");
-    	
-    }
-    
-    private void updatePrepQuery(Connection conn, int cnt) throws SQLException {
+		if (conn instanceof ProxyConnection) {
+			System.out.println(s);
+			System.out.println(1000 * (end - start) / cnt + "ms/1000rows");
+		}
+	}
 
-    	PreparedStatement s = conn.prepareStatement("select ?, ?");         
+	@Test
+	public void testExecutePrepQuery() throws Exception {
 
-    	long start = System.currentTimeMillis();
+		int cnt = 10000;
+		System.out.println("updatePrepQuery(" + cnt + ") * update");
 
-    	for (int i = 0; i < cnt; i++) {
-    		s.setInt(1, i);
-    		s.setInt(2, i);
-    		s.executeUpdate();
-    	}
+		updatePrepQuery(conn, cnt);
+		conn.close();
 
-        long end = System.currentTimeMillis();
-        System.out.println((end-start) + "ms");
-        s.close();
+		updatePrepQuery(proxyConn, cnt);
+		proxyConn.close();
 
-        if (conn instanceof ProxyConnection) {
-        	System.out.println(s);
-        	System.out.println(1000*(end-start)/cnt + "ms/1000rows");
-        }
-    }
+		System.out.println(proxyConn.dump());
+		System.out.println("finished updatePrepQuery()");
+		System.out.println("\n*****************************************");
+
+	}
+
+	private void updatePrepQuery(Connection conn, int cnt) throws SQLException {
+
+		PreparedStatement s = conn.prepareStatement("select ?, ?");
+
+		long start = System.currentTimeMillis();
+
+		for (int i = 0; i < cnt; i++) {
+			s.setInt(1, i);
+			s.setInt(2, i);
+			s.executeUpdate();
+		}
+
+		long end = System.currentTimeMillis();
+		System.out.println((end - start) + "ms");
+		s.close();
+
+		if (conn instanceof ProxyConnection) {
+			System.out.println(s);
+			System.out.println(1000 * (end - start) / cnt + "ms/1000rows");
+		}
+	}
 }

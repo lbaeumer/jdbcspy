@@ -14,18 +14,19 @@ public class MyDriver implements Driver {
 	static {
 		try {
 			System.out.println("register MyDriver");
-		    DriverManager.registerDriver(new MyDriver());
+			DriverManager.registerDriver(new MyDriver());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
+
+	@Override
 	public boolean acceptsURL(String arg0) throws SQLException {
-		// TODO Auto-generated method stub
 		return true;
 	}
 
+	@Override
 	public Connection connect(String url, Properties arg1) throws SQLException {
-		// TODO Auto-generated method stub
 		int rscnt = 100;
 		int itertime = 1000;
 		int exectime = 1000;
@@ -57,30 +58,28 @@ public class MyDriver implements Driver {
 		return c;
 	}
 
+	@Override
 	public int getMajorVersion() {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
+	@Override
 	public int getMinorVersion() {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
-	public DriverPropertyInfo[] getPropertyInfo(String arg0, Properties arg1)
-			throws SQLException {
-		// TODO Auto-generated method stub
+	@Override
+	public DriverPropertyInfo[] getPropertyInfo(String arg0, Properties arg1) throws SQLException {
 		return null;
 	}
 
+	@Override
 	public boolean jdbcCompliant() {
-		// TODO Auto-generated method stub
 		return true;
 	}
 
 	@Override
 	public Logger getParentLogger() throws SQLFeatureNotSupportedException {
-		// TODO Auto-generated method stub
 		return null;
 	}
 }

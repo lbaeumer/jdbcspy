@@ -3,7 +3,6 @@ package de.luisoft.jdbcspy.proxy.listener.impl;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
@@ -12,7 +11,6 @@ import java.util.TreeSet;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import de.luisoft.jdbcspy.ClientProperties;
 import de.luisoft.jdbcspy.proxy.StatementStatistics;
 import de.luisoft.jdbcspy.proxy.listener.CloseEvent;
 import de.luisoft.jdbcspy.proxy.listener.ExecutionAdapter;
@@ -21,48 +19,42 @@ import de.luisoft.jdbcspy.proxy.util.Utils;
 
 /**
  * The Execution checker.
- * <p>Title: </p>
- * <p>Description: </p>
- * <p>Copyright: Copyright (c) 2004</p>
- * <p>Company: </p>
- * @author Lui Baeumer
- * @version $Id$
  */
 public class ExecutionTimeListener extends ExecutionAdapter {
 
-    /** the logger object for tracing */
-    private static final Log mTrace =
-        LogFactory.getLog(ExecutionTimeListener.class);
+	/** the logger object for tracing */
+	private static final Log mTrace = LogFactory.getLog(ExecutionTimeListener.class);
 
-    /** max history */
-    private static final int MAX_HISTORY = 15;
+	/** max history */
+	private static final int MAX_HISTORY = 15;
 
-    /** the time map */
-    private Map mRunningStmts = new HashMap();
+	/** the time map */
+	private Map<StatementStatistics, Integer> mRunningStmts = new HashMap<>();
 
-    /** the statements that are executed but not closed */
-    private Map mWaiting = new HashMap();
+	/** the statements that are executed but not closed */
+	private Map<StatementStatistics, Integer> mWaiting = new HashMap<>();
 
-    /** the history map */
-    private SortedSet mHistorySet = new TreeSet(new Comparator() {
-        public int compare(Object o1, Object o2) {
-            Entry l1 = (Entry) o1;
-            Entry l2 = (Entry) o2;
-            long c = (l2.duration - l1.duration);
-            if (c > 0) {
-                return 1;
-            }
-            if (c < 0) {
-                return -1;
-            }
-            return l1.stmt.compareTo(l2.stmt);
-        }
-    });
+	private Utils utils = new Utils();
 
-    private Runnable r;
-    private int longExecutionThreshold;
+	/** the history map */
+	private SortedSet<Entry> mHistorySet = new TreeSet<>(new Comparator<Entry>() {
+		@Override
+		public int compare(Entry l1, Entry l2) {
+			long c = (l2.duration - l1.duration);
+			if (c > 0) {
+				return 1;
+			}
+			if (c < 0) {
+				return -1;
+			}
+			return l1.stmt.compareTo(l2.stmt);
+		}
+	});
 
-    public int getLongExecutionThreshold() {
+	private Runnable r;
+	private int longExecutionThreshold;
+
+	public int getLongExecutionThreshold() {
 		return longExecutionThreshold;
 	}
 
@@ -71,235 +63,227 @@ public class ExecutionTimeListener extends ExecutionAdapter {
 	}
 
 	/**
-     * @see de.luisoft.jdbcspy.proxy.listener.ExecutionListener#startExecution
-     */
-    public void startExecution(ExecutionEvent event) {
-    	if (r == null) {
-            r = new Runnable() {
-                public void run() {
-                    Set loopSet = new TreeSet(new Comparator() {
-                        public int compare(Object o1, Object o2) {
-                            Map.Entry e1 = (Map.Entry) o1;
-                            Map.Entry e2 = (Map.Entry) o2;
+	 * @see de.luisoft.jdbcspy.proxy.listener.ExecutionListener#startExecution
+	 */
+	@Override
+	public void startExecution(ExecutionEvent event) {
+		if (r == null) {
+			r = new Runnable() {
+				@Override
+				public void run() {
+					Set<Map.Entry<StatementStatistics, Integer>> loopSet = new TreeSet<>(
+							new Comparator<Map.Entry<StatementStatistics, Integer>>() {
+								@Override
+								public int compare(Map.Entry<StatementStatistics, Integer> e1,
+										Map.Entry<StatementStatistics, Integer> e2) {
+									StatementStatistics stmt1 = e1.getKey();
+									StatementStatistics stmt2 = e2.getKey();
 
-                            StatementStatistics stmt1 = (StatementStatistics) e1.getKey();
-                            StatementStatistics stmt2 = (StatementStatistics) e2.getKey();
+									return (int) (stmt2.getExecutionStartTime() - stmt1.getExecutionStartTime());
+								}
+							});
 
-                            return (int) (stmt2.getExecutionStartTime()
-                                - stmt1.getExecutionStartTime());
-                        }
-                    });
+					while (true) {
+						try {
+							Thread.sleep(60000); // 1 min
+							Date now = new Date();
 
-                    while (true) {
-                        try {
-                            Thread.sleep(60000); // 1 min
-                            Date now = new Date();
+							loopSet.clear();
+							synchronized (mRunningStmts) {
+								loopSet.addAll(mRunningStmts.entrySet());
+							}
 
-                            loopSet.clear();
-                            synchronized (mRunningStmts) {
-                                loopSet.addAll(mRunningStmts.entrySet());
-                            }
+							for (Map.Entry<StatementStatistics, Integer> entry : loopSet) {
 
-                            for (Iterator it = loopSet.iterator(); it.hasNext(); ) {
-                                Map.Entry entry = (Map.Entry) it.next();
+								StatementStatistics stmt = entry.getKey();
+								int loop = entry.getValue().intValue();
 
-                                StatementStatistics stmt = (StatementStatistics) entry.getKey();
-                                int loop = ((Integer) entry.getValue()).intValue();
+								int wait;
+								switch (loop) {
+								case 1:
+									wait = 1;
+									break;
+								case 2:
+									wait = 2;
+									break;
+								case 3:
+									wait = 3;
+									break;
+								case 4:
+									wait = 5;
+									break;
+								case 5:
+									wait = 10;
+									break;
+								case 6:
+									wait = 15;
+									break;
+								case 7:
+									wait = 20;
+									break;
+								case 8:
+									wait = 25;
+									break;
+								case 9:
+									wait = 30;
+									break;
+								case 10:
+									wait = 45;
+									break;
+								default: {
+									wait = (loop <= 15 ? 60 * (loop - 10) : 120 * (loop - 13));
+								}
+								}
 
-                                int wait;
-                                switch (loop) {
-                                    case 1:
-                                        wait = 1;
-                                        break;
-                                    case 2:
-                                        wait = 2;
-                                        break;
-                                    case 3:
-                                        wait = 3;
-                                        break;
-                                    case 4:
-                                        wait = 5;
-                                        break;
-                                    case 5:
-                                        wait = 10;
-                                        break;
-                                    case 6:
-                                        wait = 15;
-                                        break;
-                                    case 7:
-                                        wait = 20;
-                                        break;
-                                    case 8:
-                                        wait = 25;
-                                        break;
-                                    case 9:
-                                        wait = 30;
-                                        break;
-                                    case 10:
-                                        wait = 45;
-                                        break;
-                                    default: {
-                                        wait = (loop <= 15
-                                            ? 60 * (loop - 10)
-                                            : 120 * (loop - 13));
-                                    }
-                                }
+								long execTime = (now.getTime() - stmt.getExecutionStartTime());
+								if (execTime > longExecutionThreshold * wait) {
+									entry.setValue(new Integer(loop + 1));
+									printMessage(stmt.getSQL(), loop, execTime, false, stmt.getExecuteCaller());
+								}
+							}
+						} catch (Exception e) {
+							mTrace.warn("failed ", e);
+						}
+					}
+				}
+			};
+			Thread t = new Thread(r, "CheckLongExecThread");
+			t.setDaemon(true);
+			t.start();
+		}
+		synchronized (mRunningStmts) {
+			mRunningStmts.put(event.getStatementStatistics(), new Integer(1));
+		}
+	};
 
-                                long execTime = (now.getTime() - stmt.getExecutionStartTime());
-                                if (execTime > longExecutionThreshold * wait) {
-                                    entry.setValue(new Integer(loop + 1));
-                                    printMessage(stmt.getSQL(), loop, execTime, false,
-                                                 stmt.getExecuteCaller());
-                                }
-                            }
-                        }
-                        catch (Exception e) {
-                            mTrace.warn("failed ", e);
-                        }
-                    }
-                }
-            };
-            Thread t = new Thread(r, "CheckLongExecThread");
-            t.setDaemon(true);
-            t.start();
-    	}
-        synchronized (mRunningStmts) {
-            mRunningStmts.put(event.getStatementStatistics(), new Integer(1));
-        }
-    };
+	/**
+	 * @see de.luisoft.jdbcspy.proxy.listener.ExecutionListener#endExecution
+	 */
+	@Override
+	public void endExecution(ExecutionEvent event) {
+		Integer loop = null;
+		synchronized (mRunningStmts) {
+			loop = mRunningStmts.remove(event.getStatementStatistics());
+		}
+		synchronized (mWaiting) {
+			mWaiting.put(event.getStatementStatistics(), loop);
+		}
+	};
 
-    /**
-     * @see de.luisoft.jdbcspy.proxy.listener.ExecutionListener#endExecution
-     */
-    public void endExecution(ExecutionEvent event) {
-        Integer loop = null;
-        synchronized (mRunningStmts) {
-            loop = (Integer) mRunningStmts.remove(event.getStatementStatistics());
-        }
-        synchronized (mWaiting) {
-            mWaiting.put(event.getStatementStatistics(), loop);
-        }
-    };
+	/**
+	 * @see de.luisoft.jdbcspy.proxy.listener.ExecutionListener#closeStatement
+	 */
+	@Override
+	public void closeStatement(CloseEvent event) {
 
-    /**
-     * @see de.luisoft.jdbcspy.proxy.listener.ExecutionListener#closeStatement
-     */
-    public void closeStatement(CloseEvent event) {
+		StatementStatistics stmt = event.getStatementStatistics();
+		Integer loop = null;
+		synchronized (mWaiting) {
+			loop = mWaiting.remove(stmt);
+		}
+		if (loop != null) {
+			Entry entry = new Entry();
 
-        StatementStatistics stmt = event.getStatementStatistics();
-        Integer loop = null;
-        synchronized (mWaiting) {
-            loop = (Integer) mWaiting.remove(stmt);
-        }
-        if (loop != null) {
-            Entry entry = new Entry();
+			entry.duration = stmt.getDuration();
+			entry.stmt = stmt.toString();
 
-            entry.duration = stmt.getDuration();
-            entry.stmt = stmt.toString();
+			synchronized (mHistorySet) {
+				mHistorySet.add(entry);
+				while (mHistorySet.size() > MAX_HISTORY) {
+					mHistorySet.remove(mHistorySet.last());
+				}
+			}
 
-            synchronized (mHistorySet) {
-                mHistorySet.add(entry);
-                while (mHistorySet.size() > MAX_HISTORY) {
-                    mHistorySet.remove(mHistorySet.last());
-                }
-            }
+			if (loop.intValue() > 1) {
+				printMessage(stmt.getSQL(), loop.intValue(), entry.duration, true, stmt.getExecuteCaller());
+			}
+		}
+	};
 
-            if (loop.intValue() > 1) {
-                printMessage(stmt.getSQL(), loop.intValue(),
-                             entry.duration,
-                             true, stmt.getExecuteCaller());
-            }
-        }
-    };
+	/**
+	 * @see de.luisoft.jdbcspy.proxy.listener.ExecutionListener#clearStatistics
+	 */
+	@Override
+	public void clearStatistics() {
+		synchronized (mRunningStmts) {
+			mRunningStmts.clear();
+		}
+		synchronized (mWaiting) {
+			mWaiting.clear();
+		}
+		synchronized (mHistorySet) {
+			mHistorySet.clear();
+		}
+	}
 
-    /**
-     * @see de.luisoft.jdbcspy.proxy.listener.ExecutionListener#clearStatistics
-     */
-    public void clearStatistics() {
-        synchronized (mRunningStmts) {
-            mRunningStmts.clear();
-        }
-        synchronized (mWaiting) {
-            mWaiting.clear();
-        }
-        synchronized (mHistorySet) {
-            mHistorySet.clear();
-        }
-    }
+	/**
+	 * Print the message.
+	 * 
+	 * @param sql
+	 *            String
+	 * @param loop
+	 *            int
+	 * @param execTime
+	 *            long
+	 * @param finished
+	 *            boolean
+	 * @param method
+	 *            the method
+	 */
+	private void printMessage(String sql, int loop, long execTime, boolean finished, String method) {
+		if (loop > 1 && sql.length() > 25) {
+			sql = sql.substring(0, 25) + "...";
+		}
+		mTrace.warn("Statement " + sql + " called in " + method + (finished
+				? " finished in " + utils.getTimeString(execTime)
+				: " executing for " + utils.getTimeString(execTime) + (loop > 1 ? " (loop " + loop + ")" : "")));
+	}
 
-    /**
-     * Print the message.
-     * @param sql String
-     * @param loop int
-     * @param execTime long
-     * @param finished boolean
-     * @param method the method
-     */
-    private void printMessage(String sql, int loop,
-        long execTime, boolean finished, String method) {
-        if (loop > 1 && sql.length() > 25) {
-            sql = sql.substring(0, 25) + "...";
-        }
-        mTrace.warn("Statement " + sql
-                    + " called in " + method
-                    + (finished
-                       ? " finished in " + Utils.getTimeString(execTime)
-                       : " executing for "
-                       + Utils.getTimeString(execTime)
-                       + (loop > 1
-                          ? " (loop " + loop + ")"
-                          : "")));
-    }
+	/**
+	 * @see java.lang.Object#toString
+	 */
+	@Override
+	public String toString() {
+		StringBuffer strb = new StringBuffer("[ExecutionTimeListener[\n");
+		synchronized (mRunningStmts) {
+			strb.append("currently executing:\n");
+			int i = 1;
+			for (StatementStatistics stmt : mRunningStmts.keySet()) {
 
-    /**
-     * @see java.lang.Object#toString
-     */
-    public String toString() {
-        StringBuffer strb = new StringBuffer("[ExecutionTimeListener[\n");
-        synchronized (mRunningStmts) {
-            strb.append("currently executing:\n");
-            int i = 1;
-            for (Iterator it = mRunningStmts.entrySet().iterator(); it.hasNext();
-                i++) {
-                Map.Entry entry = (Map.Entry) it.next();
-                StatementStatistics stmt = (StatementStatistics) entry.getKey();
+				strb.append(i + ": ");
+				strb.append(stmt);
+				strb.append("\n");
+				i++;
+			}
+		}
 
-                strb.append(i + ": ");
-                strb.append(stmt);
-                strb.append("\n");
-            }
-        }
+		synchronized (mWaiting) {
+			strb.append("\nexecuted but waiting to be closed:\n");
+			int i = 1;
+			for (StatementStatistics stmt : mWaiting.keySet()) {
+				strb.append(i + ": ");
+				strb.append(stmt.toString());
+				strb.append("\n");
+				i++;
+			}
+		}
 
-        synchronized (mWaiting) {
-            strb.append("\nexecuted but waiting to be closed:\n");
-            int i = 1;
-            for (Iterator it = mWaiting.entrySet().iterator(); it.hasNext();
-                i++) {
-                Map.Entry entry = (Map.Entry) it.next();
-                StatementStatistics stmt = (StatementStatistics) entry.getKey();
-                strb.append(i + ": ");
-                strb.append(stmt.toString());
-                strb.append("\n");
-            }
-        }
+		strb.append("\nlong running history (execTime + iterTime):\n");
+		synchronized (mHistorySet) {
+			int i = 1;
+			for (Entry entry : mHistorySet) {
+				strb.append(i + ": ");
+				strb.append(entry.stmt);
+				strb.append("\n");
+				i++;
+			}
+		}
+		strb.append("]]\n");
+		return strb.toString();
+	}
 
-        strb.append("\nlong running history (execTime + iterTime):\n");
-        synchronized (mHistorySet) {
-            int i = 1;
-            for (Iterator it = mHistorySet.iterator(); it.hasNext();
-                i++) {
-                Entry entry = (Entry) it.next();
-                strb.append(i + ": ");
-                strb.append(entry.stmt);
-                strb.append("\n");
-            }
-        }
-        strb.append("]]\n");
-        return strb.toString();
-    }
-
-    private class Entry {
-        long duration;
-        String stmt;
-    }
+	private class Entry {
+		long duration;
+		String stmt;
+	}
 }

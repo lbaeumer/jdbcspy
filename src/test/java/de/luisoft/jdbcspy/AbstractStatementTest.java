@@ -15,148 +15,129 @@ import de.luisoft.jdbcspy.proxy.StatementStatistics;
  */
 public abstract class AbstractStatementTest {
 
-    protected Connection conn;
-    private static final boolean debug = false;
+	protected Connection conn;
+	private static final boolean debug = false;
 
-    @Test
+	@Test
 	public void testExecute() throws Exception {
-		int cnt=10;
-    	long start = System.currentTimeMillis();
+		int cnt = 10;
+		long start = System.currentTimeMillis();
 
-    	for (int i = 0; i < cnt; i++) {
-        	Statement s = conn.createStatement();         
-            boolean b = s.execute("select * from x");
-        	s.close();
-        	
-        	if ((debug || i < 2 || i> cnt-3)
-        			&& conn instanceof ProxyConnection) {
-        		StatementStatistics st = (StatementStatistics) s;
-        		System.out.println(i + ":" + s);
-        		Assert.assertTrue("exec time must be 1000 != "
-        				+ st.getExecutionTime(),
-        				Math.abs(st.getExecutionTime() - 1000) < 10);
-        		Assert.assertTrue("#items must be 0!=" + st.getItemCount(),
-        				st.getItemCount() == 0);
-        		Assert.assertTrue("duration must be equal execution time " 
-        				+ st.getExecutionTime() + "!=" + st.getDuration(),
-        				st.getExecutionTime() == st.getDuration());
-        		Assert.assertTrue(b);
-        	}
-    	}
+		for (int i = 0; i < cnt; i++) {
+			Statement s = conn.createStatement();
+			boolean b = s.execute("select * from x");
+			s.close();
 
-    	long end = System.currentTimeMillis();
-        System.out.println("execute: total time=" + (end-start) + "ms");
-       	System.out.println(1000*(end-start-cnt*1000)/cnt + "ms/1000stmts");
-    }
+			if ((debug || i < 2 || i > cnt - 3) && conn instanceof ProxyConnection) {
+				StatementStatistics st = (StatementStatistics) s;
+				System.out.println(i + ":" + s);
+				Assert.assertTrue("exec time must be 1000 != " + st.getExecutionTime(),
+						Math.abs(st.getExecutionTime() - 1000) < 10);
+				Assert.assertTrue("#items must be 0!=" + st.getItemCount(), st.getItemCount() == 0);
+				Assert.assertTrue(
+						"duration must be equal execution time " + st.getExecutionTime() + "!=" + st.getDuration(),
+						st.getExecutionTime() == st.getDuration());
+				Assert.assertTrue(b);
+			}
+		}
 
-    @Test
+		long end = System.currentTimeMillis();
+		System.out.println("execute: total time=" + (end - start) + "ms");
+		System.out.println(1000 * (end - start - cnt * 1000) / cnt + "ms/1000stmts");
+	}
+
+	@Test
 	public void testExecuteQuery() throws Exception {
-		int cnt=10;
+		int cnt = 10;
 		int sleep = 100;
 		int rsCount = 100;
-    	long start = System.currentTimeMillis();
+		long start = System.currentTimeMillis();
 
-    	for (int i = 0; i < cnt; i++) {
-        	Statement s = conn.createStatement();         
-            ResultSet rs = s.executeQuery(
-            		"select * from x");
-            while (rs.next()) {
-            	rs.getInt(0);
-            }
-            rs.close();
-        	s.close();
-        	
-        	if ((debug || i < 2 || i> cnt-3)
-        			&& conn instanceof ProxyConnection) {
-        		StatementStatistics st = (StatementStatistics) s;
-        		System.out.println(i + ":" + s);
-        		Assert.assertTrue("exec time must be 1000 !="
-        				+ st.getExecutionTime(),
-        				Math.abs(st.getExecutionTime() - 1000) < 10);
-        		Assert.assertTrue("#items must be " + rsCount
-        				+ "!=" + st.getItemCount(),
-        				st.getItemCount() == rsCount);
-        		Assert.assertTrue("duration must be greater execution time " 
-        				+ st.getExecutionTime() + "!=" + st.getDuration(),
-        				st.getDuration() - st.getExecutionTime() <= 7);
-        	}
-    	}
+		for (int i = 0; i < cnt; i++) {
+			Statement s = conn.createStatement();
+			ResultSet rs = s.executeQuery("select * from x");
+			while (rs.next()) {
+				rs.getInt(0);
+			}
+			rs.close();
+			s.close();
 
-    	long end = System.currentTimeMillis();
-        System.out.println("executeQuery: total time=" + (end-start) + "ms");
-       	System.out.println(1000*(end-start-cnt*sleep)/cnt + "ms/1000stmts");
-    }
+			if ((debug || i < 2 || i > cnt - 3) && conn instanceof ProxyConnection) {
+				StatementStatistics st = (StatementStatistics) s;
+				System.out.println(i + ":" + s);
+				Assert.assertTrue("exec time must be 1000 !=" + st.getExecutionTime(),
+						Math.abs(st.getExecutionTime() - 1000) < 10);
+				Assert.assertTrue("#items must be " + rsCount + "!=" + st.getItemCount(), st.getItemCount() == rsCount);
+				Assert.assertTrue(
+						"duration must be greater execution time " + st.getExecutionTime() + "!=" + st.getDuration(),
+						st.getDuration() - st.getExecutionTime() <= 7);
+			}
+		}
 
-    @Test
-    public void testExecuteQueryRSDelay() throws Exception {
-		int cnt=10;
+		long end = System.currentTimeMillis();
+		System.out.println("executeQuery: total time=" + (end - start) + "ms");
+		System.out.println(1000 * (end - start - cnt * sleep) / cnt + "ms/1000stmts");
+	}
+
+	@Test
+	public void testExecuteQueryRSDelay() throws Exception {
+		int cnt = 10;
 		int sleep = 100;
 		int rsCount = 100;
 		int delay = 5;
-    	long start = System.currentTimeMillis();
+		long start = System.currentTimeMillis();
 
-    	for (int i = 0; i < cnt; i++) {
-        	Statement s = conn.createStatement();         
-            ResultSet rs = s.executeQuery(
-            		"select * from x where time="
-            		+ sleep + " and size="
-            		+ rsCount + " and delay=" + delay + " ");
-            while (rs.next()) {
-            	rs.getInt(0);
-            }
-            rs.close();
-        	s.close();
-        	
-        	if ((debug || i < 2 || i> cnt-3)
-        			&& conn instanceof ProxyConnection) {
-        		StatementStatistics st = (StatementStatistics) s;
-        		System.out.println(i + ":" + s);
-        		Assert.assertTrue("exec time must be " + sleep + "!="
-        				+ st.getExecutionTime(),
-        				Math.abs(st.getExecutionTime() - sleep) < 10);
-        		Assert.assertTrue("#items must be " + rsCount
-        				+ "!=" + st.getItemCount(),
-        				st.getItemCount() == rsCount);
-        		Assert.assertTrue("duration must be greater execution time " 
-        				+ st.getExecutionTime() + "!=" + st.getDuration(),
-        				st.getDuration() - (st.getExecutionTime()+cnt*delay*rsCount) <= 5);
-        	}
-    	}
+		for (int i = 0; i < cnt; i++) {
+			Statement s = conn.createStatement();
+			ResultSet rs = s.executeQuery(
+					"select * from x where time=" + sleep + " and size=" + rsCount + " and delay=" + delay + " ");
+			while (rs.next()) {
+				rs.getInt(0);
+			}
+			rs.close();
+			s.close();
 
-    	long end = System.currentTimeMillis();
-        System.out.println("executeQuery: total time=" + (end-start) + "ms");
-       	System.out.println(1000*(end-start-cnt*sleep-cnt*rsCount*delay)/cnt + "ms/1000stmts");
-    }
+			if ((debug || i < 2 || i > cnt - 3) && conn instanceof ProxyConnection) {
+				StatementStatistics st = (StatementStatistics) s;
+				System.out.println(i + ":" + s);
+				Assert.assertTrue("exec time must be " + sleep + "!=" + st.getExecutionTime(),
+						Math.abs(st.getExecutionTime() - sleep) < 10);
+				Assert.assertTrue("#items must be " + rsCount + "!=" + st.getItemCount(), st.getItemCount() == rsCount);
+				Assert.assertTrue(
+						"duration must be greater execution time " + st.getExecutionTime() + "!=" + st.getDuration(),
+						st.getDuration() - (st.getExecutionTime() + cnt * delay * rsCount) <= 5);
+			}
+		}
 
-    @Test
+		long end = System.currentTimeMillis();
+		System.out.println("executeQuery: total time=" + (end - start) + "ms");
+		System.out.println(1000 * (end - start - cnt * sleep - cnt * rsCount * delay) / cnt + "ms/1000stmts");
+	}
+
+	@Test
 	public void testExecuteRsQuery() throws Exception {
-		int cnt=1;
+		int cnt = 1;
 		int rsCount = 100000;
-    	long start = System.currentTimeMillis();
+		long start = System.currentTimeMillis();
 
-    	for (int i = 0; i < cnt; i++) {
-        	Statement s = conn.createStatement();         
-            ResultSet rs = s.executeQuery(
-            		"speed * from x where size="
-            		+ rsCount + " ");
-            while (rs.next()) {
-            	rs.getInt(0);
-            }
-            rs.close();
-        	s.close();
-        	
-        	if ((debug || i < 2 || i> cnt-3)
-        			&& conn instanceof ProxyConnection) {
-        		StatementStatistics st = (StatementStatistics) s;
-        		System.out.println(i + ":" + s);
-        		Assert.assertTrue("#items must be " + rsCount
-        				+ "!=" + st.getItemCount(),
-        				st.getItemCount() == rsCount);
-        	}
-    	}
+		for (int i = 0; i < cnt; i++) {
+			Statement s = conn.createStatement();
+			ResultSet rs = s.executeQuery("speed * from x where size=" + rsCount + " ");
+			while (rs.next()) {
+				rs.getInt(0);
+			}
+			rs.close();
+			s.close();
 
-    	long end = System.currentTimeMillis();
-        System.out.println("executeRsQuery: total time=" + (end-start) + "ms");
-       	System.out.println(10000*(end-start)/rsCount + "ms/10000rs");
-    }
+			if ((debug || i < 2 || i > cnt - 3) && conn instanceof ProxyConnection) {
+				StatementStatistics st = (StatementStatistics) s;
+				System.out.println(i + ":" + s);
+				Assert.assertTrue("#items must be " + rsCount + "!=" + st.getItemCount(), st.getItemCount() == rsCount);
+			}
+		}
+
+		long end = System.currentTimeMillis();
+		System.out.println("executeRsQuery: total time=" + (end - start) + "ms");
+		System.out.println(10000 * (end - start) / rsCount + "ms/10000rs");
+	}
 }
