@@ -1,5 +1,7 @@
 <dbproxy>
     <property name="DriverClass" value="de.luisoft.jdbc.testdriver.MyDriver"/>
+    <property name="DatasourceClass" value="org.apache.derby.jdbc.EmbeddedDataSource"/>
+    <property name="XADatasourceClass" value="org.apache.derby.jdbc.EmbeddedDataSource"/>
 
     <property name="EnableProxyInitially" value="true"/>
 

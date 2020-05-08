@@ -5,16 +5,15 @@ package de.luisoft.jdbcspy.proxy.listener;
  */
 public interface ExecutionFailedListener {
 
-	/**
-	 * Execution Failed.
-	 * 
-	 * @param event
-	 *            ExecutionFailedEvent
-	 */
-	void executionFailed(ExecutionFailedEvent event);
+    /**
+     * Execution Failed.
+     *
+     * @param event ExecutionFailedEvent
+     */
+    void executionFailed(ExecutionFailedEvent event);
 
-	/**
-	 * Clear the statistical data.
-	 */
-	void clearStatistics();
+    /**
+     * Clear the statistical data.
+     */
+    void clearStatistics();
 }

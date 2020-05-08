@@ -7,25 +7,26 @@ import de.luisoft.jdbcspy.proxy.StatementStatistics;
  */
 public class CloseEvent {
 
-	/** the event source */
-	private StatementStatistics mSource;
+    /**
+     * the event source
+     */
+    private final StatementStatistics mSource;
 
-	/**
-	 * Constructor.
-	 * 
-	 * @param source
-	 *            Object
-	 */
-	public CloseEvent(StatementStatistics source) {
-		mSource = source;
-	}
+    /**
+     * Constructor.
+     *
+     * @param source Object
+     */
+    public CloseEvent(StatementStatistics source) {
+        mSource = source;
+    }
 
-	/**
-	 * Get the source event.
-	 * 
-	 * @return Object
-	 */
-	public StatementStatistics getStatementStatistics() {
-		return mSource;
-	}
+    /**
+     * Get the source event.
+     *
+     * @return Object
+     */
+    public StatementStatistics getStatementStatistics() {
+        return mSource;
+    }
 }
