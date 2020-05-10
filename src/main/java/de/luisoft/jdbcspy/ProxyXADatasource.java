@@ -8,54 +8,55 @@ import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
 import java.util.logging.Logger;
 
-public class ProxyXADatasource implements XADataSource {
+public class ProxyXADatasource extends AbstractProxyDatasource implements XADataSource {
 
     private ConnectionFactory connFac;
-    private XADataSource uDatasource;
 
     public ProxyXADatasource() throws ClassNotFoundException, IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
+        System.out.println("jdbcspy: init");
         connFac = new ConnectionFactory();
         String driverClass = (String) connFac.getProperty(ClientProperties.DB_XA_DATASOURCE_CLASS);
-        System.out.println("inst " + driverClass);
+        System.out.println("jdbcspy: found xa driver " + driverClass);
         Class c = Class.forName(driverClass);
-        uDatasource = (XADataSource) c.getDeclaredConstructor().newInstance();
+        System.out.println("jdbcspy instanciated driver " + c);
+        uDatasource = c.getDeclaredConstructor().newInstance();
     }
 
     @Override
     public XAConnection getXAConnection() throws SQLException {
-        XAConnection c = uDatasource.getXAConnection();
+        XAConnection c = ((XADataSource) uDatasource).getXAConnection();
         return connFac.getConnection(c);
     }
 
     @Override
     public XAConnection getXAConnection(String user, String password) throws SQLException {
-        XAConnection c = uDatasource.getXAConnection(user, password);
+        XAConnection c = ((XADataSource) uDatasource).getXAConnection(user, password);
         return connFac.getConnection(c);
     }
 
     @Override
     public PrintWriter getLogWriter() throws SQLException {
-        return uDatasource.getLogWriter();
+        return ((XADataSource) uDatasource).getLogWriter();
     }
 
     @Override
     public void setLogWriter(PrintWriter out) throws SQLException {
-        uDatasource.setLogWriter(out);
+        ((XADataSource) uDatasource).setLogWriter(out);
     }
 
     @Override
     public int getLoginTimeout() throws SQLException {
-        return uDatasource.getLoginTimeout();
+        return ((XADataSource) uDatasource).getLoginTimeout();
     }
 
     @Override
     public void setLoginTimeout(int seconds) throws SQLException {
-        uDatasource.setLoginTimeout(seconds);
+        ((XADataSource) uDatasource).setLoginTimeout(seconds);
     }
 
     @Override
     public Logger getParentLogger() throws SQLFeatureNotSupportedException {
-        return uDatasource.getParentLogger();
+        return ((XADataSource) uDatasource).getParentLogger();
     }
 
 }

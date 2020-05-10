@@ -158,7 +158,7 @@ public final class ClientProperties {
     /**
      * all string values
      */
-    private static final List<String> mStringValues = Arrays.asList(DB_DRIVER_CLASS, DB_DATASOURCE_CLASS);
+    private static final List<String> mStringValues = Arrays.asList(DB_DRIVER_CLASS, DB_DATASOURCE_CLASS, DB_XA_DATASOURCE_CLASS);
     /**
      * all list values
      */
@@ -322,7 +322,7 @@ public final class ClientProperties {
     private void init() {
 
         File f = new File(System.getProperty("user.home") + "/dbproxy.xml");
-        mTrace.debug("Reading properties from " + f);
+        System.out.println("jdbcspy: reading properties from " + f);
 
         try {
             SAXParser parser = SAXParserFactory.newInstance().newSAXParser();

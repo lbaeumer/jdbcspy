@@ -114,7 +114,7 @@ public class DBProxyDriver implements Driver {
         try {
             DBProxyDriver m = new DBProxyDriver();
             String driverClass = (String) m.connFac.getProperty(ClientProperties.DB_DRIVER_CLASS);
-            System.out.println("trying to register wrapper for driver " + driverClass);
+            System.out.println("jdbcspy: trying to register wrapper for driver " + driverClass);
             Class.forName(driverClass);
             Enumeration<Driver> e = DriverManager.getDrivers();
             while (e.hasMoreElements()) {
@@ -126,7 +126,7 @@ public class DBProxyDriver implements Driver {
                 }
             }
         } catch (Exception e) {
-            System.err.println("exception in the DBProxyDriver occurred");
+            System.err.println("jdbcspy: exception in the DBProxyDriver occurred");
             e.printStackTrace();
         }
     }

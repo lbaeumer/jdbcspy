@@ -21,7 +21,6 @@ import org.apache.commons.logging.LogFactory;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.sql.Connection;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Iterator;

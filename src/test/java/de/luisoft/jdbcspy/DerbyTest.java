@@ -1,10 +1,12 @@
 package de.luisoft.jdbcspy;
 
-import org.junit.Ignore;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.Statement;
 
 /**
@@ -12,7 +14,6 @@ import java.sql.Statement;
  */
 public class DerbyTest {
 
-    @Ignore
     @Test
     public void testDump2() throws Exception {
 
@@ -29,11 +30,8 @@ public class DerbyTest {
         statement.execute(sql);
 
         ProxyDatasource proxy = new ProxyDatasource();
-//        EmbeddedDataSourceInterface ds =
-//                new org.apache.derby.jdbc.EmbeddedDataSource();
-//        EmbeddedDataSourceInterface ds = (EmbeddedDataSourceInterface) proxy;
-        //ds.setDatabaseName("booksdb");
-/*
+
+        proxy.setDatabaseName("booksdb");
         Connection c = proxy.getConnection();
         PreparedStatement s = c.prepareStatement("select * from book");
         ResultSet rs = s.executeQuery();
@@ -47,7 +45,5 @@ public class DerbyTest {
         s.close();
         c.close();
         System.out.println("c=" + c);
-        */
-
     }
 }
