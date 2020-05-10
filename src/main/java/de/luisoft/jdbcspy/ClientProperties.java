@@ -197,6 +197,12 @@ public final class ClientProperties {
             if ("property".equals(qName)) {
                 String name = attributes.getValue("name");
                 String value = attributes.getValue("value");
+                if (name != null) {
+                    name = name.trim();
+                }
+                if (value != null) {
+                    value = value.trim();
+                }
 
                 if (connectionListener == null && executionFailedListener == null && executionListener == null) {
                     boolean found = false;
@@ -428,15 +434,6 @@ public final class ClientProperties {
      */
     public boolean isInitiallyEnabled() {
         return (Boolean) values.get(DB_ENABLE_PROXY_INITIALLY);
-    }
-
-    /**
-     * Get the driver class
-     *
-     * @return the driver class
-     */
-    public String getDriverClass() {
-        return (String) values.get(DB_DRIVER_CLASS);
     }
 
     /**
