@@ -4,8 +4,6 @@ import de.luisoft.jdbcspy.proxy.listener.ConnectionListener;
 import de.luisoft.jdbcspy.proxy.listener.ExecutionFailedListener;
 import de.luisoft.jdbcspy.proxy.listener.ExecutionListener;
 import de.luisoft.jdbcspy.proxy.util.Utils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -20,6 +18,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * The Properties class.
@@ -137,7 +137,7 @@ public final class ClientProperties {
     /**
      * A Logger.
      */
-    private static final Log mTrace = LogFactory.getLog(ClientProperties.class);
+    private static final Logger mTrace = Logger.getLogger(ClientProperties.class.getName());
     /**
      * the db init file
      */
@@ -195,14 +195,8 @@ public final class ClientProperties {
         @Override
         public void startElement(String uri, String localName, String qName, Attributes attributes) {
             if ("property".equals(qName)) {
-                String name = attributes.getValue("name");
-                String value = attributes.getValue("value");
-                if (name != null) {
-                    name = name.trim();
-                }
-                if (value != null) {
-                    value = value.trim();
-                }
+                String name = attributes.getValue("name").trim();
+                String value = attributes.getValue("value").trim();
 
                 if (connectionListener == null && executionFailedListener == null && executionListener == null) {
                     boolean found = false;
@@ -223,7 +217,7 @@ public final class ClientProperties {
                     }
 
                     if (!found) {
-                        mTrace.warn("Could not find the property " + name + ".");
+                        mTrace.warning("Could not find the property " + name + ".");
                     }
                 } else {
                     // this must be a value assigned by a listener
@@ -240,20 +234,26 @@ public final class ClientProperties {
                 String classname = attributes.getValue("class");
                 try {
                     Class<?> c = Class.forName(classname);
-                    Object cl = c.newInstance();
+                    Object cl = c.getDeclaredConstructor().newInstance();
 
                     switch (qName) {
                         case "connectionlistener":
                             mConnectionListener.add((ConnectionListener) cl);
                             connectionListener = (ConnectionListener) cl;
+                            executionFailedListener = null;
+                            executionListener = null;
                             break;
                         case "executionfailedlistener":
                             mFailedListener.add((ExecutionFailedListener) cl);
                             executionFailedListener = (ExecutionFailedListener) cl;
+                            connectionListener = null;
+                            executionListener = null;
                             break;
                         case "executionlistener":
                             mListener.add((ExecutionListener) cl);
                             executionListener = (ExecutionListener) cl;
+                            connectionListener = null;
+                            executionFailedListener = null;
                             break;
                         default:
                             throw new IllegalArgumentException("The listener " + qName + " does not exist.");
@@ -291,21 +291,7 @@ public final class ClientProperties {
             parser.parse(input, mHandler);
             input.close();
         } catch (Exception ex) {
-            mTrace.info("Parsing the dbinit file " + DBINIT_FILE + " failed.", ex);
-            ex.printStackTrace();
-        }
-
-        try {
-            input = ClientProperties.class.getResourceAsStream("/dbproxy.xml");
-            if (input != null) {
-                System.out.println("Reading dbproxy.xml configuration from classpath.");
-                SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
-                parser.parse(input, mHandler);
-                input.close();
-            }
-        } catch (Exception ex) {
-            mTrace.info("Parsing the dbinit file dbproxy.xml failed.", ex);
-            ex.printStackTrace();
+            throw new IllegalStateException("something's wrong here with dbinit.xml");
         }
     }
 
@@ -327,19 +313,41 @@ public final class ClientProperties {
      */
     private void init() {
 
-        File f = new File(System.getProperty("user.home") + "/dbproxy.xml");
-        System.out.println("jdbcspy: reading properties from " + f);
+        boolean init = false;
 
+        InputStream input;
         try {
-            SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
-            parser.parse(f, mHandler);
-        } catch (FileNotFoundException ex) {
-            mTrace.info("The dbproxy configuration file " + f + " does not exist.");
+            input = ClientProperties.class.getResourceAsStream("/dbproxy.xml");
+            if (input != null) {
+                System.out.println("jdbcspy: reading dbproxy.xml configuration from classpath.");
+                SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
+                parser.parse(input, mHandler);
+                input.close();
+                init = true;
+            }
         } catch (Exception ex) {
-            mTrace.error("parsing the file " + f + " failed", ex);
+            throw new IllegalArgumentException("Parsing the dbinit file dbproxy.xml failed.", ex);
         }
 
-        mTrace.debug("Reading system properties");
+        File f = new File(System.getProperty("user.home") + "/dbproxy.xml");
+        if (f.exists()) {
+            System.out.println("jdbcspy: reading properties from " + f);
+            try {
+                SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
+                parser.parse(f, mHandler);
+                init = true;
+            } catch (FileNotFoundException ex) {
+                mTrace.info("The dbproxy configuration file " + f + " does not exist.");
+            } catch (Exception ex) {
+                mTrace.log(Level.SEVERE, "parsing the file " + f + " failed", ex);
+            }
+        }
+
+        if (!init) {
+            System.out.println("jdbcspy: neither a file " + f + " nor a file dbproxy.xml in the classpath exists."
+                    + " You can download an example of the file here https://github.com/lbaeumer/jdbcspy/blob/master/src/test/resources/dbproxy.xml");
+        }
+
         readSystemProperties();
     }
 
@@ -447,7 +455,6 @@ public final class ClientProperties {
             if (!mBoolValues.contains(property)) {
                 throw new IllegalArgumentException("the boolean property " + property + " does not exist.");
             }
-            mTrace.debug("set " + property + " to " + value);
             values.put(property, value);
             return;
         }
@@ -455,7 +462,6 @@ public final class ClientProperties {
             if (!mIntValues.contains(property)) {
                 throw new IllegalArgumentException("the int property " + property + " does not exist.");
             }
-            mTrace.debug("set " + property + " to " + value);
             values.put(property, value);
             return;
         }
@@ -463,7 +469,6 @@ public final class ClientProperties {
             if (!mStringValues.contains(property)) {
                 throw new IllegalArgumentException("the string property " + property + " does not exist.");
             }
-            mTrace.debug("set " + property + " to " + value);
             values.put(property, value);
             return;
         }
@@ -471,7 +476,6 @@ public final class ClientProperties {
             if (!mListValues.contains(property)) {
                 throw new IllegalArgumentException("the list property " + property + " does not exist.");
             }
-            mTrace.debug("set " + property + " to " + value);
             values.put(property, value);
             return;
         }
@@ -485,7 +489,6 @@ public final class ClientProperties {
             Object obj = p.get(key);
             if (obj != null) {
                 try {
-                    mTrace.debug("set " + key + " to " + obj);
                     values.put(key, Integer.valueOf((String) obj));
                 } catch (Exception e) {
                     System.err.println("property for " + key + "=" + obj + " is not convertable to type int");
@@ -496,7 +499,6 @@ public final class ClientProperties {
             Object obj = p.get(key);
             if (obj != null) {
                 try {
-                    mTrace.debug("set " + key + " to " + obj);
                     values.put(key, Boolean.valueOf((String) obj));
                 } catch (Exception e) {
                     System.err.println("property for " + key + "=" + obj + " is not convertable to type boolean");
@@ -506,7 +508,6 @@ public final class ClientProperties {
         for (String key : mStringValues) {
             Object obj = p.get(key);
             if (obj != null) {
-                mTrace.debug("set " + key + " to " + obj);
                 values.put(key, obj);
             }
         }

@@ -21,7 +21,7 @@ public class StatTest {
     public void setUp() {
         conn = new MyConnection(10000, 1000, 5000);
         connFac = new ConnectionFactory();
-        proxyConn = (ProxyConnection) connFac.getConnection(conn);
+        proxyConn = (ProxyConnection) connFac.getProxyConnection(conn);
     }
 
     @Test

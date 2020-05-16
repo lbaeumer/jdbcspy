@@ -5,8 +5,6 @@ import de.luisoft.jdbcspy.proxy.handler.ConnectionHandler;
 import de.luisoft.jdbcspy.proxy.listener.ConnectionEvent;
 import de.luisoft.jdbcspy.proxy.listener.ConnectionListener;
 import de.luisoft.jdbcspy.proxy.util.Utils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import javax.sql.XAConnection;
 import java.sql.Connection;
@@ -14,6 +12,7 @@ import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.logging.Logger;
 
 /**
  * The ConnectionStatisticListener.
@@ -23,7 +22,7 @@ public class ConnectionStatisticListener implements ConnectionListener {
     /**
      * the logger object for tracing
      */
-    private static final Log mTrace = LogFactory.getLog(ConnectionStatisticListener.class);
+    private static final Logger mTrace = Logger.getLogger(ConnectionStatisticListener.class.getName());
 
     /**
      * the connections
@@ -122,7 +121,7 @@ public class ConnectionStatisticListener implements ConnectionListener {
                     }
                 } catch (SQLException e) {
                     strb.append("; no connection properties");
-                    mTrace.info("property reading failed, but ignored ", e);
+                    mTrace.info("property reading failed, but ignored " + e);
                     it.remove();
                 }
             }

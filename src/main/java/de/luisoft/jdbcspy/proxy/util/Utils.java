@@ -2,8 +2,6 @@ package de.luisoft.jdbcspy.proxy.util;
 
 import de.luisoft.jdbcspy.ClientProperties;
 import de.luisoft.jdbcspy.ProxyConnection;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import java.lang.reflect.Method;
 import java.sql.Connection;
@@ -15,6 +13,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * The utils class.
@@ -24,7 +23,7 @@ public class Utils {
     /**
      * the logger object for tracing
      */
-    private static final Log mTrace = LogFactory.getLog(Utils.class);
+    private static final Logger mTrace = Logger.getLogger(Utils.class.getName());
     /**
      * the size formatter
      */
@@ -122,11 +121,9 @@ public class Utils {
                     ).matches(regExp)) {
                         return regExp;
                     } else {
-                        if (mTrace.isDebugEnabled()) {
-                            mTrace.debug(el.getClassName() + "." + el.getMethodName()
-                                    // + ":" + el.getLineNumber()
-                                    + " does not match " + regExp);
-                        }
+                        mTrace.fine(el.getClassName() + "." + el.getMethodName()
+                                // + ":" + el.getLineNumber()
+                                + " does not match " + regExp);
                     }
                 }
             }
@@ -283,25 +280,14 @@ public class Utils {
         }
     }
 
-    public static void setProperty(Object obj, String name, String value) {
+    public static void setProperty(final Object obj, final String name, final String value) {
         Class c = obj.getClass();
-        if (mTrace.isDebugEnabled()) {
-            mTrace.debug("setProperty(" + obj.getClass() + ", " + name + ", " + value + ")");
-        }
+        final String setter = "set" + name.substring(0, 1).toUpperCase() + name.substring(1);
         Method[] m = c.getMethods();
         for (Method method : m) {
-            if (mTrace.isDebugEnabled()) {
-                mTrace.debug("found method" + method);
-            }
-            if (method.getName().equals("set" + name.substring(0, 1).toUpperCase() + name.substring(1))) {
-                if (mTrace.isDebugEnabled()) {
-                    mTrace.debug("korrekt method" + method);
-                }
+            if (method.getName().equals(setter)) {
                 Class[] parms = method.getParameterTypes();
                 if (parms.length == 1) {
-                    if (mTrace.isDebugEnabled()) {
-                        mTrace.debug("korrekt parms" + parms[0]);
-                    }
                     if (parms[0].isAssignableFrom(String.class)) {
                         try {
                             method.invoke(obj, value);
@@ -331,7 +317,7 @@ public class Utils {
                 }
             }
         }
-        mTrace.warn("did not find a method " + obj + ", " + name + ", " + value);
+        mTrace.warning("did not find a setter " + setter + " in class " + obj.getClass());
     }
 
     /**

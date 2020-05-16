@@ -4,11 +4,10 @@ import de.luisoft.jdbcspy.proxy.handler.ConnectionHandler;
 import de.luisoft.jdbcspy.proxy.listener.ConnectionEvent;
 import de.luisoft.jdbcspy.proxy.listener.ConnectionListener;
 import de.luisoft.jdbcspy.proxy.util.Utils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * The ConnectionStatisticListener.
@@ -18,7 +17,7 @@ public class ConnectionDumpListener implements ConnectionListener {
     /**
      * the logger object for tracing
      */
-    private static final Log mTrace = LogFactory.getLog(ConnectionDumpListener.class);
+    private static final Logger mTrace = Logger.getLogger(ConnectionDumpListener.class.getName());
     private String dbConnDumpClassExp;
 
     /**

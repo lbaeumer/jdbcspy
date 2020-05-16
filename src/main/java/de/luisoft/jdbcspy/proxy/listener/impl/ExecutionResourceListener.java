@@ -2,11 +2,11 @@ package de.luisoft.jdbcspy.proxy.listener.impl;
 
 import de.luisoft.jdbcspy.proxy.listener.ExecutionAdapter;
 import de.luisoft.jdbcspy.proxy.listener.ResourceEvent;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * The Execution resource listener.
@@ -16,7 +16,7 @@ public class ExecutionResourceListener extends ExecutionAdapter {
     /**
      * the logger object for tracing
      */
-    private static final Log mTrace = LogFactory.getLog(ExecutionResourceListener.class);
+    private static final Logger mTrace = Logger.getLogger(ExecutionResourceListener.class.getName());
 
     /**
      * the resource map String-&gt; Integer
@@ -53,12 +53,12 @@ public class ExecutionResourceListener extends ExecutionAdapter {
 
                 mResource.put(event.getOpenMethod(), entry);
                 if (!throwWarnings) {
-                    mTrace.warn("resource failure in " + event.getMethod(), event.getCause());
+                    mTrace.log(Level.SEVERE, "resource failure in " + event.getMethod(), event.getCause());
                 }
             } else {
                 entry.count++;
                 if (entry.count % 10 == 0) {
-                    mTrace.warn("resource failure in " + event.getMethod() + " occurred " + entry.count + " times");
+                    mTrace.warning("resource failure in " + event.getMethod() + " occurred " + entry.count + " times");
                 }
             }
         }

@@ -10,8 +10,6 @@ import de.luisoft.jdbcspy.proxy.listener.ExecutionFailedListener;
 import de.luisoft.jdbcspy.proxy.listener.ExecutionListener;
 import de.luisoft.jdbcspy.proxy.listener.ResourceEvent;
 import de.luisoft.jdbcspy.proxy.util.Utils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
@@ -21,6 +19,8 @@ import java.sql.ResultSet;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * The result set handler.
@@ -30,7 +30,7 @@ public class ResultSetHandler implements InvocationHandler, ResultSetStatistics 
     /**
      * the logger object for tracing
      */
-    private static final Log mTrace = LogFactory.getLog(ResultSetHandler.class);
+    private static final Logger mTrace = Logger.getLogger(ResultSetHandler.class.getName());
     /**
      * ignore the size evaluation
      */
@@ -107,10 +107,6 @@ public class ResultSetHandler implements InvocationHandler, ResultSetStatistics 
 
         String methodName = method.getName();
 
-        if (mTrace.isDebugEnabled()) {
-            mTrace.debug("call method: " + methodName);
-        }
-
         try {
             if (methodName.startsWith("get") && args != null && args.length > 0) {
                 return handleGet(method, args);
@@ -142,7 +138,7 @@ public class ResultSetHandler implements InvocationHandler, ResultSetStatistics 
             // remaining calls
             return method.invoke(mRs, args);
         } catch (InvocationTargetException e) {
-            mTrace.error("result set access failed for " + mSql + " in " + methodName + getArgs(args), e.getCause());
+            mTrace.log(Level.SEVERE, "result set access failed for " + mSql + " in " + methodName + getArgs(args), e.getCause());
 
             ExecutionFailedEvent event = new ExecutionFailedEvent(toString(), e.getCause());
 
@@ -164,7 +160,7 @@ public class ResultSetHandler implements InvocationHandler, ResultSetStatistics 
 
             return null;
         } catch (Exception e) {
-            mTrace.error("result set access failed for " + mSql + " in " + methodName + getArgs(args), e);
+            mTrace.log(Level.SEVERE, "result set access failed for " + mSql + " in " + methodName + getArgs(args), e);
 
             ExecutionFailedEvent event = new ExecutionFailedEvent(toString(), e);
 
@@ -183,10 +179,6 @@ public class ResultSetHandler implements InvocationHandler, ResultSetStatistics 
      * @throws ProxyException if a resource was not closed or double closed
      */
     private void handleClose(Object proxy) throws ProxyException {
-        if (mTrace.isDebugEnabled()) {
-            mTrace.debug("close the resultset " + mSql);
-        }
-
         if (!mProps.getBoolean(ClientProperties.DB_IGNORE_DOUBLE_CLOSED_OBJECTS) && mIsClosed) {
 
             String txt = "The ResultSet opened in " + mOpenMethod + " was already closed in "
@@ -221,9 +213,6 @@ public class ResultSetHandler implements InvocationHandler, ResultSetStatistics 
 
             String txt = "The ResultSet opened in " + mOpenMethod + " was not closed in " + Utils.getExecClass(proxy)
                     + ".";
-            if (mTrace.isDebugEnabled()) {
-                mTrace.debug(txt);
-            }
 
             boolean displayMsg = mProps.getBoolean(ClientProperties.DB_DISPLAY_ENTITY_BEANS);
 
@@ -305,7 +294,7 @@ public class ResultSetHandler implements InvocationHandler, ResultSetStatistics 
                 } else if (ret instanceof byte[]) {
                     mSize += ((byte[]) ret).length;
                 } else if (ret != null) {
-                    mTrace.warn("unknown return type: " + ret.getClass(), new RuntimeException());
+                    mTrace.log(Level.SEVERE, "unknown return type: " + ret.getClass(), new RuntimeException());
                 }
             }
 

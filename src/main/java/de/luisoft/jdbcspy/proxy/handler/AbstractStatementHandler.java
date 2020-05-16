@@ -16,8 +16,6 @@ import de.luisoft.jdbcspy.proxy.listener.ExecutionFailedListener;
 import de.luisoft.jdbcspy.proxy.listener.ExecutionListener;
 import de.luisoft.jdbcspy.proxy.listener.ResourceEvent;
 import de.luisoft.jdbcspy.proxy.util.Utils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
@@ -30,6 +28,8 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * The statement handler.
@@ -55,7 +55,7 @@ public abstract class AbstractStatementHandler implements InvocationHandler, Sta
     /**
      * the logger object for tracing
      */
-    private static final Log mTrace = LogFactory.getLog(AbstractStatementHandler.class);
+    private static final Logger mTrace = Logger.getLogger(AbstractStatementHandler.class.getName());
     /**
      * the prepared statement
      */
@@ -156,9 +156,7 @@ public abstract class AbstractStatementHandler implements InvocationHandler, Sta
                 return toString();
             }
 
-            if (mTrace.isDebugEnabled()) {
-                mTrace.debug("call method: " + method.getName() + "(" + (args != null ? "#=" + args.length : "") + ")");
-            }
+            mTrace.fine("call method: " + method.getName() + "(" + (args != null ? "#=" + args.length : "") + ")");
 
             if ("close".equals(method.getName())) {
                 return handleClose(proxy, method, args);
@@ -200,7 +198,7 @@ public abstract class AbstractStatementHandler implements InvocationHandler, Sta
 
             String txt = "execution " + method.getName() + getArgs(args) + " failed for " + getSQL() +
                     " in method " + Utils.getExecClass(proxy);
-            mTrace.error(txt, e.getCause());
+            mTrace.severe(txt + e.getCause());
 
             ExecutionFailedEvent event = new ExecutionFailedEvent(toString(), e.getCause());
 
@@ -221,7 +219,7 @@ public abstract class AbstractStatementHandler implements InvocationHandler, Sta
             }
             return null;
         } catch (Exception e) {
-            mTrace.error("statement access failed for " + method.getName() + getArgs(args), e);
+            mTrace.log(Level.SEVERE, "statement access failed for " + method.getName() + getArgs(args), e);
 
             ExecutionFailedEvent event = new ExecutionFailedEvent(toString(), e);
 
@@ -299,10 +297,6 @@ public abstract class AbstractStatementHandler implements InvocationHandler, Sta
      */
     protected Object handleClose(Object proxy, Method method, Object[] args) throws Throwable {
 
-        if (mTrace.isDebugEnabled()) {
-            mTrace.debug("close the statement " + getSQL() + " with " + mResultSets.size() + " result sets");
-        }
-
         if (!mProps.getBoolean(ClientProperties.DB_IGNORE_DOUBLE_CLOSED_OBJECTS) && mState == CLOSED) {
             String txt = "The Statement " + getSQL() + " opened in " + mOpenMethod + " was already closed in "
                     + Utils.getExecClass(proxy) + ".";
@@ -372,9 +366,6 @@ public abstract class AbstractStatementHandler implements InvocationHandler, Sta
 
         try {
             if (method.getName().startsWith("execute") && args != null && args.length > 0) {
-                if (mTrace.isDebugEnabled()) {
-                    mTrace.debug("execute(" + args[0] + ")");
-                }
                 args[0] = (mProps.getBoolean(ClientProperties.DB_REMOVE_HINTS) ? Utils.removeHints(args[0].toString())
                         : args[0].toString());
                 mDirectSql = (String) args[0];
@@ -390,7 +381,7 @@ public abstract class AbstractStatementHandler implements InvocationHandler, Sta
                 listener.startExecution(event);
             }
         } catch (RuntimeException e) {
-            mTrace.error("failed ", e);
+            mTrace.log(Level.SEVERE, "failed ", e);
         }
 
         Object retObject;
@@ -404,9 +395,6 @@ public abstract class AbstractStatementHandler implements InvocationHandler, Sta
             retObject = result;
 
             if (result instanceof ResultSet) {
-                if (mTrace.isDebugEnabled()) {
-                    mTrace.debug("create a proxy result set in method " + method.getName());
-                }
                 ResultSet proxyRs = getResultSetProxy((ResultSet) result, getSQL(), Utils.getExecClass(proxy));
 
                 if (proxyRs instanceof Checkable) {
@@ -439,8 +427,8 @@ public abstract class AbstractStatementHandler implements InvocationHandler, Sta
 
         if (infoLevel) {
             mTrace.info(getPrintString(method.getName(), result, dur, mExecCaller));
-        } else if (mTrace.isDebugEnabled()) {
-            mTrace.debug(getPrintString(method.getName(), result, dur, mExecCaller));
+        } else if (mTrace.isLoggable(Level.FINE)) {
+            mTrace.fine(getPrintString(method.getName(), result, dur, mExecCaller));
         }
 
         return retObject;

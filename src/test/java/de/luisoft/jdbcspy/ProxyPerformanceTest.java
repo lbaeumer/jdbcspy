@@ -22,7 +22,7 @@ public class ProxyPerformanceTest {
     public void setUp() {
         Connection uconn = new MyConnection(10000, 0, 0);
         ConnectionFactory connFac = new ConnectionFactory();
-        conn = connFac.getConnection(uconn);
+        conn = connFac.getProxyConnection(uconn);
     }
 
     @Test

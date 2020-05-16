@@ -150,7 +150,7 @@ public class DBProxyDriver implements Driver {
     @Override
     public Connection connect(String url, Properties info) throws SQLException {
         Connection c = uDriver.connect(url.substring(6), info);
-        return connFac.getConnection(c);
+        return connFac.getProxyConnection(c);
     }
 
     @Override

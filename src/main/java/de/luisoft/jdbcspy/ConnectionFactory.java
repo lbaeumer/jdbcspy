@@ -1,18 +1,17 @@
 package de.luisoft.jdbcspy;
 
 import de.luisoft.jdbcspy.proxy.handler.ConnectionHandler;
+import de.luisoft.jdbcspy.proxy.handler.XAConnectionHandler;
 import de.luisoft.jdbcspy.proxy.listener.ConnectionEvent;
 import de.luisoft.jdbcspy.proxy.listener.ConnectionListener;
 import de.luisoft.jdbcspy.proxy.listener.ExecutionFailedListener;
 import de.luisoft.jdbcspy.proxy.listener.ExecutionListener;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import javax.sql.XAConnection;
 import java.lang.reflect.Proxy;
 import java.sql.Connection;
 import java.util.List;
-import java.util.Properties;
+import java.util.logging.Logger;
 
 /**
  * Title: ConnectionFactory
@@ -22,28 +21,7 @@ public class ConnectionFactory implements ProxyConnectionMetaData {
     /**
      * A Logger.
      */
-    private static final Log mTrace = LogFactory.getLog(ConnectionFactory.class);
-    /**
-     * the version string
-     */
-    private static String VERSION;
-    /**
-     * the build date
-     */
-    private static String BUILD_DATE;
-
-    static {
-        Properties prop = new Properties();
-        try {
-            prop.load(ConnectionFactory.class.getResourceAsStream("/de/luisoft/db/build.properties"));
-            VERSION = prop.get("build.major") + "." + prop.get("build.release") + "." + prop.get("build.number");
-            BUILD_DATE = prop.get("build.date").toString();
-        } catch (Exception e) {
-            VERSION = "";
-            BUILD_DATE = "";
-        }
-        mTrace.debug("loading properties: " + prop);
-    }
+    private static final Logger mTrace = Logger.getLogger(ConnectionFactory.class.getName());
 
     /**
      * shall the proxy be enabled
@@ -64,7 +42,7 @@ public class ConnectionFactory implements ProxyConnectionMetaData {
 
         if (mInitiallyEnableProxy) {
             mEnableProxy = true;
-            init(props);
+            mTrace.info("settings=" + props);
         } else {
             mTrace.info("Disable the ProxyConnectionFactory initially. " + "Using standard connection.");
         }
@@ -72,6 +50,7 @@ public class ConnectionFactory implements ProxyConnectionMetaData {
         if (ClientProperties.getInstance().getBoolean(ClientProperties.DB_DUMP_AFTER_SHUTDOWN)) {
 
             Thread t = new Thread(() -> System.out.println(dumpStatistics()));
+            t.setDaemon(true);
             Runtime.getRuntime().addShutdownHook(t);
         }
 
@@ -91,22 +70,6 @@ public class ConnectionFactory implements ProxyConnectionMetaData {
             t.setDaemon(true);
             t.start();
         }
-    }
-
-    /**
-     * InitListener.
-     *
-     * @param props the properties
-     */
-    private void init(ClientProperties props) {
-
-        mTrace.info("ProxyConnectionFactory (" + VERSION + " " + BUILD_DATE + ") instanciated.");
-
-        if (props == null) {
-            props = ClientProperties.getInstance();
-        }
-
-        mTrace.info("Setting properties:\n" + props);
     }
 
     /**
@@ -137,11 +100,7 @@ public class ConnectionFactory implements ProxyConnectionMetaData {
     @Override
     public final void enableProxy(boolean enableProxy) {
         mTrace.info((enableProxy ? "Enable the Connection proxy." : "Disable the Connection proxy."));
-
         mEnableProxy = enableProxy;
-        if (enableProxy) {
-            init(null);
-        }
     }
 
     /**
@@ -150,15 +109,24 @@ public class ConnectionFactory implements ProxyConnectionMetaData {
      * @param conn the original connection
      * @return a proxy connection
      */
-    final Connection getConnection(Connection conn) {
+    public final Connection getProxyConnection(Connection conn) {
 
         if (!mEnableProxy) {
             // get standard connection
             return conn;
         }
 
-        ConnectionHandler connHandler = getNewConnectionHandler(conn);
-        Connection c = getProxyConnection(connHandler);
+        ConnectionHandler connHandler = new ConnectionHandler(
+                ClientProperties.getInstance(),
+                conn,
+                this);
+
+        for (ConnectionListener listener : ClientProperties.getInstance().getConnectionListener()) {
+            connHandler.addConnectionListener(listener);
+        }
+
+        Connection c = (ProxyConnection) Proxy.newProxyInstance(ProxyConnection.class.getClassLoader(),
+                new Class[]{ProxyConnection.class}, connHandler);
 
         ConnectionEvent event = new ConnectionEvent(connHandler);
         for (ConnectionListener listener : ClientProperties.getInstance().getConnectionListener()) {
@@ -174,53 +142,22 @@ public class ConnectionFactory implements ProxyConnectionMetaData {
      * @param conn the original connection
      * @return a proxy connection
      */
-    final XAConnection getConnection(XAConnection conn) {
+    final XAConnection getProxyXAConnection(XAConnection conn) {
 
         if (!mEnableProxy) {
             // get standard connection
             return conn;
         }
 
-        ConnectionHandler connHandler = getNewConnectionHandler(conn);
-        ProxyConnection c = getProxyConnection(connHandler);
+        XAConnectionHandler connHandler = new XAConnectionHandler(
+                ClientProperties.getInstance(),
+                conn,
+                this);
 
-        ConnectionEvent event = new ConnectionEvent(connHandler);
-        for (ConnectionListener listener : ClientProperties.getInstance().getConnectionListener()) {
-            listener.openConnection(event);
-        }
+        XAConnection c = (ProxyConnection) Proxy.newProxyInstance(ProxyConnection.class.getClassLoader(),
+                new Class[]{ProxyConnection.class}, connHandler);
 
         return c;
-    }
-
-    /**
-     * Get the proxy connection.
-     *
-     * @param invocationHandler the connection handler
-     * @return Connection
-     */
-    protected ProxyConnection getProxyConnection(ConnectionHandler invocationHandler) {
-        if (mTrace.isDebugEnabled()) {
-            mTrace.debug("get proxy connection");
-        }
-
-        return (ProxyConnection) Proxy.newProxyInstance(ProxyConnection.class.getClassLoader(),
-                new Class[]{ProxyConnection.class}, invocationHandler);
-    }
-
-    /**
-     * Get a connection handler
-     *
-     * @param conn Connection
-     * @return InvocationHandler
-     */
-    protected final ConnectionHandler getNewConnectionHandler(Object conn) {
-        ClientProperties props = ClientProperties.getInstance();
-        ConnectionHandler handler = new ConnectionHandler(props, conn, ClientProperties.getInstance().getListener(),
-                ClientProperties.getInstance().getFailedListener(), this);
-        for (ConnectionListener listener : ClientProperties.getInstance().getConnectionListener()) {
-            handler.addConnectionListener(listener);
-        }
-        return handler;
     }
 
     /**

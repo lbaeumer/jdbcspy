@@ -3,10 +3,9 @@ package de.luisoft.jdbcspy.proxy.listener.impl;
 import de.luisoft.jdbcspy.proxy.StatementStatistics;
 import de.luisoft.jdbcspy.proxy.listener.ExecutionAdapter;
 import de.luisoft.jdbcspy.proxy.listener.ExecutionEvent;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import java.util.Arrays;
+import java.util.logging.Logger;
 
 /**
  * The Execution Repeat checker.
@@ -16,7 +15,7 @@ public class ExecutionLastStatementListener extends ExecutionAdapter {
     /**
      * the logger object for tracing
      */
-    private static final Log mTrace = LogFactory.getLog(ExecutionLastStatementListener.class);
+    private static final Logger mTrace = Logger.getLogger(ExecutionLastStatementListener.class.getName());
 
     private int lastStatementMaxHistory;
     private int lastStatementExecutionThreshold;
@@ -59,7 +58,7 @@ public class ExecutionLastStatementListener extends ExecutionAdapter {
                 e.totalCount++;
                 if (e.count >= lastStatementExecutionThreshold) {
                     e.count = 0;
-                    mTrace.warn("Statement " + stmt + " called in method " + stmt.getExecuteCaller() + " was executed "
+                    mTrace.warning("Statement " + stmt + " called in method " + stmt.getExecuteCaller() + " was executed "
                             + e.totalCount + " times in a row.");
                 }
                 return;

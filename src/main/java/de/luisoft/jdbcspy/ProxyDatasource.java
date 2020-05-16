@@ -18,19 +18,20 @@ public class ProxyDatasource extends AbstractProxyDatasource implements DataSour
         String driverClass = (String) connFac.getProperty(ClientProperties.DB_DATASOURCE_CLASS);
         System.out.println("jdbcspy: driver " + driverClass);
         Class c = Class.forName(driverClass);
+        System.out.println("jdbcspy: instanciated driver " + c);
         uDatasource = c.getDeclaredConstructor().newInstance();
     }
 
     @Override
     public Connection getConnection() throws SQLException {
         Connection c = ((DataSource) uDatasource).getConnection();
-        return connFac.getConnection(c);
+        return connFac.getProxyConnection(c);
     }
 
     @Override
     public Connection getConnection(String username, String password) throws SQLException {
         Connection c = ((DataSource) uDatasource).getConnection(username, password);
-        return connFac.getConnection(c);
+        return connFac.getProxyConnection(c);
     }
 
     @Override

@@ -2,8 +2,6 @@ package de.luisoft.jdbcspy.proxy.listener.impl;
 
 import de.luisoft.jdbcspy.proxy.listener.ExecutionAdapter;
 import de.luisoft.jdbcspy.proxy.listener.ExecutionEvent;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -11,6 +9,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.logging.Logger;
 
 /**
  * The Execution Repeat checker.
@@ -20,7 +19,7 @@ public class ExecutionRepeatCountListener extends ExecutionAdapter {
     /**
      * the logger object for tracing
      */
-    private static final Log mTrace = LogFactory.getLog(ExecutionRepeatCountListener.class);
+    private static final Logger mTrace = Logger.getLogger(ExecutionRepeatCountListener.class.getName());
     /**
      * max print size
      */
@@ -57,7 +56,7 @@ public class ExecutionRepeatCountListener extends ExecutionAdapter {
             if (count != null) {
                 mMap.put(stmt, count + 1);
                 if ((count + 1) % repeatCountThreshold == 0) {
-                    mTrace.warn(
+                    mTrace.warning(
                             "The statement " + stmt + " in method " + event.getStatementStatistics().getExecuteCaller()
                                     + " has been executed " + (count + 1) + " times ");
                 }

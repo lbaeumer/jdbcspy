@@ -5,13 +5,12 @@ import de.luisoft.jdbcspy.proxy.listener.CloseEvent;
 import de.luisoft.jdbcspy.proxy.listener.ExecutionAdapter;
 import de.luisoft.jdbcspy.proxy.listener.ExecutionEvent;
 import de.luisoft.jdbcspy.proxy.util.Utils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * The Special statement listener.
@@ -21,7 +20,7 @@ public class SpecialStatementListener extends ExecutionAdapter {
     /**
      * the logger object for tracing
      */
-    private static final Log mTrace = LogFactory.getLog(SpecialStatementListener.class);
+    private static final Logger mTrace = Logger.getLogger(SpecialStatementListener.class.getName());
 
     /**
      * the time map

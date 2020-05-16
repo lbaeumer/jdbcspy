@@ -24,7 +24,7 @@ public class ProxyTest {
     public void setUp() {
         conn = new MyConnection(10000, 0, 0);
         connFac = new ConnectionFactory();
-        proxyConn = (ProxyConnection) connFac.getConnection(conn);
+        proxyConn = (ProxyConnection) connFac.getProxyConnection(conn);
     }
 
     @After

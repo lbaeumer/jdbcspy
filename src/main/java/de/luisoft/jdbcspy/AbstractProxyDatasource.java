@@ -8,13 +8,9 @@ public abstract class AbstractProxyDatasource {
     protected Object uDatasource;
 
     public void setDriverType(int type) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        try {
-            Class<?> c = uDatasource.getClass();
-            Method m = c.getMethod("setDriverType", int.class);
-            m.invoke(uDatasource, type);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        Class<?> c = uDatasource.getClass();
+        Method m = c.getMethod("setDriverType", int.class);
+        m.invoke(uDatasource, type);
     }
 
     public void setUser(String user) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
@@ -30,13 +26,9 @@ public abstract class AbstractProxyDatasource {
     }
 
     public void setDatabaseName(String databaseName) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        try {
-            Class<?> c = uDatasource.getClass();
-            Method m = c.getMethod("setDatabaseName", String.class);
-            m.invoke(uDatasource, databaseName);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        Class<?> c = uDatasource.getClass();
+        Method m = c.getMethod("setDatabaseName", String.class);
+        m.invoke(uDatasource, databaseName);
     }
 
     public void setServerName(String serverName) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
@@ -57,21 +49,21 @@ public abstract class AbstractProxyDatasource {
         m.invoke(uDatasource, currentSchema);
     }
 
-    public void setRetrieveMessagesFromServerOnGetMessage(String flag) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    public void setRetrieveMessagesFromServerOnGetMessage(boolean flag) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         Class<?> c = uDatasource.getClass();
         Method m = c.getMethod("setRetrieveMessagesFromServerOnGetMessage", boolean.class);
         m.invoke(uDatasource, flag);
     }
 
-    public void setDeferPrepares(String flag) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    public void setDeferPrepares(boolean flag) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         Class<?> c = uDatasource.getClass();
         Method m = c.getMethod("setDeferPrepares", boolean.class);
         m.invoke(uDatasource, flag);
     }
 
-    public void setTraceLevel(String flag) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    public void setTraceLevel(int traceLevel) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         Class<?> c = uDatasource.getClass();
         Method m = c.getMethod("setTraceLevel", int.class);
-        m.invoke(uDatasource, flag);
+        m.invoke(uDatasource, traceLevel);
     }
 }

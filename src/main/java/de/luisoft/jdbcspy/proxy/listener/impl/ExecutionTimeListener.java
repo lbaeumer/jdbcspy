@@ -5,8 +5,6 @@ import de.luisoft.jdbcspy.proxy.listener.CloseEvent;
 import de.luisoft.jdbcspy.proxy.listener.ExecutionAdapter;
 import de.luisoft.jdbcspy.proxy.listener.ExecutionEvent;
 import de.luisoft.jdbcspy.proxy.util.Utils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -14,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.logging.Logger;
 
 /**
  * The Execution checker.
@@ -23,7 +22,7 @@ public class ExecutionTimeListener extends ExecutionAdapter {
     /**
      * the logger object for tracing
      */
-    private static final Log mTrace = LogFactory.getLog(ExecutionTimeListener.class);
+    private static final Logger mTrace = Logger.getLogger(ExecutionTimeListener.class.getName());
 
     /**
      * max history
@@ -141,7 +140,7 @@ public class ExecutionTimeListener extends ExecutionAdapter {
                             }
                         }
                     } catch (Exception e) {
-                        mTrace.warn("failed ", e);
+                        mTrace.warning("failed " + e);
                     }
                 }
             };
@@ -227,7 +226,7 @@ public class ExecutionTimeListener extends ExecutionAdapter {
         if (loop > 1 && sql.length() > 25) {
             sql = sql.substring(0, 25) + "...";
         }
-        mTrace.warn("Statement " + sql + " called in " + method + (finished
+        mTrace.warning("Statement " + sql + " called in " + method + (finished
                 ? " finished in " + utils.getTimeString(execTime)
                 : " executing for " + utils.getTimeString(execTime) + (loop > 1 ? " (loop " + loop + ")" : "")));
     }
