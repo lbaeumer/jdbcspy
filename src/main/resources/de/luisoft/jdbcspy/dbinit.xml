@@ -33,7 +33,31 @@
 
     <property name="DumpAfterShutdown" value="false"/>
     <property name="DumpInterval" value="0"/>
-    <property name="DumpAfterCloseConnection" value="false"/>
-    <property name="DumpAfterCloseStatement" value="false"/>
 
+    <property name="DumpAfterCloseConnection" value="true"/>
+    <property name="DumpAfterCloseStatement" value="true"/>
+
+    <listeners>
+
+        <executionlistener class="de.luisoft.jdbcspy.proxy.listener.impl.ExecutionTimeListener">
+            <property name="longExecutionThreshold" value="180"/>
+        </executionlistener>
+        <executionlistener class="de.luisoft.jdbcspy.proxy.listener.impl.ExecutionLastStatementListener">
+            <property name="lastStatementMaxHistory" value="3"/>
+            <property name="lastStatementExecutionThreshold" value="500"/>
+        </executionlistener>
+        <executionlistener class="de.luisoft.jdbcspy.proxy.listener.impl.ExecutionRepeatCountListener"/>
+        <executionlistener class="de.luisoft.jdbcspy.proxy.listener.impl.ExecutionResourceListener">
+            <property name="ThrowWarnings" value="false"/>
+        </executionlistener>
+        <executionlistener class="de.luisoft.jdbcspy.proxy.listener.impl.ExecutionStatisticListener"/>
+        <executionlistener class="de.luisoft.jdbcspy.proxy.listener.impl.SpecialStatementListener"/>
+
+        <executionfailedlistener class="de.luisoft.jdbcspy.proxy.listener.impl.ExecutionFailedHistoryListener"/>
+
+        <connectionlistener class="de.luisoft.jdbcspy.proxy.listener.impl.ConnectionDumpListener">
+            <property name="connDumpCloseClassExp" value=""/>
+        </connectionlistener>
+        <connectionlistener class="de.luisoft.jdbcspy.proxy.listener.impl.ConnectionStatisticListener"/>
+    </listeners>
 </dbproxy>

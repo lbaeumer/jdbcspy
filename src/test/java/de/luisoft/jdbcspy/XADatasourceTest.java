@@ -5,7 +5,6 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import javax.sql.XAConnection;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -71,8 +70,8 @@ public class XADatasourceTest {
         con = c.getConnection();
         System.out.println("con=" + con);
         con.isReadOnly();
-        i=0;
-         s = con.prepareStatement("select * from book");
+        i = 0;
+        s = con.prepareStatement("select * from book");
         rs = s.executeQuery();
 
         while (rs.next()) {
@@ -80,14 +79,12 @@ public class XADatasourceTest {
         }
         Assert.assertEquals(i, 2);
 
-        Thread.sleep(40000);
         rs.close();
         s.close();
         con.close();
         System.out.println("c=" + c);
 
         c.close();
-
 
         System.out.println("dump" + c.dump());
     }

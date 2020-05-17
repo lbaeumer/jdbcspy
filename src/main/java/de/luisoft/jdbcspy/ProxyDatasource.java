@@ -1,10 +1,7 @@
 package de.luisoft.jdbcspy;
 
-import de.luisoft.jdbcspy.proxy.ConnectionFactory;
-
 import javax.sql.DataSource;
 import java.io.PrintWriter;
-import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
@@ -12,16 +9,8 @@ import java.util.logging.Logger;
 
 public class ProxyDatasource extends AbstractProxyDatasource implements DataSource {
 
-    private ConnectionFactory connFac;
-
-    public ProxyDatasource() throws ClassNotFoundException, IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
-        System.out.println("jdbcspy: init proxy datasource");
-        connFac = new ConnectionFactory();
-        String driverClass = (String) connFac.getProperty(ClientProperties.DB_DATASOURCE_CLASS);
-        System.out.println("jdbcspy: driver " + driverClass);
-        Class c = Class.forName(driverClass);
-        System.out.println("jdbcspy: instanciated driver " + c);
-        uDatasource = c.getDeclaredConstructor().newInstance();
+    public ProxyDatasource() {
+        super(ClientProperties.DB_DATASOURCE_CLASS);
     }
 
     @Override

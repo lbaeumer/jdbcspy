@@ -22,7 +22,7 @@ public class ConnectionFactory implements ProxyConnectionMetaData {
     /**
      * A Logger.
      */
-    private static final Logger mTrace = Logger.getLogger(ConnectionFactory.class.getName());
+    private static final Logger mTrace = Logger.getLogger("jdbcspy.connectionfactory");
 
     /**
      * shall the proxy be enabled

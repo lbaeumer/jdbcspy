@@ -35,7 +35,7 @@ public class ConnectionInvocationHandler implements InvocationHandler, Connectio
     /**
      * the logger object for tracing
      */
-    private static final Logger mTrace = Logger.getLogger(ConnectionInvocationHandler.class.getName());
+    private static final Logger mTrace = Logger.getLogger("jdbcspy.connection");
 
     /**
      * max statement count

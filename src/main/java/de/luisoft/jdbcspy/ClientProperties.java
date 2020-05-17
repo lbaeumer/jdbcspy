@@ -141,7 +141,7 @@ public final class ClientProperties {
     /**
      * A Logger.
      */
-    private static final Logger mTrace = Logger.getLogger(ClientProperties.class.getName());
+    private static final Logger mTrace = Logger.getLogger("jdbcspy.properties");
     /**
      * the db init file
      */

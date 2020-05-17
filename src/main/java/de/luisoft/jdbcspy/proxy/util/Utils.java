@@ -59,6 +59,8 @@ public class Utils {
                     || proxy.getClass().getName().equals(el.getClassName())
                     || el.getClassName().startsWith("org.jboss.")
                     || el.getClassName().startsWith("org.junit")
+                    || el.getClassName().startsWith("org.hibernate")
+                    || el.getClassName().startsWith("org.springframework")
                     || el.getClassName().startsWith("com.ibm.")
                     || el.getClassName().startsWith("com.sun.")
                     || el.getClassName().startsWith("jdk.internal.")

@@ -1,11 +1,36 @@
 package de.luisoft.jdbcspy;
 
+import de.luisoft.jdbcspy.proxy.ConnectionFactory;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public abstract class AbstractProxyDatasource {
 
     protected Object uDatasource;
+    protected ConnectionFactory connFac;
+
+    public AbstractProxyDatasource(String driver) {
+        Class c = null;
+        Exception e = null;
+        try {
+            connFac = new ConnectionFactory();
+            String driverClass = (String) connFac.getProperty(driver);
+            c = Class.forName(driverClass);
+            uDatasource = c.getDeclaredConstructor().newInstance();
+        } catch (Exception ex) {
+            e = ex;
+        } finally {
+            if (c != null) {
+                System.out.println("jdbcspy: instanciated driver " + c);
+            } else {
+                System.out.println("jdbcspy: init failed.");
+                if (e != null) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
 
     public void setDriverType(int type) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         Class<?> c = uDatasource.getClass();

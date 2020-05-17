@@ -1,27 +1,16 @@
 package de.luisoft.jdbcspy;
 
-import de.luisoft.jdbcspy.proxy.ConnectionFactory;
-
 import javax.sql.XAConnection;
 import javax.sql.XADataSource;
 import java.io.PrintWriter;
-import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
 import java.util.logging.Logger;
 
 public class ProxyXADatasource extends AbstractProxyDatasource implements XADataSource {
 
-    private ConnectionFactory connFac;
-
-    public ProxyXADatasource() throws ClassNotFoundException, IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
-        System.out.println("jdbcspy: init proxy xa datasource");
-        connFac = new ConnectionFactory();
-        String driverClass = (String) connFac.getProperty(ClientProperties.DB_XA_DATASOURCE_CLASS);
-        System.out.println("jdbcspy: found xa driver " + driverClass);
-        Class c = Class.forName(driverClass);
-        System.out.println("jdbcspy: instanciated xa driver " + c);
-        uDatasource = c.getDeclaredConstructor().newInstance();
+    public ProxyXADatasource() {
+        super(ClientProperties.DB_XA_DATASOURCE_CLASS);
     }
 
     @Override

@@ -156,7 +156,7 @@ public abstract class AbstractStatementInvocationHandler implements InvocationHa
                 return toString();
             }
 
-            mTrace.fine("call method: " + method.getName() + "(" + (args != null ? "#=" + args.length : "") + ")");
+            mTrace.info("call method: " + method.getName() + "(" + (args != null ? "#=" + args.length : "") + ")");
 
             if ("close".equals(method.getName())) {
                 return handleClose(proxy, method, args);

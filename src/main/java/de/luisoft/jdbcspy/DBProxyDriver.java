@@ -7,6 +7,7 @@ import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.DriverPropertyInfo;
 import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
 import java.util.Enumeration;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -181,7 +182,7 @@ public class DBProxyDriver implements Driver {
     }
 
     @Override
-    public Logger getParentLogger() {
-        return null;
+    public Logger getParentLogger() throws SQLFeatureNotSupportedException {
+        return uDriver.getParentLogger();
     }
 }

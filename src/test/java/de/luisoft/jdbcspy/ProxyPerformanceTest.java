@@ -30,7 +30,7 @@ public class ProxyPerformanceTest {
     @Test
     public void testExecute() throws Exception {
 
-        int cnt = 10;
+        int cnt = 1;
         long start = System.currentTimeMillis();
 
         for (int i = 0; i < cnt; i++) {
@@ -59,7 +59,7 @@ public class ProxyPerformanceTest {
     @Test
     public void testExecuteQuery() throws Exception {
 
-        int cnt = 10;
+        int cnt = 1;
         long start = System.currentTimeMillis();
 
         for (int i = 0; i < cnt; i++) {

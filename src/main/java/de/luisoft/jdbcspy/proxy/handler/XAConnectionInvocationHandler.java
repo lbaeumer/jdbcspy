@@ -23,7 +23,7 @@ public class XAConnectionInvocationHandler implements InvocationHandler, Connect
     /**
      * the logger object for tracing
      */
-    private static final Logger mTrace = Logger.getLogger(XAConnectionInvocationHandler.class.getName());
+    private static final Logger mTrace = Logger.getLogger("jdbcspy.xaconnection");
 
     /**
      * the underlying connection

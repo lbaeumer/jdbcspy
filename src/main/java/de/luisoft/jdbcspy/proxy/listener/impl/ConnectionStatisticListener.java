@@ -90,7 +90,7 @@ public class ConnectionStatisticListener implements ConnectionListener {
      */
     @Override
     public String toString() {
-        StringBuilder strb = new StringBuilder("[ConnectionStatisticListener[\n" + "#conn=" + mCount
+        StringBuilder strb = new StringBuilder("[ConnectionStatisticListener[\n" + "  #conn=" + mCount
                 + "; #max open conns=" + mMaxCurrentCount + "; #max stmts/conn=" + mMaxStmtCount);
 
         int i = 0;
@@ -102,12 +102,12 @@ public class ConnectionStatisticListener implements ConnectionListener {
                 if (i == 1) {
                     strb.append("; current:");
                 }
-                strb.append("\n").append(i).append(": ");
+                strb.append("\n  ").append(i).append(": ");
                 strb.append(hndlr.toString());
 
                 try {
-                    if ((c instanceof Connection) && ((Connection) c).getAutoCommit()
-                            || (c instanceof XAConnection) && ((XAConnection) c).getConnection().getAutoCommit()) {
+                    if (c instanceof Connection && ((Connection) c).getAutoCommit()
+                            || c instanceof XAConnection && ((XAConnection) c).getConnection().getAutoCommit()) {
                         strb.append("; autocommit");
                     }
                     strb.append("; isolation=").append(Utils.getIsolationLevel(
@@ -115,8 +115,8 @@ public class ConnectionStatisticListener implements ConnectionListener {
                                     ? ((Connection) c).getTransactionIsolation()
                                     : ((XAConnection) c).getConnection().getTransactionIsolation())
                     ));
-                    if ((c instanceof Connection) && ((Connection) c).isReadOnly()
-                            || (c instanceof XAConnection) && ((XAConnection) c).getConnection().isReadOnly()) {
+                    if (c instanceof Connection && ((Connection) c).isReadOnly()
+                            || c instanceof XAConnection && ((XAConnection) c).getConnection().isReadOnly()) {
                         strb.append("; readonly");
                     }
                 } catch (SQLException e) {

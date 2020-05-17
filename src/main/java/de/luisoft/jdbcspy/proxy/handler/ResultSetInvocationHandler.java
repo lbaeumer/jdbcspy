@@ -29,7 +29,7 @@ public class ResultSetInvocationHandler implements InvocationHandler, ResultSetS
     /**
      * the logger object for tracing
      */
-    private static final Logger mTrace = Logger.getLogger(ResultSetInvocationHandler.class.getName());
+    private static final Logger mTrace = Logger.getLogger("jdbcspy.rs");
     /**
      * the original result set
      */
