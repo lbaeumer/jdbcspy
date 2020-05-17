@@ -1,9 +1,9 @@
 package de.luisoft.jdbcspy.proxy.handler;
 
 import de.luisoft.jdbcspy.ClientProperties;
-import de.luisoft.jdbcspy.ProxyConnectionMetaData;
 import de.luisoft.jdbcspy.proxy.Checkable;
 import de.luisoft.jdbcspy.proxy.ConnectionStatistics;
+import de.luisoft.jdbcspy.proxy.ProxyConnectionMetaData;
 import de.luisoft.jdbcspy.proxy.StatementFactory;
 import de.luisoft.jdbcspy.proxy.StatementStatistics;
 import de.luisoft.jdbcspy.proxy.Statistics;
@@ -18,6 +18,7 @@ import de.luisoft.jdbcspy.proxy.util.Utils;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.sql.Connection;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -29,12 +30,12 @@ import java.util.logging.Logger;
 /**
  * The connection handler.
  */
-public class ConnectionHandler implements InvocationHandler, ConnectionStatistics {
+public class ConnectionInvocationHandler implements InvocationHandler, ConnectionStatistics {
 
     /**
      * the logger object for tracing
      */
-    private static final Logger mTrace = Logger.getLogger(ConnectionHandler.class.getName());
+    private static final Logger mTrace = Logger.getLogger(ConnectionInvocationHandler.class.getName());
 
     /**
      * max statement count
@@ -42,9 +43,9 @@ public class ConnectionHandler implements InvocationHandler, ConnectionStatistic
     private static final int MAX_STMT_COUNT = 100;
 
     /**
-     * the prepared statement
+     * the underlying connection
      */
-    private final Object mConn;
+    private final Connection mConn;
 
     /**
      * all generated statements
@@ -55,10 +56,6 @@ public class ConnectionHandler implements InvocationHandler, ConnectionStatistic
      * result set item count
      */
     private final List<Integer> mResultSetItemCount = new ArrayList<>();
-    /**
-     * the properties
-     */
-    private final ClientProperties mProps;
 
     /**
      * the connection listener list
@@ -97,35 +94,14 @@ public class ConnectionHandler implements InvocationHandler, ConnectionStatistic
     /**
      * The Constructor.
      *
-     * @param props          the client properties
-     * @param theConn        the original connection
+     * @param theConn the original connection
      */
-    public ConnectionHandler(ClientProperties props,
-                             Object theConn,
-                             ProxyConnectionMetaData metaData) {
+    public ConnectionInvocationHandler(Connection theConn,
+                                       ProxyConnectionMetaData metaData) {
         mConn = theConn;
         mMetaData = metaData;
-        mProps = props;
         mConnectionListener = new LinkedList<>();
         mCaller = Utils.getExecClass(this);
-    }
-
-    /**
-     * Add a connection listener.
-     *
-     * @param listener ConnectionListener
-     */
-    public void addConnectionListener(ConnectionListener listener) {
-        mConnectionListener.add(listener);
-    }
-
-    /**
-     * Remove a connection listener.
-     *
-     * @param listener ConnectionListener
-     */
-    public void removeConnectionListener(ConnectionListener listener) {
-        mConnectionListener.remove(listener);
     }
 
     /**
@@ -173,10 +149,10 @@ public class ConnectionHandler implements InvocationHandler, ConnectionStatistic
         } catch (ProxyException e) {
             ResourceEvent event = new ResourceEvent(e, e.getOpenMethod(), Utils.getExecClass(proxy));
 
-            for (ExecutionListener listener : mProps.getListener()) {
+            for (ExecutionListener listener : ClientProperties.getInstance().getListener()) {
                 listener.resourceFailure(event);
             }
-            if (mProps.getBoolean(ClientProperties.DB_THROW_WARNINGS)) {
+            if (ClientProperties.getInstance().getBoolean(ClientProperties.DB_THROW_WARNINGS)) {
                 throw e;
             }
             return null;
@@ -204,21 +180,6 @@ public class ConnectionHandler implements InvocationHandler, ConnectionStatistic
         }
         strb.append(")");
         return strb.toString();
-    }
-
-    /**
-     * Dump the connection.
-     *
-     * @return String
-     */
-    @Override
-    public String toString() {
-        synchronized (mStatements) {
-            return "Connection[#stmt=" + getItemCount() + "; #rs=" + printList(mResultSetItemCount) + "; duration="
-                    + utils.getTimeString(getDuration())
-                    + (getSize() > 0 ? "; size=" + utils.getSizeString(getSize()) : "") + ", opened in " + getCaller()
-                    + "]";
-        }
     }
 
     /**
@@ -270,13 +231,13 @@ public class ConnectionHandler implements InvocationHandler, ConnectionStatistic
      */
     private Object handlePrepare(Object proxy, Method method, Object[] args) throws Throwable {
 
-        String sql = (mProps.getBoolean(ClientProperties.DB_REMOVE_HINTS) ? Utils.removeHints(args[0].toString())
+        String sql = (ClientProperties.getInstance().getBoolean(ClientProperties.DB_REMOVE_HINTS) ? Utils.removeHints(args[0].toString())
                 : args[0].toString());
 
         Object ob = method.invoke(mConn, args);
         if (ob instanceof Statement) {
-            Statement proxyStmt = StatementFactory.getInstance().getStatement(mProps, (Statement) ob, mMetaData, sql,
-                    mProps.getListener(), mProps.getFailedListener(), Utils.getExecClass(proxy));
+            Statement proxyStmt = StatementFactory.getInstance().getStatement(ClientProperties.getInstance(), (Statement) ob, mMetaData, sql,
+                    Utils.getExecClass(proxy));
 
             if (proxyStmt instanceof Checkable) {
                 addStatement((Checkable) proxyStmt);
@@ -301,8 +262,8 @@ public class ConnectionHandler implements InvocationHandler, ConnectionStatistic
     private Object handleCreate(Object proxy, Method method, Object[] args) throws Throwable {
         Object ob = method.invoke(mConn, args);
         if (ob instanceof Statement) {
-            Statement proxyStmt = StatementFactory.getInstance().getStatement(mProps, (Statement) ob, mMetaData, null,
-                    mProps.getListener(), mProps.getFailedListener(), Utils.getExecClass(proxy));
+            Statement proxyStmt = StatementFactory.getInstance().getStatement(ClientProperties.getInstance(), (Statement) ob, mMetaData, null,
+                    Utils.getExecClass(proxy));
 
             if (proxyStmt instanceof Checkable) {
                 addStatement((Checkable) proxyStmt);
@@ -357,7 +318,7 @@ public class ConnectionHandler implements InvocationHandler, ConnectionStatistic
      */
     private Object handleClose(Object proxy, Method method, Object[] args) throws Throwable {
 
-        if (!mProps.getBoolean(ClientProperties.DB_IGNORE_DOUBLE_CLOSED_OBJECTS) && mIsClosed) {
+        if (!ClientProperties.getInstance().getBoolean(ClientProperties.DB_IGNORE_DOUBLE_CLOSED_OBJECTS) && mIsClosed) {
             String txt = "The connection " + this + " was already closed in " + Utils.getExecClass(proxy) + ".";
             ResourceAlreadyClosedException proxyExc = new ResourceAlreadyClosedException(txt);
 
@@ -401,15 +362,33 @@ public class ConnectionHandler implements InvocationHandler, ConnectionStatistic
             }
         }
 
-        boolean displayTime = mDuration > mProps.getInt(ClientProperties.DB_CONN_TOTAL_TIME_THRESHOLD);
-        boolean displaySize = mDuration > mProps.getInt(ClientProperties.DB_CONN_TOTAL_SIZE_THRESHOLD);
-        boolean displayAfterClose = mProps.getBoolean(ClientProperties.DB_DUMP_AFTER_CLOSE);
+        boolean displayTime = mDuration > ClientProperties.getInstance().getInt(ClientProperties.DB_CONN_TOTAL_TIME_THRESHOLD);
+        boolean displaySize = mDuration > ClientProperties.getInstance().getInt(ClientProperties.DB_CONN_TOTAL_SIZE_THRESHOLD);
+        boolean displayAfterClose = ClientProperties.getInstance().getBoolean(ClientProperties.DB_DUMP_AFTER_CLOSE_CONNECTION);
 
         if (displayTime || displaySize || displayAfterClose) {
-            mTrace.info("closed " + this + " in " + Utils.getExecClass(proxy));
+            mTrace.info("closed connection " + this + " in " + Utils.getExecClass(proxy));
         }
 
         return ret;
+    }
+
+    /**
+     * Add a connection listener.
+     *
+     * @param listener ConnectionListener
+     */
+    public void addConnectionListener(ConnectionListener listener) {
+        mConnectionListener.add(listener);
+    }
+
+    /**
+     * Remove a connection listener.
+     *
+     * @param listener ConnectionListener
+     */
+    public void removeConnectionListener(ConnectionListener listener) {
+        mConnectionListener.remove(listener);
     }
 
     /**
@@ -515,5 +494,20 @@ public class ConnectionHandler implements InvocationHandler, ConnectionStatistic
     @Override
     public ProxyConnectionMetaData getProxyConnectionMetaData() {
         return mMetaData;
+    }
+
+    /**
+     * Dump the connection.
+     *
+     * @return String
+     */
+    @Override
+    public String toString() {
+        synchronized (mStatements) {
+            return "Connection[#stmt=" + getItemCount() + "; #rs=" + printList(mResultSetItemCount) + "; duration="
+                    + Utils.getTimeString(getDuration())
+                    + (getSize() > 0 ? "; size=" + Utils.getSizeString(getSize()) : "") + ", opened in " + getCaller()
+                    + "]";
+        }
     }
 }

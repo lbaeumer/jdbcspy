@@ -66,4 +66,16 @@ public abstract class AbstractProxyDatasource {
         Method m = c.getMethod("setTraceLevel", int.class);
         m.invoke(uDatasource, traceLevel);
     }
+
+    public void setProgressiveStreaming(int traceLevel) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        Class<?> c = uDatasource.getClass();
+        Method m = c.getMethod("setProgressiveStreaming", int.class);
+        m.invoke(uDatasource, traceLevel);
+    }
+
+    public void setFullyMaterializeLobData(boolean fullyMaterializeLobData) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        Class<?> c = uDatasource.getClass();
+        Method m = c.getMethod("setFullyMaterializeLobData", boolean.class);
+        m.invoke(uDatasource, fullyMaterializeLobData);
+    }
 }

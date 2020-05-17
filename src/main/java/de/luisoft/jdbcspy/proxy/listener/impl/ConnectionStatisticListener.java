@@ -1,7 +1,7 @@
 package de.luisoft.jdbcspy.proxy.listener.impl;
 
 import de.luisoft.jdbcspy.proxy.ConnectionStatistics;
-import de.luisoft.jdbcspy.proxy.handler.ConnectionHandler;
+import de.luisoft.jdbcspy.proxy.handler.ConnectionInvocationHandler;
 import de.luisoft.jdbcspy.proxy.listener.ConnectionEvent;
 import de.luisoft.jdbcspy.proxy.listener.ConnectionListener;
 import de.luisoft.jdbcspy.proxy.util.Utils;
@@ -96,7 +96,7 @@ public class ConnectionStatisticListener implements ConnectionListener {
         int i = 0;
         synchronized (mConns) {
             for (Iterator it = mConns.iterator(); it.hasNext(); i++) {
-                ConnectionHandler hndlr = (ConnectionHandler) it.next();
+                ConnectionInvocationHandler hndlr = (ConnectionInvocationHandler) it.next();
                 Object c = hndlr.getUnderlyingConnection();
 
                 if (i == 1) {

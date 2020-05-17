@@ -32,8 +32,10 @@
     <property name="TraceDepth" value="3"/>
 
     <property name="DumpAfterShutdown" value="false"/>
-    <property name="DumpInterval" value="0"/>
-    <property name="DumpAfterClose" value="false"/>
+    <property name="DumpInterval" value="20"/>
+
+    <property name="DumpAfterCloseConnection" value="true"/>
+    <property name="DumpAfterCloseStatement" value="true"/>
 
     <listeners>
 

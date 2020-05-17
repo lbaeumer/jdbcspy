@@ -1,7 +1,8 @@
-package de.luisoft.jdbcspy;
+package de.luisoft.jdbcspy.proxy;
 
-import de.luisoft.jdbcspy.proxy.handler.ConnectionHandler;
-import de.luisoft.jdbcspy.proxy.handler.XAConnectionHandler;
+import de.luisoft.jdbcspy.ClientProperties;
+import de.luisoft.jdbcspy.proxy.handler.ConnectionInvocationHandler;
+import de.luisoft.jdbcspy.proxy.handler.XAConnectionInvocationHandler;
 import de.luisoft.jdbcspy.proxy.listener.ConnectionEvent;
 import de.luisoft.jdbcspy.proxy.listener.ConnectionListener;
 import de.luisoft.jdbcspy.proxy.listener.ExecutionFailedListener;
@@ -26,7 +27,7 @@ public class ConnectionFactory implements ProxyConnectionMetaData {
     /**
      * shall the proxy be enabled
      */
-    private boolean mInitiallyEnableProxy;
+    private final boolean mInitiallyEnableProxy;
     /**
      * shall the proxy be enabled
      */
@@ -35,7 +36,7 @@ public class ConnectionFactory implements ProxyConnectionMetaData {
     /**
      * Constructor.
      */
-    ConnectionFactory() {
+    public ConnectionFactory() {
 
         ClientProperties props = ClientProperties.getInstance();
         mInitiallyEnableProxy = props.isInitiallyEnabled();
@@ -116,10 +117,8 @@ public class ConnectionFactory implements ProxyConnectionMetaData {
             return conn;
         }
 
-        ConnectionHandler connHandler = new ConnectionHandler(
-                ClientProperties.getInstance(),
-                conn,
-                this);
+        ConnectionInvocationHandler connHandler =
+                new ConnectionInvocationHandler(conn, this);
 
         for (ConnectionListener listener : ClientProperties.getInstance().getConnectionListener()) {
             connHandler.addConnectionListener(listener);
@@ -142,22 +141,18 @@ public class ConnectionFactory implements ProxyConnectionMetaData {
      * @param conn the original connection
      * @return a proxy connection
      */
-    final XAConnection getProxyXAConnection(XAConnection conn) {
+    public final XAConnection getProxyXAConnection(XAConnection conn) {
 
         if (!mEnableProxy) {
             // get standard connection
             return conn;
         }
 
-        XAConnectionHandler connHandler = new XAConnectionHandler(
-                ClientProperties.getInstance(),
-                conn,
-                this);
+        XAConnectionInvocationHandler connHandler =
+                new XAConnectionInvocationHandler(conn, this);
 
-        XAConnection c = (ProxyConnection) Proxy.newProxyInstance(ProxyConnection.class.getClassLoader(),
+        return (XAConnection) Proxy.newProxyInstance(ProxyConnection.class.getClassLoader(),
                 new Class[]{ProxyConnection.class}, connHandler);
-
-        return c;
     }
 
     /**

@@ -1,7 +1,5 @@
 package de.luisoft.jdbcspy.proxy;
 
-import de.luisoft.jdbcspy.ProxyConnectionMetaData;
-
 import java.util.List;
 
 /**

@@ -127,9 +127,13 @@ public final class ClientProperties {
      */
     public static final String DB_DUMP_AFTER_SHUTDOWN = "DumpAfterShutdown";
     /**
-     * dump after shutdown
+     * dump after connection close
      */
-    public static final String DB_DUMP_AFTER_CLOSE = "DumpAfterClose";
+    public static final String DB_DUMP_AFTER_CLOSE_CONNECTION = "DumpAfterCloseConnection";
+    /**
+     * dump after statement close
+     */
+    public static final String DB_DUMP_AFTER_CLOSE_STATEMENT = "DumpAfterCloseStatement";
     /**
      * dump interval in s
      */
@@ -154,7 +158,7 @@ public final class ClientProperties {
      */
     private static final List<String> mBoolValues = Arrays.asList(DB_ENABLE_PROXY_INITIALLY, DB_THROW_WARNINGS,
             DB_DISPLAY_ENTITY_BEANS, DB_REMOVE_HINTS, DB_IGNORE_NOT_CLOSED_OBJECTS, DB_IGNORE_DOUBLE_CLOSED_OBJECTS,
-            DB_ENABLE_SIZE_EVALUATION, DB_DUMP_AFTER_SHUTDOWN, DB_DUMP_AFTER_CLOSE);
+            DB_ENABLE_SIZE_EVALUATION, DB_DUMP_AFTER_SHUTDOWN, DB_DUMP_AFTER_CLOSE_CONNECTION, DB_DUMP_AFTER_CLOSE_STATEMENT);
     /**
      * all string values
      */

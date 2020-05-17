@@ -1,4 +1,4 @@
-package de.luisoft.jdbcspy;
+package de.luisoft.jdbcspy.proxy;
 
 import java.util.List;
 

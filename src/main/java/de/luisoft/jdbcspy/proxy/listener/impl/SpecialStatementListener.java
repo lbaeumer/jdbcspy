@@ -98,11 +98,11 @@ public class SpecialStatementListener extends ExecutionAdapter {
             for (Map.Entry<String, List<String>> e : mHistoryMap.entrySet()) {
                 List<String> stmts = e.getValue();
 
-                strb.append("\nhistory list for (").append(e.getKey()).append("):\n");
+                strb.append("\n  history list for (").append(e.getKey()).append("):\n");
 
                 int i = 1;
                 for (String s : stmts) {
-                    strb.append(i).append(": ");
+                    strb.append("  ").append(i).append(": ");
                     strb.append(s);
                     strb.append("\n");
                     i++;

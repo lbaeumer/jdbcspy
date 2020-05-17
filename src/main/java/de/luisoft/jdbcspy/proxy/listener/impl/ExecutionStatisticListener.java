@@ -354,12 +354,12 @@ public class ExecutionStatisticListener extends ExecutionAdapter {
 
         StringBuilder map = new StringBuilder(
                 "[ExecutionStatisticListener[" + "online since " + utils.getFormattedDate(mInitDate) + " ("
-                        + utils.getTimeString((System.currentTimeMillis() - mInitDate.getTime())) + ")\n#stmt="
-                        + mStmtCount + "; #rs=" + mItemCount + (mSize > 0 ? "; size=" + utils.getSizeString(mSize) : "")
-                        + "; duration=" + utils.getTimeString(mDuration));
+                        + Utils.getTimeString((System.currentTimeMillis() - mInitDate.getTime())) + ")\n  #stmt="
+                        + mStmtCount + "; #rs=" + mItemCount + (mSize > 0 ? "; size=" + Utils.getSizeString(mSize) : "")
+                        + "; duration=" + Utils.getTimeString(mDuration));
 
         if (mStmtCount != 0) {
-            map.append("; avgDuration=").append(utils.getTimeString(mDuration / mStmtCount)).append("; maxLength=").append(mMaxLength).append("; avgLength=").append(mTotalLength / mStmtCount).append(";\ntime=");
+            map.append("; avgDuration=").append(Utils.getTimeString(mDuration / mStmtCount)).append("; maxLength=").append(mMaxLength).append("; avgLength=").append(mTotalLength / mStmtCount).append(";\n  time=");
 
             boolean first = true;
             synchronized (mTimeMap) {
@@ -375,7 +375,7 @@ public class ExecutionStatisticListener extends ExecutionAdapter {
                 }
             }
 
-            map.append(";\nlength=");
+            map.append(";\n  length=");
             first = true;
             synchronized (mLengthMap) {
                 for (String s : LENGTH_CAT_STRING) {

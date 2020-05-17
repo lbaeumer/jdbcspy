@@ -143,7 +143,7 @@ public class ExecutionRepeatCountListener extends ExecutionAdapter {
 
         int count = MAX_PRINT_SIZE;
         for (Map.Entry<String, Integer> e : s) {
-            strb.append(MAX_PRINT_SIZE - count + 1).append(": #=").append(e.getValue()).append(": \"").append(e.getKey()).append("\"\n");
+            strb.append("  ").append(MAX_PRINT_SIZE - count + 1).append(": #=").append(e.getValue()).append(": \"").append(e.getKey()).append("\"\n");
             count--;
             if (count <= 0) {
                 break;

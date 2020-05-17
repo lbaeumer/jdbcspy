@@ -1,7 +1,7 @@
 package de.luisoft.jdbcspy.proxy.handler;
 
 import de.luisoft.jdbcspy.ClientProperties;
-import de.luisoft.jdbcspy.ProxyConnectionMetaData;
+import de.luisoft.jdbcspy.proxy.ProxyConnectionMetaData;
 import de.luisoft.jdbcspy.proxy.util.Utils;
 
 import java.lang.reflect.Method;
@@ -17,7 +17,7 @@ import java.util.Map;
 /**
  * The statement handler.
  */
-public class PreparedStatementHandler extends AbstractStatementHandler {
+public class PreparedStatementInvocationHandler extends AbstractStatementInvocationHandler {
 
     /**
      * the bind variables
@@ -43,8 +43,8 @@ public class PreparedStatementHandler extends AbstractStatementHandler {
      * @param theSql  the sql string
      * @param method  the method
      */
-    public PreparedStatementHandler(ClientProperties props, Statement theStmt, ProxyConnectionMetaData metaData,
-                                    String theSql, String method) {
+    public PreparedStatementInvocationHandler(ClientProperties props, Statement theStmt, ProxyConnectionMetaData metaData,
+                                              String theSql, String method) {
         super(props, theStmt, metaData, theSql, method);
         mProps = props;
         mSql = theSql;

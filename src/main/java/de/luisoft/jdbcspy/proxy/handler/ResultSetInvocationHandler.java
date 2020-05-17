@@ -18,48 +18,32 @@ import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.Time;
 import java.sql.Timestamp;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
  * The result set handler.
  */
-public class ResultSetHandler implements InvocationHandler, ResultSetStatistics {
+public class ResultSetInvocationHandler implements InvocationHandler, ResultSetStatistics {
 
     /**
      * the logger object for tracing
      */
-    private static final Logger mTrace = Logger.getLogger(ResultSetHandler.class.getName());
-    /**
-     * ignore the size evaluation
-     */
-    private final boolean mPropEnableSizeEvaluation;
+    private static final Logger mTrace = Logger.getLogger(ResultSetInvocationHandler.class.getName());
     /**
      * the original result set
      */
-    private final ResultSet mRs;
+    private final ResultSet uResultSet;
     /**
      * the sql statement
      */
     private final String mSql;
-    /**
-     * the properties
-     */
-    private final ClientProperties mProps;
-    /**
-     * the execution listener
-     */
-    private final List<ExecutionListener> mExecListeners;
-    /**
-     * the execution failed listener
-     */
-    private final List<ExecutionFailedListener> mExecFailedListeners;
+
     /**
      * the open method
      */
     private final String mOpenMethod;
-    private final Utils utils = new Utils();
+
     /**
      * is closed
      */
@@ -80,22 +64,14 @@ public class ResultSetHandler implements InvocationHandler, ResultSetStatistics 
     /**
      * Constructor.
      *
-     * @param props          the client properties
-     * @param rs             ResultSet
-     * @param sql            String
-     * @param listener       the execution listener
-     * @param failedListener the failed listener
-     * @param openMethod     the method
+     * @param rs         ResultSet
+     * @param sql        String
+     * @param openMethod the method
      */
-    public ResultSetHandler(ClientProperties props, ResultSet rs, String sql, List<ExecutionListener> listener,
-                            List<ExecutionFailedListener> failedListener, String openMethod) {
+    public ResultSetInvocationHandler(ResultSet rs, String sql, String openMethod) {
 
-        mRs = rs;
+        uResultSet = rs;
         mSql = sql;
-        mProps = props;
-        mExecListeners = listener;
-        mExecFailedListeners = failedListener;
-        mPropEnableSizeEvaluation = mProps.getBoolean(ClientProperties.DB_ENABLE_SIZE_EVALUATION);
         mOpenMethod = openMethod;
     }
 
@@ -136,13 +112,13 @@ public class ResultSetHandler implements InvocationHandler, ResultSetStatistics 
             }
 
             // remaining calls
-            return method.invoke(mRs, args);
+            return method.invoke(uResultSet, args);
         } catch (InvocationTargetException e) {
             mTrace.log(Level.SEVERE, "result set access failed for " + mSql + " in " + methodName + getArgs(args), e.getCause());
 
             ExecutionFailedEvent event = new ExecutionFailedEvent(toString(), e.getCause());
 
-            for (ExecutionFailedListener listener : mExecFailedListeners) {
+            for (ExecutionFailedListener listener : ClientProperties.getInstance().getFailedListener()) {
                 listener.executionFailed(event);
             }
 
@@ -150,11 +126,11 @@ public class ResultSetHandler implements InvocationHandler, ResultSetStatistics 
         } catch (ProxyException e) {
             ResourceEvent event = new ResourceEvent(e, e.getOpenMethod(), Utils.getExecClass(proxy));
 
-            for (ExecutionListener listener : mExecListeners) {
+            for (ExecutionListener listener : ClientProperties.getInstance().getListener()) {
                 listener.resourceFailure(event);
             }
 
-            if (mProps.getBoolean(ClientProperties.DB_THROW_WARNINGS)) {
+            if (ClientProperties.getInstance().getBoolean(ClientProperties.DB_THROW_WARNINGS)) {
                 throw e;
             }
 
@@ -164,7 +140,7 @@ public class ResultSetHandler implements InvocationHandler, ResultSetStatistics 
 
             ExecutionFailedEvent event = new ExecutionFailedEvent(toString(), e);
 
-            for (ExecutionFailedListener listener : mExecFailedListeners) {
+            for (ExecutionFailedListener listener : ClientProperties.getInstance().getFailedListener()) {
                 listener.executionFailed(event);
             }
 
@@ -179,7 +155,7 @@ public class ResultSetHandler implements InvocationHandler, ResultSetStatistics 
      * @throws ProxyException if a resource was not closed or double closed
      */
     private void handleClose(Object proxy) throws ProxyException {
-        if (!mProps.getBoolean(ClientProperties.DB_IGNORE_DOUBLE_CLOSED_OBJECTS) && mIsClosed) {
+        if (!ClientProperties.getInstance().getBoolean(ClientProperties.DB_IGNORE_DOUBLE_CLOSED_OBJECTS) && mIsClosed) {
 
             String txt = "The ResultSet opened in " + mOpenMethod + " was already closed in "
                     + Utils.getExecClass(proxy) + ".";
@@ -190,13 +166,13 @@ public class ResultSetHandler implements InvocationHandler, ResultSetStatistics 
         }
 
         // may be null if next hasn't been called
-        boolean displayTime = mDuration > mProps.getInt(ClientProperties.DB_RESULTSET_TOTAL_TIME_THRESHOLD);
-        boolean displaySize = mSize > mProps.getInt(ClientProperties.DB_RESULTSET_TOTAL_SIZE_THRESHOLD);
+        boolean displayTime = mDuration > ClientProperties.getInstance().getInt(ClientProperties.DB_RESULTSET_TOTAL_TIME_THRESHOLD);
+        boolean displaySize = mSize > ClientProperties.getInstance().getInt(ClientProperties.DB_RESULTSET_TOTAL_SIZE_THRESHOLD);
 
         if (displayTime || displaySize) {
             mTrace.info("iteration of resultset closed in " + Utils.getExecClass(proxy) + " took "
-                    + utils.getTimeString(mDuration) + ". "
-                    + (mSize > 0 ? "(" + utils.getSizeString(mSize) + ")" : ""));
+                    + Utils.getTimeString(mDuration) + ". "
+                    + (mSize > 0 ? "(" + Utils.getSizeString(mSize) + ")" : ""));
         }
 
         mIsClosed = true;
@@ -209,12 +185,12 @@ public class ResultSetHandler implements InvocationHandler, ResultSetStatistics 
      * @throws ProxyException if a resource was not closed or double closed
      */
     private void handleCheckClosed(Object proxy) throws ProxyException {
-        if (!mIsClosed && !mProps.getBoolean(ClientProperties.DB_IGNORE_NOT_CLOSED_OBJECTS)) {
+        if (!mIsClosed && !ClientProperties.getInstance().getBoolean(ClientProperties.DB_IGNORE_NOT_CLOSED_OBJECTS)) {
 
             String txt = "The ResultSet opened in " + mOpenMethod + " was not closed in " + Utils.getExecClass(proxy)
                     + ".";
 
-            boolean displayMsg = mProps.getBoolean(ClientProperties.DB_DISPLAY_ENTITY_BEANS);
+            boolean displayMsg = ClientProperties.getInstance().getBoolean(ClientProperties.DB_DISPLAY_ENTITY_BEANS);
 
             boolean cmp = false;
             if (!displayMsg) {
@@ -249,7 +225,7 @@ public class ResultSetHandler implements InvocationHandler, ResultSetStatistics 
         long startTime = System.currentTimeMillis();
         try {
 
-            Boolean b = (Boolean) method.invoke(mRs, args);
+            Boolean b = (Boolean) method.invoke(uResultSet, args);
             if (b) {
                 mItemCount++;
             }
@@ -258,7 +234,7 @@ public class ResultSetHandler implements InvocationHandler, ResultSetStatistics 
             long dur = (System.currentTimeMillis() - startTime);
 
             mDuration += dur;
-            if (dur > mProps.getInt(ClientProperties.DB_RESULTSET_NEXT_TIME_THRESHOLD)) {
+            if (dur > ClientProperties.getInstance().getInt(ClientProperties.DB_RESULTSET_NEXT_TIME_THRESHOLD)) {
                 String txt = "finished next in " + dur + "ms. (loop " + mItemCount + ")";
 
                 mTrace.info(txt);
@@ -278,8 +254,8 @@ public class ResultSetHandler implements InvocationHandler, ResultSetStatistics 
 
         Object ret;
         try {
-            ret = method.invoke(mRs, args);
-            if (mPropEnableSizeEvaluation) {
+            ret = method.invoke(uResultSet, args);
+            if (ClientProperties.getInstance().getBoolean(ClientProperties.DB_ENABLE_SIZE_EVALUATION)) {
                 if (ret instanceof String) {
                     mSize += 2 * ((String) ret).length();
                 } else if (ret instanceof Integer || ret instanceof Float) {

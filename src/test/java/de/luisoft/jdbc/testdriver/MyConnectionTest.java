@@ -33,7 +33,7 @@ public class MyConnectionTest {
         s.close();
 
         Assert.assertEquals(i, 100);
-        Assert.assertTrue("t=" + (afterExec - start), afterExec - start > 3000 && afterExec - start < 3050);
-        Assert.assertTrue("t=" + (afterIter - afterExec), afterIter - afterExec > 1000 && afterIter - afterExec < 1050);
+        Assert.assertTrue("t=" + (afterExec - start), afterExec - start >= 3000 && afterExec - start < 3050);
+        Assert.assertTrue("t=" + (afterIter - afterExec), afterIter - afterExec >= 1000 && afterIter - afterExec < 1050);
     }
 }

@@ -1,5 +1,7 @@
 package de.luisoft.jdbcspy;
 
+import de.luisoft.jdbcspy.proxy.ConnectionFactory;
+
 import javax.sql.XAConnection;
 import javax.sql.XADataSource;
 import java.io.PrintWriter;

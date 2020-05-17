@@ -1,6 +1,4 @@
-package de.luisoft.jdbcspy;
-
-import de.luisoft.jdbcspy.proxy.ConnectionStatistics;
+package de.luisoft.jdbcspy.proxy;
 
 import javax.sql.XAConnection;
 import java.sql.Connection;

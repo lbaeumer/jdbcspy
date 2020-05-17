@@ -101,7 +101,7 @@ public class ExecutionLastStatementListener extends ExecutionAdapter {
         for (int i = 0; i < lastStatementMaxHistory; i++) {
             Entry e = mEntries[(2 * lastStatementMaxHistory + mCurrentPos - i - 1) % lastStatementMaxHistory];
             if (e != null) {
-                strb.append(i).append(": \"").append(e.event).append("\" (#=").append(e.count).append(", ").append(e.method).append(")\n");
+                strb.append("  ").append(i).append(": \"").append(e.event).append("\" (#=").append(e.count).append(", ").append(e.method).append(")\n");
             }
         }
         strb.append("]]\n");

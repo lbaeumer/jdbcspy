@@ -1,6 +1,6 @@
 package de.luisoft.jdbcspy.proxy.listener.impl;
 
-import de.luisoft.jdbcspy.proxy.handler.ConnectionHandler;
+import de.luisoft.jdbcspy.proxy.handler.ConnectionInvocationHandler;
 import de.luisoft.jdbcspy.proxy.listener.ConnectionEvent;
 import de.luisoft.jdbcspy.proxy.listener.ConnectionListener;
 import de.luisoft.jdbcspy.proxy.util.Utils;
@@ -35,7 +35,7 @@ public class ConnectionDumpListener implements ConnectionListener {
         List<String> debug = Arrays.asList(dbConnDumpClassExp.split(","));
         String regExp = Utils.isTraceClass(debug);
         if (regExp != null) {
-            ConnectionHandler handler = (ConnectionHandler) event.getConnectionStatistics();
+            ConnectionInvocationHandler handler = (ConnectionInvocationHandler) event.getConnectionStatistics();
             mTrace.info("closed connection: " + handler.dump());
         }
     }

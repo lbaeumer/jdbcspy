@@ -1,6 +1,8 @@
 package de.luisoft.jdbcspy;
 
 import de.luisoft.jdbc.testdriver.MyConnection;
+import de.luisoft.jdbcspy.proxy.ConnectionFactory;
+import de.luisoft.jdbcspy.proxy.ProxyConnection;
 import de.luisoft.jdbcspy.proxy.StatementStatistics;
 import org.junit.Assert;
 import org.junit.Before;

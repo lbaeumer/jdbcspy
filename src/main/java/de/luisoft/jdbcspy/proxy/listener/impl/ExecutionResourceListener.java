@@ -91,7 +91,7 @@ public class ExecutionResourceListener extends ExecutionAdapter {
                     strb.append("\n");
                 }
                 Entry e = entry.getValue();
-                strb.append(i).append(": ").append(e.cause.getMessage()).append(" (#=").append(e.count).append(")\n");
+                strb.append("  ").append(i).append(": ").append(e.cause.getMessage()).append(" (#=").append(e.count).append(")\n");
                 i++;
             }
 

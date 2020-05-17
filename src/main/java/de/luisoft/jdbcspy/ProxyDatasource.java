@@ -1,5 +1,7 @@
 package de.luisoft.jdbcspy;
 
+import de.luisoft.jdbcspy.proxy.ConnectionFactory;
+
 import javax.sql.DataSource;
 import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;

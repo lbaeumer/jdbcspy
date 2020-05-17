@@ -33,6 +33,7 @@
 
     <property name="DumpAfterShutdown" value="false"/>
     <property name="DumpInterval" value="0"/>
-    <property name="DumpAfterClose" value="false"/>
+    <property name="DumpAfterCloseConnection" value="false"/>
+    <property name="DumpAfterCloseStatement" value="false"/>
 
 </dbproxy>

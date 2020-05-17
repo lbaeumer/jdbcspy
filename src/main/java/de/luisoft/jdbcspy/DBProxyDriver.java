@@ -1,5 +1,7 @@
 package de.luisoft.jdbcspy;
 
+import de.luisoft.jdbcspy.proxy.ConnectionFactory;
+
 import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverManager;

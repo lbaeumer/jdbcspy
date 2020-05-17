@@ -1,5 +1,6 @@
 package de.luisoft.jdbcspy;
 
+import de.luisoft.jdbcspy.proxy.ProxyConnection;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -41,11 +42,19 @@ public class XADatasourceTest {
 
         ProxyXADatasource proxy = new ProxyXADatasource();
         //EmbeddedXADataSource proxy = new EmbeddedXADataSource();
+        //org.apache.derby.jdbc.EmbedXAConnection c;
 
+
+        //org.apache.derby.jdbc.EmbedPooledConnection c;
+        javax.sql.PooledConnection p;
+        org.apache.derby.iapi.jdbc.BrokeredConnection42 f;
         proxy.setDatabaseName("booksdb");
 
-        XAConnection c = proxy.getXAConnection();
-        PreparedStatement s = c.getConnection().prepareStatement("select * from book");
+        ProxyConnection c = (ProxyConnection) proxy.getXAConnection();
+        Connection con = c.getConnection();
+        System.out.println("con=" + con);
+        con.isReadOnly();
+        PreparedStatement s = con.prepareStatement("select * from book");
         ResultSet rs = s.executeQuery();
 
         int i = 0;
@@ -55,8 +64,32 @@ public class XADatasourceTest {
         Assert.assertEquals(i, 2);
         rs.close();
         s.close();
-        c.close();
+        con.close();
         System.out.println("c=" + c);
+
+        // again
+        con = c.getConnection();
+        System.out.println("con=" + con);
+        con.isReadOnly();
+        i=0;
+         s = con.prepareStatement("select * from book");
+        rs = s.executeQuery();
+
+        while (rs.next()) {
+            i++;
+        }
+        Assert.assertEquals(i, 2);
+
+        Thread.sleep(40000);
+        rs.close();
+        s.close();
+        con.close();
+        System.out.println("c=" + c);
+
+        c.close();
+
+
+        System.out.println("dump" + c.dump());
     }
 
 }

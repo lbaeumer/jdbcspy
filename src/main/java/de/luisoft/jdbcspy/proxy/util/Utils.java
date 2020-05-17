@@ -1,7 +1,7 @@
 package de.luisoft.jdbcspy.proxy.util;
 
 import de.luisoft.jdbcspy.ClientProperties;
-import de.luisoft.jdbcspy.ProxyConnection;
+import de.luisoft.jdbcspy.proxy.ProxyConnection;
 
 import java.lang.reflect.Method;
 import java.sql.Connection;
@@ -21,13 +21,13 @@ import java.util.logging.Logger;
 public class Utils {
 
     /**
+     * the size formatter
+     */
+    public static final NumberFormat NUMBER_FORMATTER = new DecimalFormat("0.0#");
+    /**
      * the logger object for tracing
      */
     private static final Logger mTrace = Logger.getLogger(Utils.class.getName());
-    /**
-     * the size formatter
-     */
-    public final NumberFormat NUMBER_FORMATTER = new DecimalFormat("0.0#");
     /**
      * the date formatter
      */
@@ -55,9 +55,14 @@ public class Utils {
         int j = 1;
         for (int i = 0; i < e.length; i++) {
             StackTraceElement el = e[i];
-            if (el.getClassName().startsWith(ProxyConnection.class.getPackage().getName())
+            if (el.getClassName().startsWith("de.luisoft.jdbcspy.proxy")
                     || proxy.getClass().getName().equals(el.getClassName())
-                    || el.getClassName().startsWith("org.jboss.") || el.getClassName().startsWith("java.")
+                    || el.getClassName().startsWith("org.jboss.")
+                    || el.getClassName().startsWith("org.junit")
+                    || el.getClassName().startsWith("com.ibm.")
+                    || el.getClassName().startsWith("com.sun.")
+                    || el.getClassName().startsWith("jdk.internal.")
+                    || el.getClassName().startsWith("java.")
                     || el.getClassName().startsWith("sun.")) {
                 continue;
             }
@@ -89,8 +94,10 @@ public class Utils {
      * @return String
      */
     private static String getPrintClass(StackTraceElement el) {
-        return (el.getClassName().indexOf('.') > 0 ? el.getClassName().substring(el.getClassName().lastIndexOf(".") + 1)
-                : el.getClassName()) + "." + el.getMethodName() + ":" + el.getLineNumber();
+        return (el.getClassName().indexOf('.') > 0
+                ? el.getClassName().substring(el.getClassName().lastIndexOf(".") + 1)
+                : el.getClassName())
+                + "." + el.getMethodName() + ":" + el.getLineNumber();
     }
 
     /**
@@ -326,7 +333,7 @@ public class Utils {
      * @param size long
      * @return String
      */
-    public String getSizeString(long size) {
+    public static String getSizeString(long size) {
         if (size < 1000) {
             return size + "byte";
         } else if (size < 1000000) {
@@ -342,7 +349,7 @@ public class Utils {
      * @param duration the duration
      * @return the time string
      */
-    public String getTimeString(long duration) {
+    public static String getTimeString(long duration) {
         if (duration < 1000) {
             return duration + "ms";
         } else if (duration < 60000) {

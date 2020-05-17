@@ -1,8 +1,8 @@
 package de.luisoft.jdbcspy.proxy.handler;
 
 import de.luisoft.jdbcspy.ClientProperties;
-import de.luisoft.jdbcspy.ProxyConnectionMetaData;
 import de.luisoft.jdbcspy.proxy.Checkable;
+import de.luisoft.jdbcspy.proxy.ProxyConnectionMetaData;
 import de.luisoft.jdbcspy.proxy.ResultSetStatistics;
 import de.luisoft.jdbcspy.proxy.StatementStatistics;
 import de.luisoft.jdbcspy.proxy.Statistics;
@@ -34,7 +34,7 @@ import java.util.logging.Logger;
 /**
  * The statement handler.
  */
-public abstract class AbstractStatementHandler implements InvocationHandler, StatementStatistics {
+public abstract class AbstractStatementInvocationHandler implements InvocationHandler, StatementStatistics {
 
     /**
      * open state
@@ -55,11 +55,11 @@ public abstract class AbstractStatementHandler implements InvocationHandler, Sta
     /**
      * the logger object for tracing
      */
-    private static final Logger mTrace = Logger.getLogger(AbstractStatementHandler.class.getName());
+    private static final Logger mTrace = Logger.getLogger(AbstractStatementInvocationHandler.class.getName());
     /**
      * the prepared statement
      */
-    private final Statement mStmt;
+    private final Statement uStatement;
     /**
      * the sql command
      */
@@ -127,9 +127,9 @@ public abstract class AbstractStatementHandler implements InvocationHandler, Sta
      * @param theSql  the sql string
      * @param method  the method
      */
-    public AbstractStatementHandler(ClientProperties props, Statement theStmt, ProxyConnectionMetaData metaData,
-                                    String theSql, String method) {
-        mStmt = theStmt;
+    public AbstractStatementInvocationHandler(ClientProperties props, Statement theStmt, ProxyConnectionMetaData metaData,
+                                              String theSql, String method) {
+        uStatement = theStmt;
         mSql = theSql;
         mProps = props;
         mOpenMethod = method;
@@ -193,7 +193,7 @@ public abstract class AbstractStatementHandler implements InvocationHandler, Sta
             }
 
             // all other calls
-            return method.invoke(mStmt, args);
+            return method.invoke(uStatement, args);
         } catch (InvocationTargetException e) {
 
             String txt = "execution " + method.getName() + getArgs(args) + " failed for " + getSQL() +
@@ -309,11 +309,8 @@ public abstract class AbstractStatementHandler implements InvocationHandler, Sta
         mState = CLOSED;
         Object ret;
 
-        boolean displayStmt;
-        ProxyException proxyExc = null;
-
         try {
-            ret = method.invoke(mStmt, args);
+            ret = method.invoke(uStatement, args);
             synchronized (mResultSets) {
                 for (Object o : mResultSets) {
                     Checkable c = (Checkable) o;
@@ -328,8 +325,6 @@ public abstract class AbstractStatementHandler implements InvocationHandler, Sta
                 }
             }
 
-            displayStmt = mDuration > mProps.getInt(ClientProperties.DB_STMT_TOTAL_TIME_THRESHOLD)
-                    || mSize > mProps.getInt(ClientProperties.DB_STMT_TOTAL_SIZE_THRESHOLD);
         } finally {
             synchronized (mResultSets) {
                 mResultSets.clear();
@@ -342,8 +337,13 @@ public abstract class AbstractStatementHandler implements InvocationHandler, Sta
             }
         }
 
-        if (displayStmt) {
-            mTrace.info("execution finished: " + toString());
+        boolean displayStmt = mDuration > mProps.getInt(ClientProperties.DB_STMT_TOTAL_TIME_THRESHOLD)
+                || mSize > mProps.getInt(ClientProperties.DB_STMT_TOTAL_SIZE_THRESHOLD);
+
+        boolean displayAfterClose = ClientProperties.getInstance().getBoolean(ClientProperties.DB_DUMP_AFTER_CLOSE_STATEMENT);
+
+        if (displayStmt || displayAfterClose || displayAfterClose) {
+            mTrace.info("closed statement " + this + " in " + Utils.getExecClass(proxy));
         }
 
         return ret;
@@ -388,7 +388,7 @@ public abstract class AbstractStatementHandler implements InvocationHandler, Sta
         start = System.currentTimeMillis();
         long dur = 0;
         try {
-            result = method.invoke(mStmt, args);
+            result = method.invoke(uStatement, args);
 
             dur = (System.currentTimeMillis() - start);
             mState = EXECUTED;
@@ -446,7 +446,7 @@ public abstract class AbstractStatementHandler implements InvocationHandler, Sta
     private String getPrintString(String method, Object result, long dur, String methodCall) {
 
         StringBuilder txt = new StringBuilder(
-                "finished " + method + " in " + utils.getTimeString(dur) + " (" + getSQL() + ")");
+                "finished " + method + " in " + Utils.getTimeString(dur) + " (" + getSQL() + ")");
 
         if (result instanceof Boolean) {
             txt.append(": ");
@@ -498,8 +498,7 @@ public abstract class AbstractStatementHandler implements InvocationHandler, Sta
      */
     private ResultSet getResultSetProxy(ResultSet rs, String sql, String openMethod) {
 
-        InvocationHandler handler = new ResultSetHandler(mProps, rs, sql, mExecListeners, mExecFailedListeners,
-                openMethod);
+        InvocationHandler handler = new ResultSetInvocationHandler(rs, sql, openMethod);
 
         return (ResultSet) Proxy.newProxyInstance(Checkable.class.getClassLoader(),
                 new Class[]{ResultSet.class, Checkable.class, ResultSetStatistics.class}, handler);
@@ -512,12 +511,21 @@ public abstract class AbstractStatementHandler implements InvocationHandler, Sta
      */
     @Override
     public String toString() {
-        return "\"" + getSQL() + "\"" + (mState != OPEN ? " (" + utils.getTimeString(getExecutionTime())
-                + (mState != EXECUTING ? " + " + utils.getTimeString(getDuration() - getExecutionTime()) : "") + "; #="
-                + getItemCount() + (getSize() > 0 ? "; size=" + utils.getSizeString(getSize()) : "") + ") " : " ")
-                + (mState != OPEN ? (mState == EXECUTING ? "executing" : "executed") + " since "
+        return "\"" + getSQL() + "\""
+                + (mState != OPEN
+                ? " (" + Utils.getTimeString(getExecutionTime())
+                + (mState != EXECUTING ? " + "
+                + Utils.getTimeString(getDuration() - getExecutionTime()) : "")
+                + "; #=" + getItemCount() + (getSize() > 0
+                ? "; size=" + Utils.getSizeString(getSize())
+                : "")
+                + ") "
+                : " ")
+                + (mState != OPEN
+                ? (mState == EXECUTING ? "executing" : "executed") + " since "
                 + utils.MILLI_TIME_FORMATTER.format(new Date(getExecutionStartTime())) + " in "
-                + getExecuteCaller() : " not executed");
+                + getExecuteCaller()
+                : " not executed");
     }
 
     /**

@@ -227,8 +227,8 @@ public class ExecutionTimeListener extends ExecutionAdapter {
             sql = sql.substring(0, 25) + "...";
         }
         mTrace.warning("Statement " + sql + " called in " + method + (finished
-                ? " finished in " + utils.getTimeString(execTime)
-                : " executing for " + utils.getTimeString(execTime) + (loop > 1 ? " (loop " + loop + ")" : "")));
+                ? " finished in " + Utils.getTimeString(execTime)
+                : " executing for " + Utils.getTimeString(execTime) + (loop > 1 ? " (loop " + loop + ")" : "")));
     }
 
     /**
@@ -238,36 +238,42 @@ public class ExecutionTimeListener extends ExecutionAdapter {
     public String toString() {
         StringBuilder strb = new StringBuilder("[ExecutionTimeListener[\n");
         synchronized (mRunningStmts) {
-            strb.append("currently executing:\n");
-            int i = 1;
-            for (StatementStatistics stmt : mRunningStmts.keySet()) {
+            if (!mRunningStmts.isEmpty()) {
+                strb.append("  currently executing:\n");
+                int i = 1;
+                for (StatementStatistics stmt : mRunningStmts.keySet()) {
 
-                strb.append(i).append(": ");
-                strb.append(stmt);
-                strb.append("\n");
-                i++;
+                    strb.append("    ").append(i).append(": ");
+                    strb.append(stmt);
+                    strb.append("\n");
+                    i++;
+                }
             }
         }
 
         synchronized (mWaiting) {
-            strb.append("\nexecuted but waiting to be closed:\n");
-            int i = 1;
-            for (StatementStatistics stmt : mWaiting.keySet()) {
-                strb.append(i).append(": ");
-                strb.append(stmt.toString());
-                strb.append("\n");
-                i++;
+            if (!mWaiting.isEmpty()) {
+                strb.append("\n  executed but waiting to be closed:\n");
+                int i = 1;
+                for (StatementStatistics stmt : mWaiting.keySet()) {
+                    strb.append("    ").append(i).append(": ");
+                    strb.append(stmt.toString());
+                    strb.append("\n");
+                    i++;
+                }
             }
         }
 
-        strb.append("\nlong running history (execTime + iterTime):\n");
+        strb.append("\n  long running history (execTime + iterTime):\n");
         synchronized (mHistorySet) {
-            int i = 1;
-            for (Entry entry : mHistorySet) {
-                strb.append(i).append(": ");
-                strb.append(entry.stmt);
-                strb.append("\n");
-                i++;
+            if (!mHistorySet.isEmpty()) {
+                int i = 1;
+                for (Entry entry : mHistorySet) {
+                    strb.append("    ").append(i).append(": ");
+                    strb.append(entry.stmt);
+                    strb.append("\n");
+                    i++;
+                }
             }
         }
         strb.append("]]\n");

@@ -49,7 +49,7 @@ public class ExecutionFailedHistoryListener implements ExecutionFailedListener {
         synchronized (mList) {
             int i = 1;
             for (ExecutionFailedEvent ev : mList) {
-                strb.append(i).append(": ");
+                strb.append("  ").append(i).append(": ");
                 strb.append(ev.getStatement()).append(" failed, cause: ").append(ev.getCause());
                 strb.append("\n");
                 i++;
