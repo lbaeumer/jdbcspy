@@ -69,22 +69,6 @@ public class ConnectionInvocationHandler implements InvocationHandler, Connectio
      */
     private final ProxyConnectionMetaData mMetaData;
     /**
-     * stmt count
-     */
-    private int mStmtCount;
-    /**
-     * total duration of iteration
-     */
-    private long mDuration;
-    /**
-     * total size of iteration
-     */
-    private long mSize;
-    /**
-     * is closed
-     */
-    private boolean mIsClosed;
-    /**
      * is closed
      */
     private int mDeletedStmts;
@@ -285,9 +269,6 @@ public class ConnectionInvocationHandler implements InvocationHandler, Connectio
                     if (c.isClosed()) {
                         StatementStatistics stat = (StatementStatistics) c;
                         mResultSetItemCount.add(stat.getItemCount());
-                        mDuration += stat.getDuration();
-                        mSize += stat.getSize();
-                        mStmtCount++;
                         it.remove();
                         x--;
                         mDeletedStmts++;
@@ -330,9 +311,10 @@ public class ConnectionInvocationHandler implements InvocationHandler, Connectio
 
             if (method != null) {
                 ret = method.invoke(mConn, args);
-                mIsClosed = true;
             }
 
+            int mDuration = 0;
+            int mSize = 0;
             synchronized (mStatements) {
                 for (ProxyStatement mStatement : mStatements) {
                     Statistics c = (Statistics) mStatement;
@@ -365,7 +347,6 @@ public class ConnectionInvocationHandler implements InvocationHandler, Connectio
 
         } finally {
             synchronized (mStatements) {
-                mStmtCount += mStatements.size();
                 mStatements.clear();
             }
         }
@@ -405,7 +386,7 @@ public class ConnectionInvocationHandler implements InvocationHandler, Connectio
                 dur += c.getDuration();
             }
         }
-        return mDuration + dur;
+        return dur;
     }
 
     /**
@@ -422,7 +403,7 @@ public class ConnectionInvocationHandler implements InvocationHandler, Connectio
                 size += c.getSize();
             }
         }
-        return mSize + size;
+        return size;
     }
 
     /**
@@ -432,7 +413,7 @@ public class ConnectionInvocationHandler implements InvocationHandler, Connectio
      */
     @Override
     public int getItemCount() {
-        return mStmtCount + mStatements.size();
+        return mDeletedStmts + mStatements.size();
     }
 
     /**
