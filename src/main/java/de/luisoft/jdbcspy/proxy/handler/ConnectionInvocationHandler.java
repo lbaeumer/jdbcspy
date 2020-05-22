@@ -478,7 +478,9 @@ public class ConnectionInvocationHandler implements InvocationHandler, Connectio
         strb.append(toString()).append(" {").append("\n");
 
         int i = mDeletedStmts + 1;
-        strb.append("1 .. ").append(mDeletedStmts).append(": ...\n");
+        if (mDeletedStmts > 0) {
+            strb.append("1 .. ").append(mDeletedStmts).append(": ...\n");
+        }
         synchronized (mStatements) {
             for (ProxyStatement s : mStatements) {
                 strb.append(i).append(": ");

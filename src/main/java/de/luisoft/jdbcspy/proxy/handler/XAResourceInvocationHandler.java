@@ -41,9 +41,9 @@ public class XAResourceInvocationHandler implements InvocationHandler {
     public Object invoke(Object proxy, Method method, Object[] args) {
 
         try {
-            //if (mTrace.isLoggable(Level.FINE)) {
-            mTrace.info("call " + uXa.getClass() + "." + Utils.getMethodSignature(method, args));
-            //}
+            if (mTrace.isLoggable(Level.FINE)) {
+                mTrace.fine("call " + uXa.getClass() + "." + Utils.getMethodSignature(method, args));
+            }
 
             if ("end".equals(method.getName())) {
                 xaConnectionInvocationHandler.endTx();

@@ -32,7 +32,6 @@
 
     <property name="RemoveHints" value="false"/>
     <property name="IgnoreNotClosedObjects" value="true"/>
-    <property name="IgnoreDoubleClosedObjects" value="true"/>
     <property name="EnableSizeEvaluation" value="false"/>
 
     <property name="StmtDebugClassExp" value=""/>

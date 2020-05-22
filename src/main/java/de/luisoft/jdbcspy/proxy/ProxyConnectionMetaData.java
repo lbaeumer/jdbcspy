@@ -89,12 +89,6 @@ import java.util.List;
  * <td>boolean</td>
  * </tr>
  * <tr>
- * <td>IgnoreDoubleClosedObjects</td>
- * <td>ignore result sets or statements that are not closed more than one
- * time</td>
- * <td>boolean</td>
- * </tr>
- * <tr>
  * <td>EnableSizeEvaluation</td>
  * <td>enable the size evaluation</td>
  * <td>boolean</td>
