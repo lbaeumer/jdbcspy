@@ -2,3 +2,7 @@
 /.classpath
 /.project
 /.settings
+/.idea
+/*.iml
+derby.log
+/booksdb

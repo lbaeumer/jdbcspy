@@ -1,4 +1,4 @@
-package de.luisoft.jdbcspy;
+package de.luisoft.jdbcspy.proxy;
 
 import java.util.List;
 
@@ -79,11 +79,6 @@ import java.util.List;
  * <td>int</td>
  * </tr>
  * <tr>
- * <td>DisplayEntityBeans</td>
- * <td>display entity bean info</td>
- * <td>boolean</td>
- * </tr>
- * <tr>
  * <td>RemoveHints</td>
  * <td>remove the hints from the statement</td>
  * <td>boolean</td>
@@ -91,12 +86,6 @@ import java.util.List;
  * <tr>
  * <td>IgnoreNotClosedObjects</td>
  * <td>ignore result sets or statements that are not closed</td>
- * <td>boolean</td>
- * </tr>
- * <tr>
- * <td>IgnoreDoubleClosedObjects</td>
- * <td>ignore result sets or statements that are not closed more than one
- * time</td>
  * <td>boolean</td>
  * </tr>
  * <tr>
@@ -162,77 +151,73 @@ import java.util.List;
  */
 public interface ProxyConnectionMetaData {
 
-	/**
-	 * Is proxy enabled?
-	 * 
-	 * @return boolean
-	 */
-	boolean isInitiallyEnabled();
+    /**
+     * Is proxy enabled?
+     *
+     * @return boolean
+     */
+    boolean isInitiallyEnabled();
 
-	/**
-	 * Is proxy enabled?
-	 * 
-	 * @return boolean
-	 */
-	boolean isEnabled();
+    /**
+     * Is proxy enabled?
+     *
+     * @return boolean
+     */
+    boolean isEnabled();
 
-	/**
-	 * Enable the proxy.
-	 * 
-	 * @param enableProxy
-	 *            boolean
-	 */
-	void enableProxy(boolean enableProxy);
+    /**
+     * Enable the proxy.
+     *
+     * @param enableProxy boolean
+     */
+    void enableProxy(boolean enableProxy);
 
-	/**
-	 * Dump the statistics.
-	 * 
-	 * @return String
-	 */
-	String dumpStatistics();
+    /**
+     * Dump the statistics.
+     *
+     * @return String
+     */
+    String dumpStatistics();
 
-	/**
-	 * Clear the statistics.
-	 */
-	void clearStatistics();
+    /**
+     * Clear the statistics.
+     */
+    void clearStatistics();
 
-	/**
-	 * Get the int keys.
-	 * 
-	 * @return String[]
-	 */
-	List<String> getIntKeys();
+    /**
+     * Get the int keys.
+     *
+     * @return String[]
+     */
+    List<String> getIntKeys();
 
-	/**
-	 * Get the boolean keys.
-	 * 
-	 * @return String[]
-	 */
-	List<String> getBooleanKeys();
+    /**
+     * Get the boolean keys.
+     *
+     * @return String[]
+     */
+    List<String> getBooleanKeys();
 
-	/**
-	 * Get the list keys.
-	 * 
-	 * @return String[]
-	 */
-	List<String> getListKeys();
+    /**
+     * Get the list keys.
+     *
+     * @return String[]
+     */
+    List<String> getListKeys();
 
-	/**
-	 * Set an int value.
-	 * 
-	 * @param property
-	 *            String
-	 * @param value
-	 *            int
-	 */
-	void setProperty(String property, Object value);
+    /**
+     * Set an int value.
+     *
+     * @param property String
+     * @param value    int
+     */
+    void setProperty(String property, Object value);
 
-	/**
-	 * Get a property.
-	 * 
-	 * @param property
-	 *            String
-	 * @return the int value
-	 */
-	Object getProperty(String property);
+    /**
+     * Get a property.
+     *
+     * @param property String
+     * @return the int value
+     */
+    Object getProperty(String property);
 }

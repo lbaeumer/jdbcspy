@@ -7,25 +7,26 @@ import de.luisoft.jdbcspy.proxy.ConnectionStatistics;
  */
 public class ConnectionEvent {
 
-	/** the proxy object */
-	private ConnectionStatistics mConn;
+    /**
+     * the proxy object
+     */
+    private final ConnectionStatistics mConn;
 
-	/**
-	 * Constructor.
-	 * 
-	 * @param proxy
-	 *            the proxy object
-	 */
-	public ConnectionEvent(ConnectionStatistics conn) {
-		mConn = conn;
-	}
+    /**
+     * Constructor.
+     *
+     * @param conn the proxy object
+     */
+    public ConnectionEvent(ConnectionStatistics conn) {
+        mConn = conn;
+    }
 
-	/**
-	 * Get the connection statistics object.
-	 * 
-	 * @return Object
-	 */
-	public ConnectionStatistics getConnectionStatistics() {
-		return mConn;
-	}
+    /**
+     * Get the connection statistics object.
+     *
+     * @return Object
+     */
+    public ConnectionStatistics getConnectionStatistics() {
+        return mConn;
+    }
 }

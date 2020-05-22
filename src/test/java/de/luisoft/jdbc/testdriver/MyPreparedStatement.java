@@ -16,7 +16,6 @@ import java.sql.Ref;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.RowId;
-import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.sql.SQLXML;
 import java.sql.Time;
@@ -25,596 +24,596 @@ import java.util.Calendar;
 
 public class MyPreparedStatement implements PreparedStatement {
 
-	private int rscnt;
-	private int itertime;
-	private int exectime;
+    private final int rscnt;
+    private final int itertime;
+    private final int exectime;
 
-	public MyPreparedStatement(int rscnt, int itertime, int exectime) {
-		this.rscnt = rscnt;
-		this.itertime = itertime;
-		this.exectime = exectime;
-	}
+    public MyPreparedStatement(int rscnt, int itertime, int exectime) {
+        this.rscnt = rscnt;
+        this.itertime = itertime;
+        this.exectime = exectime;
+    }
 
-	@Override
-	public void addBatch() throws SQLException {
+    @Override
+    public void addBatch() {
 
-	}
+    }
 
-	@Override
-	public void clearParameters() throws SQLException {
+    @Override
+    public void clearParameters() {
 
-	}
+    }
 
-	@Override
-	public boolean execute() throws SQLException {
+    @Override
+    public boolean execute() {
 
-		try {
-			Thread.sleep(exectime);
-		} catch (Exception e) {
-		}
-		return false;
-	}
+        try {
+            Thread.sleep(exectime);
+        } catch (Exception ignored) {
+        }
+        return false;
+    }
 
-	@Override
-	public ResultSet executeQuery() throws SQLException {
+    @Override
+    public ResultSet executeQuery() {
 
-		try {
-			Thread.sleep(exectime);
-		} catch (Exception e) {
-		}
-		return new MyResultSet(rscnt, itertime);
-	}
+        try {
+            Thread.sleep(exectime);
+        } catch (Exception ignored) {
+        }
+        return new MyResultSet(rscnt, itertime);
+    }
 
-	@Override
-	public int executeUpdate() throws SQLException {
+    @Override
+    public int executeUpdate() {
 
-		try {
-			Thread.sleep(exectime);
-		} catch (Exception e) {
-		}
-		return 0;
-	}
+        try {
+            Thread.sleep(exectime);
+        } catch (Exception ignored) {
+        }
+        return 0;
+    }
 
-	@Override
-	public ResultSetMetaData getMetaData() throws SQLException {
+    @Override
+    public ResultSetMetaData getMetaData() {
 
-		return new MyResultSetMetaData();
-	}
+        return new MyResultSetMetaData();
+    }
 
-	@Override
-	public ParameterMetaData getParameterMetaData() throws SQLException {
+    @Override
+    public ParameterMetaData getParameterMetaData() {
 
-		return null;
-	}
+        return null;
+    }
 
-	@Override
-	public void setArray(int arg0, Array arg1) throws SQLException {
+    @Override
+    public void setArray(int arg0, Array arg1) {
 
-	}
+    }
 
-	@Override
-	public void setAsciiStream(int arg0, InputStream arg1, int arg2) throws SQLException {
+    @Override
+    public void setAsciiStream(int arg0, InputStream arg1, int arg2) {
 
-	}
+    }
 
-	@Override
-	public void setBigDecimal(int arg0, BigDecimal arg1) throws SQLException {
+    @Override
+    public void setBigDecimal(int arg0, BigDecimal arg1) {
 
-	}
+    }
 
-	@Override
-	public void setBinaryStream(int arg0, InputStream arg1, int arg2) throws SQLException {
+    @Override
+    public void setBinaryStream(int arg0, InputStream arg1, int arg2) {
 
-	}
+    }
 
-	@Override
-	public void setBlob(int arg0, Blob arg1) throws SQLException {
+    @Override
+    public void setBlob(int arg0, Blob arg1) {
 
-	}
+    }
 
-	@Override
-	public void setBoolean(int arg0, boolean arg1) throws SQLException {
+    @Override
+    public void setBoolean(int arg0, boolean arg1) {
 
-	}
+    }
 
-	@Override
-	public void setByte(int arg0, byte arg1) throws SQLException {
+    @Override
+    public void setByte(int arg0, byte arg1) {
 
-	}
+    }
 
-	@Override
-	public void setBytes(int arg0, byte[] arg1) throws SQLException {
+    @Override
+    public void setBytes(int arg0, byte[] arg1) {
 
-	}
+    }
 
-	@Override
-	public void setCharacterStream(int arg0, Reader arg1, int arg2) throws SQLException {
+    @Override
+    public void setCharacterStream(int arg0, Reader arg1, int arg2) {
 
-	}
+    }
 
-	@Override
-	public void setClob(int arg0, Clob arg1) throws SQLException {
+    @Override
+    public void setClob(int arg0, Clob arg1) {
 
-	}
+    }
 
-	@Override
-	public void setDate(int arg0, Date arg1) throws SQLException {
+    @Override
+    public void setDate(int arg0, Date arg1) {
 
-	}
+    }
 
-	@Override
-	public void setDate(int arg0, Date arg1, Calendar arg2) throws SQLException {
+    @Override
+    public void setDate(int arg0, Date arg1, Calendar arg2) {
 
-	}
+    }
 
-	@Override
-	public void setDouble(int arg0, double arg1) throws SQLException {
+    @Override
+    public void setDouble(int arg0, double arg1) {
 
-	}
+    }
 
-	@Override
-	public void setFloat(int arg0, float arg1) throws SQLException {
+    @Override
+    public void setFloat(int arg0, float arg1) {
 
-	}
+    }
 
-	@Override
-	public void setInt(int arg0, int arg1) throws SQLException {
+    @Override
+    public void setInt(int arg0, int arg1) {
 
-	}
+    }
 
-	@Override
-	public void setLong(int arg0, long arg1) throws SQLException {
+    @Override
+    public void setLong(int arg0, long arg1) {
 
-	}
+    }
 
-	@Override
-	public void setNull(int arg0, int arg1) throws SQLException {
+    @Override
+    public void setNull(int arg0, int arg1) {
 
-	}
+    }
 
-	@Override
-	public void setNull(int arg0, int arg1, String arg2) throws SQLException {
+    @Override
+    public void setNull(int arg0, int arg1, String arg2) {
 
-	}
+    }
 
-	@Override
-	public void setObject(int arg0, Object arg1) throws SQLException {
+    @Override
+    public void setObject(int arg0, Object arg1) {
 
-	}
+    }
 
-	@Override
-	public void setObject(int arg0, Object arg1, int arg2) throws SQLException {
+    @Override
+    public void setObject(int arg0, Object arg1, int arg2) {
 
-	}
+    }
 
-	@Override
-	public void setObject(int arg0, Object arg1, int arg2, int arg3) throws SQLException {
+    @Override
+    public void setObject(int arg0, Object arg1, int arg2, int arg3) {
 
-	}
+    }
 
-	@Override
-	public void setRef(int arg0, Ref arg1) throws SQLException {
+    @Override
+    public void setRef(int arg0, Ref arg1) {
 
-	}
+    }
 
-	@Override
-	public void setShort(int arg0, short arg1) throws SQLException {
+    @Override
+    public void setShort(int arg0, short arg1) {
 
-	}
+    }
 
-	@Override
-	public void setString(int arg0, String arg1) throws SQLException {
+    @Override
+    public void setString(int arg0, String arg1) {
 
-	}
+    }
 
-	@Override
-	public void setTime(int arg0, Time arg1) throws SQLException {
+    @Override
+    public void setTime(int arg0, Time arg1) {
 
-	}
+    }
 
-	@Override
-	public void setTime(int arg0, Time arg1, Calendar arg2) throws SQLException {
+    @Override
+    public void setTime(int arg0, Time arg1, Calendar arg2) {
 
-	}
+    }
 
-	@Override
-	public void setTimestamp(int arg0, Timestamp arg1) throws SQLException {
+    @Override
+    public void setTimestamp(int arg0, Timestamp arg1) {
 
-	}
+    }
 
-	@Override
-	public void setTimestamp(int arg0, Timestamp arg1, Calendar arg2) throws SQLException {
+    @Override
+    public void setTimestamp(int arg0, Timestamp arg1, Calendar arg2) {
 
-	}
+    }
 
-	@Override
-	public void setURL(int arg0, URL arg1) throws SQLException {
+    @Override
+    public void setURL(int arg0, URL arg1) {
 
-	}
+    }
 
-	@Override
-	public void setUnicodeStream(int arg0, InputStream arg1, int arg2) throws SQLException {
+    @Override
+    public void setUnicodeStream(int arg0, InputStream arg1, int arg2) {
 
-	}
+    }
 
-	@Override
-	public void addBatch(String sql) throws SQLException {
+    @Override
+    public void addBatch(String sql) {
 
-	}
+    }
 
-	@Override
-	public void cancel() throws SQLException {
+    @Override
+    public void cancel() {
 
-	}
+    }
 
-	@Override
-	public void clearBatch() throws SQLException {
+    @Override
+    public void clearBatch() {
 
-	}
+    }
 
-	@Override
-	public void clearWarnings() throws SQLException {
+    @Override
+    public void clearWarnings() {
 
-	}
+    }
 
-	@Override
-	public void close() throws SQLException {
+    @Override
+    public void close() {
 
-	}
+    }
 
-	@Override
-	public boolean execute(String sql) throws SQLException {
+    @Override
+    public boolean execute(String sql) {
 
-		try {
-			Thread.sleep(exectime);
-		} catch (Exception e) {
-		}
-		return false;
-	}
+        try {
+            Thread.sleep(exectime);
+        } catch (Exception ignored) {
+        }
+        return false;
+    }
 
-	@Override
-	public boolean execute(String sql, int autoGeneratedKeys) throws SQLException {
+    @Override
+    public boolean execute(String sql, int autoGeneratedKeys) {
 
-		try {
-			Thread.sleep(exectime);
-		} catch (Exception e) {
-		}
-		return false;
-	}
+        try {
+            Thread.sleep(exectime);
+        } catch (Exception ignored) {
+        }
+        return false;
+    }
 
-	@Override
-	public boolean execute(String sql, int[] columnIndexes) throws SQLException {
+    @Override
+    public boolean execute(String sql, int[] columnIndexes) {
 
-		try {
-			Thread.sleep(exectime);
-		} catch (Exception e) {
-		}
-		return false;
-	}
+        try {
+            Thread.sleep(exectime);
+        } catch (Exception ignored) {
+        }
+        return false;
+    }
 
-	@Override
-	public boolean execute(String sql, String[] columnNames) throws SQLException {
+    @Override
+    public boolean execute(String sql, String[] columnNames) {
 
-		try {
-			Thread.sleep(exectime);
-		} catch (Exception e) {
-		}
-		return false;
-	}
+        try {
+            Thread.sleep(exectime);
+        } catch (Exception ignored) {
+        }
+        return false;
+    }
 
-	@Override
-	public int[] executeBatch() throws SQLException {
+    @Override
+    public int[] executeBatch() {
 
-		try {
-			Thread.sleep(exectime);
-		} catch (Exception e) {
-		}
-		return null;
-	}
+        try {
+            Thread.sleep(exectime);
+        } catch (Exception ignored) {
+        }
+        return null;
+    }
 
-	@Override
-	public ResultSet executeQuery(String sql) throws SQLException {
+    @Override
+    public ResultSet executeQuery(String sql) {
 
-		try {
-			Thread.sleep(10000);
-		} catch (Exception e) {
-		}
+        try {
+            Thread.sleep(exectime);
+        } catch (Exception ignored) {
+        }
 
-		return new MyResultSet(rscnt, itertime);
-	}
+        return new MyResultSet(rscnt, itertime);
+    }
 
-	@Override
-	public int executeUpdate(String sql) throws SQLException {
+    @Override
+    public int executeUpdate(String sql) {
 
-		try {
-			Thread.sleep(10000);
-		} catch (Exception e) {
-		}
-		return 0;
-	}
+        try {
+            Thread.sleep(exectime);
+        } catch (Exception ignored) {
+        }
+        return 0;
+    }
 
-	@Override
-	public int executeUpdate(String sql, int autoGeneratedKeys) throws SQLException {
+    @Override
+    public int executeUpdate(String sql, int autoGeneratedKeys) {
 
-		try {
-			Thread.sleep(10000);
-		} catch (Exception e) {
-		}
-		return 0;
-	}
+        try {
+            Thread.sleep(exectime);
+        } catch (Exception ignored) {
+        }
+        return 0;
+    }
 
-	@Override
-	public int executeUpdate(String sql, int[] columnIndexes) throws SQLException {
+    @Override
+    public int executeUpdate(String sql, int[] columnIndexes) {
 
-		try {
-			Thread.sleep(10000);
-		} catch (Exception e) {
-		}
-		return 0;
-	}
+        try {
+            Thread.sleep(exectime);
+        } catch (Exception ignored) {
+        }
+        return 0;
+    }
 
-	@Override
-	public int executeUpdate(String sql, String[] columnNames) throws SQLException {
+    @Override
+    public int executeUpdate(String sql, String[] columnNames) {
 
-		try {
-			Thread.sleep(10000);
-		} catch (Exception e) {
-		}
-		return 0;
-	}
+        try {
+            Thread.sleep(exectime);
+        } catch (Exception ignored) {
+        }
+        return 0;
+    }
 
-	@Override
-	public Connection getConnection() throws SQLException {
+    @Override
+    public Connection getConnection() {
 
-		return null;
-	}
+        return null;
+    }
 
-	@Override
-	public int getFetchDirection() throws SQLException {
+    @Override
+    public int getFetchDirection() {
 
-		return 0;
-	}
+        return 0;
+    }
 
-	@Override
-	public int getFetchSize() throws SQLException {
+    @Override
+    public void setFetchDirection(int direction) {
 
-		return 0;
-	}
+    }
 
-	@Override
-	public ResultSet getGeneratedKeys() throws SQLException {
+    @Override
+    public int getFetchSize() {
 
-		return null;
-	}
+        return 0;
+    }
 
-	@Override
-	public int getMaxFieldSize() throws SQLException {
+    @Override
+    public void setFetchSize(int rows) {
 
-		return 0;
-	}
+    }
 
-	@Override
-	public int getMaxRows() throws SQLException {
+    @Override
+    public ResultSet getGeneratedKeys() {
 
-		return 0;
-	}
+        return null;
+    }
 
-	@Override
-	public boolean getMoreResults() throws SQLException {
+    @Override
+    public int getMaxFieldSize() {
 
-		return false;
-	}
+        return 0;
+    }
 
-	@Override
-	public boolean getMoreResults(int current) throws SQLException {
+    @Override
+    public void setMaxFieldSize(int max) {
 
-		return false;
-	}
+    }
 
-	@Override
-	public int getQueryTimeout() throws SQLException {
+    @Override
+    public int getMaxRows() {
 
-		return 0;
-	}
+        return 0;
+    }
 
-	@Override
-	public ResultSet getResultSet() throws SQLException {
+    @Override
+    public void setMaxRows(int max) {
 
-		return new MyResultSet(rscnt, itertime);
-	}
+    }
 
-	@Override
-	public int getResultSetConcurrency() throws SQLException {
+    @Override
+    public boolean getMoreResults() {
 
-		return 0;
-	}
+        return false;
+    }
 
-	@Override
-	public int getResultSetHoldability() throws SQLException {
+    @Override
+    public boolean getMoreResults(int current) {
 
-		return 0;
-	}
+        return false;
+    }
 
-	@Override
-	public int getResultSetType() throws SQLException {
+    @Override
+    public int getQueryTimeout() {
 
-		return 0;
-	}
+        return 0;
+    }
 
-	@Override
-	public int getUpdateCount() throws SQLException {
+    @Override
+    public void setQueryTimeout(int seconds) {
 
-		return 0;
-	}
+    }
 
-	@Override
-	public SQLWarning getWarnings() throws SQLException {
+    @Override
+    public ResultSet getResultSet() {
 
-		return null;
-	}
+        return new MyResultSet(rscnt, itertime);
+    }
 
-	@Override
-	public void setCursorName(String name) throws SQLException {
+    @Override
+    public int getResultSetConcurrency() {
 
-	}
+        return 0;
+    }
 
-	@Override
-	public void setEscapeProcessing(boolean enable) throws SQLException {
+    @Override
+    public int getResultSetHoldability() {
 
-	}
+        return 0;
+    }
 
-	@Override
-	public void setFetchDirection(int direction) throws SQLException {
+    @Override
+    public int getResultSetType() {
 
-	}
+        return 0;
+    }
 
-	@Override
-	public void setFetchSize(int rows) throws SQLException {
+    @Override
+    public int getUpdateCount() {
 
-	}
+        return 0;
+    }
 
-	@Override
-	public void setMaxFieldSize(int max) throws SQLException {
+    @Override
+    public SQLWarning getWarnings() {
 
-	}
+        return null;
+    }
 
-	@Override
-	public void setMaxRows(int max) throws SQLException {
+    @Override
+    public void setCursorName(String name) {
 
-	}
+    }
 
-	@Override
-	public void setQueryTimeout(int seconds) throws SQLException {
+    @Override
+    public void setEscapeProcessing(boolean enable) {
 
-	}
+    }
 
-	@Override
-	public boolean isClosed() throws SQLException {
+    @Override
+    public boolean isClosed() {
 
-		return false;
-	}
+        return false;
+    }
 
-	@Override
-	public boolean isPoolable() throws SQLException {
+    @Override
+    public boolean isPoolable() {
 
-		return false;
-	}
+        return false;
+    }
 
-	@Override
-	public void setPoolable(boolean arg0) throws SQLException {
+    @Override
+    public void setPoolable(boolean arg0) {
 
-	}
+    }
 
-	@Override
-	public boolean isWrapperFor(Class arg0) throws SQLException {
+    @Override
+    public boolean isWrapperFor(Class arg0) {
 
-		return false;
-	}
+        return false;
+    }
 
-	@Override
-	public Object unwrap(Class arg0) throws SQLException {
+    @Override
+    public Object unwrap(Class arg0) {
 
-		return null;
-	}
+        return null;
+    }
 
-	@Override
-	public void setAsciiStream(int arg0, InputStream arg1, long arg2) throws SQLException {
+    @Override
+    public void setAsciiStream(int arg0, InputStream arg1, long arg2) {
 
-	}
+    }
 
-	@Override
-	public void setAsciiStream(int arg0, InputStream arg1) throws SQLException {
+    @Override
+    public void setAsciiStream(int arg0, InputStream arg1) {
 
-	}
+    }
 
-	@Override
-	public void setBinaryStream(int arg0, InputStream arg1, long arg2) throws SQLException {
+    @Override
+    public void setBinaryStream(int arg0, InputStream arg1, long arg2) {
 
-	}
+    }
 
-	@Override
-	public void setBinaryStream(int arg0, InputStream arg1) throws SQLException {
+    @Override
+    public void setBinaryStream(int arg0, InputStream arg1) {
 
-	}
+    }
 
-	@Override
-	public void setBlob(int arg0, InputStream arg1, long arg2) throws SQLException {
+    @Override
+    public void setBlob(int arg0, InputStream arg1, long arg2) {
 
-	}
+    }
 
-	@Override
-	public void setBlob(int arg0, InputStream arg1) throws SQLException {
+    @Override
+    public void setBlob(int arg0, InputStream arg1) {
 
-	}
+    }
 
-	@Override
-	public void setCharacterStream(int arg0, Reader arg1, long arg2) throws SQLException {
+    @Override
+    public void setCharacterStream(int arg0, Reader arg1, long arg2) {
 
-	}
+    }
 
-	@Override
-	public void setCharacterStream(int arg0, Reader arg1) throws SQLException {
+    @Override
+    public void setCharacterStream(int arg0, Reader arg1) {
 
-	}
+    }
 
-	@Override
-	public void setClob(int arg0, Reader arg1, long arg2) throws SQLException {
+    @Override
+    public void setClob(int arg0, Reader arg1, long arg2) {
 
-	}
+    }
 
-	@Override
-	public void setClob(int arg0, Reader arg1) throws SQLException {
+    @Override
+    public void setClob(int arg0, Reader arg1) {
 
-	}
+    }
 
-	@Override
-	public void setNCharacterStream(int arg0, Reader arg1, long arg2) throws SQLException {
+    @Override
+    public void setNCharacterStream(int arg0, Reader arg1, long arg2) {
 
-	}
+    }
 
-	@Override
-	public void setNCharacterStream(int arg0, Reader arg1) throws SQLException {
+    @Override
+    public void setNCharacterStream(int arg0, Reader arg1) {
 
-	}
+    }
 
-	@Override
-	public void setNClob(int arg0, NClob arg1) throws SQLException {
+    @Override
+    public void setNClob(int arg0, NClob arg1) {
 
-	}
+    }
 
-	@Override
-	public void setNClob(int arg0, Reader arg1, long arg2) throws SQLException {
+    @Override
+    public void setNClob(int arg0, Reader arg1, long arg2) {
 
-	}
+    }
 
-	@Override
-	public void setNClob(int arg0, Reader arg1) throws SQLException {
+    @Override
+    public void setNClob(int arg0, Reader arg1) {
 
-	}
+    }
 
-	@Override
-	public void setNString(int arg0, String arg1) throws SQLException {
+    @Override
+    public void setNString(int arg0, String arg1) {
 
-	}
+    }
 
-	@Override
-	public void setRowId(int arg0, RowId arg1) throws SQLException {
+    @Override
+    public void setRowId(int arg0, RowId arg1) {
 
-	}
+    }
 
-	@Override
-	public void setSQLXML(int arg0, SQLXML arg1) throws SQLException {
+    @Override
+    public void setSQLXML(int arg0, SQLXML arg1) {
 
-	}
+    }
 
-	@Override
-	public void closeOnCompletion() throws SQLException {
+    @Override
+    public void closeOnCompletion() {
 
-	}
+    }
 
-	@Override
-	public boolean isCloseOnCompletion() throws SQLException {
+    @Override
+    public boolean isCloseOnCompletion() {
 
-		return false;
-	}
+        return false;
+    }
 }

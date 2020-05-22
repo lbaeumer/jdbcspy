@@ -1,5 +1,7 @@
 <dbproxy>
     <property name="DriverClass" value="de.luisoft.jdbc.testdriver.MyDriver"/>
+    <property name="DatasourceClass" value="org.apache.derby.jdbc.EmbeddedDataSource"/>
+    <property name="XADatasourceClass" value="org.apache.derby.jdbc.EmbeddedXADataSource"/>
 
     <property name="EnableProxyInitially" value="true"/>
 
@@ -16,10 +18,8 @@
 
     <property name="DisplaySqlStringMaxlen" value="0"/>
 
-    <property name="DisplayEntityBeans" value="false"/>
     <property name="RemoveHints" value="false"/>
     <property name="IgnoreNotClosedObjects" value="false"/>
-    <property name="IgnoreDoubleClosedObjects" value="false"/>
     <property name="EnableSizeEvaluation" value="false"/>
 
     <property name="StmtDebugClassExp" value=""/>
@@ -29,6 +29,25 @@
 
     <property name="TraceDepth" value="3"/>
 
-    <property name="DumpAfterShutdown" value="true"/>
-    <property name="DumpInterval" value="0"/>
+    <property name="DumpAfterShutdown" value="false"/>
+    <property name="DumpInterval" value="20"/>
+
+    <property name="DumpAfterCloseConnection" value="true"/>
+
+    <listeners>
+
+        <executionlistener class="de.luisoft.jdbcspy.proxy.listener.impl.ExecutionTimeListener">
+            <property name="longExecutionThreshold" value="180"/>
+        </executionlistener>
+        <executionlistener class="de.luisoft.jdbcspy.proxy.listener.impl.ExecutionLastStatementListener">
+            <property name="lastStatementMaxHistory" value="3"/>
+            <property name="lastStatementExecutionThreshold" value="500"/>
+        </executionlistener>
+        <executionlistener class="de.luisoft.jdbcspy.proxy.listener.impl.ExecutionRepeatCountListener"/>
+        <executionlistener class="de.luisoft.jdbcspy.proxy.listener.impl.ExecutionStatisticListener"/>
+
+        <executionfailedlistener class="de.luisoft.jdbcspy.proxy.listener.impl.ExecutionFailedHistoryListener"/>
+
+        <connectionlistener class="de.luisoft.jdbcspy.proxy.listener.impl.ConnectionStatisticListener"/>
+    </listeners>
 </dbproxy>
