@@ -314,10 +314,6 @@ public class ConnectionInvocationHandler implements InvocationHandler, Connectio
     private Object handleClose(Object proxy, Method method, Object[] args,
                                boolean checkClosed) throws Throwable {
 
-        if (mIsClosed) {
-            return false;
-        }
-
         Object ret = null;
         synchronized (mStatements) {
             for (ProxyStatement mStatement : mStatements) {
@@ -327,7 +323,6 @@ public class ConnectionInvocationHandler implements InvocationHandler, Connectio
         }
 
         try {
-            mIsClosed = true;
             ConnectionEvent event = new ConnectionEvent(this);
             for (ConnectionListener listener : mConnectionListener) {
                 listener.closeConnection(event);
@@ -335,6 +330,7 @@ public class ConnectionInvocationHandler implements InvocationHandler, Connectio
 
             if (method != null) {
                 ret = method.invoke(mConn, args);
+                mIsClosed = true;
             }
 
             synchronized (mStatements) {
