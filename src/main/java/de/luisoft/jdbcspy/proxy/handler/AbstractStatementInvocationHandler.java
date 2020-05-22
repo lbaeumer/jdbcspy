@@ -1,13 +1,12 @@
 package de.luisoft.jdbcspy.proxy.handler;
 
 import de.luisoft.jdbcspy.ClientProperties;
-import de.luisoft.jdbcspy.proxy.Checkable;
 import de.luisoft.jdbcspy.proxy.ProxyConnectionMetaData;
+import de.luisoft.jdbcspy.proxy.ProxyResultSet;
 import de.luisoft.jdbcspy.proxy.ResultSetStatistics;
 import de.luisoft.jdbcspy.proxy.StatementStatistics;
 import de.luisoft.jdbcspy.proxy.Statistics;
 import de.luisoft.jdbcspy.proxy.exception.ProxyException;
-import de.luisoft.jdbcspy.proxy.exception.ResourceAlreadyClosedException;
 import de.luisoft.jdbcspy.proxy.exception.ResourceNotClosedException;
 import de.luisoft.jdbcspy.proxy.listener.CloseEvent;
 import de.luisoft.jdbcspy.proxy.listener.ExecutionEvent;
@@ -55,7 +54,7 @@ public abstract class AbstractStatementInvocationHandler implements InvocationHa
     /**
      * the logger object for tracing
      */
-    private static final Logger mTrace = Logger.getLogger(AbstractStatementInvocationHandler.class.getName());
+    protected final Logger mTrace = Logger.getLogger("jdbcspy.stmt");
     /**
      * the prepared statement
      */
@@ -156,10 +155,12 @@ public abstract class AbstractStatementInvocationHandler implements InvocationHa
                 return toString();
             }
 
-            mTrace.info("call method: " + method.getName() + "(" + (args != null ? "#=" + args.length : "") + ")");
+            if (mTrace.isLoggable(Level.FINE)) {
+                mTrace.fine("call method: " + method.getName() + "(" + (args != null ? "#=" + args.length : "") + ")");
+            }
 
             if ("close".equals(method.getName())) {
-                return handleClose(proxy, method, args);
+                return handleClose(proxy, method, args, true);
             } else if ("checkClosed".equals(method.getName())) {
                 handleCheckClosed(proxy);
                 return null;
@@ -179,6 +180,9 @@ public abstract class AbstractStatementInvocationHandler implements InvocationHa
                 return getSize();
             } else if ("getItemCount".equals(method.getName())) {
                 return getItemCount();
+            } else if ("endTx".equals(method.getName())) {
+                handleClose(proxy, null, null, false);
+                return true;
             } else {
                 handle(method, args);
             }
@@ -198,7 +202,7 @@ public abstract class AbstractStatementInvocationHandler implements InvocationHa
 
             String txt = "execution " + method.getName() + getArgs(args) + " failed for " + getSQL() +
                     " in method " + Utils.getExecClass(proxy);
-            mTrace.severe(txt + e.getCause());
+            mTrace.log(Level.SEVERE, "failed " + e.getCause(), e);
 
             ExecutionFailedEvent event = new ExecutionFailedEvent(toString(), e.getCause());
 
@@ -295,26 +299,26 @@ public abstract class AbstractStatementInvocationHandler implements InvocationHa
      * @return the return value
      * @throws Throwable on error
      */
-    protected Object handleClose(Object proxy, Method method, Object[] args) throws Throwable {
+    protected Object handleClose(Object proxy, Method method, Object[] args, boolean checkClosed) throws Throwable {
 
-        if (!mProps.getBoolean(ClientProperties.DB_IGNORE_DOUBLE_CLOSED_OBJECTS) && mState == CLOSED) {
-            String txt = "The Statement " + getSQL() + " opened in " + mOpenMethod + " was already closed in "
-                    + Utils.getExecClass(proxy) + ".";
-            ResourceAlreadyClosedException proxyExc = new ResourceAlreadyClosedException(txt);
-
-            proxyExc.setOpenMethod(mOpenMethod);
-            throw proxyExc;
+        if (mState == CLOSED) {
+            return false;
         }
 
         mState = CLOSED;
-        Object ret;
+        Object ret = null;
 
         try {
-            ret = method.invoke(uStatement, args);
+            if (method != null) {
+                ret = method.invoke(uStatement, args);
+            }
+
             synchronized (mResultSets) {
-                for (Object o : mResultSets) {
-                    Checkable c = (Checkable) o;
-                    c.checkClosed();
+                if (checkClosed) {
+                    for (Object o : mResultSets) {
+                        ProxyResultSet c = (ProxyResultSet) o;
+                        c.checkClosed();
+                    }
                 }
 
                 for (Object o : mResultSets) {
@@ -337,13 +341,14 @@ public abstract class AbstractStatementInvocationHandler implements InvocationHa
             }
         }
 
-        boolean displayStmt = mDuration > mProps.getInt(ClientProperties.DB_STMT_TOTAL_TIME_THRESHOLD)
-                || mSize > mProps.getInt(ClientProperties.DB_STMT_TOTAL_SIZE_THRESHOLD);
+        boolean displayStmt = mDuration >= mProps.getInt(ClientProperties.DB_STMT_TOTAL_TIME_THRESHOLD)
+                || mSize >= mProps.getInt(ClientProperties.DB_STMT_TOTAL_SIZE_THRESHOLD);
 
-        boolean displayAfterClose = ClientProperties.getInstance().getBoolean(ClientProperties.DB_DUMP_AFTER_CLOSE_STATEMENT);
-
-        if (displayStmt || displayAfterClose || displayAfterClose) {
-            mTrace.info("closed statement " + this + " in " + Utils.getExecClass(proxy));
+        if (displayStmt) {
+            mTrace.info(
+                    (method == null ? "implicitly " : "")
+                            + "closed statement " + this + " in "
+                            + Utils.getExecClass(proxy));
         }
 
         return ret;
@@ -397,7 +402,7 @@ public abstract class AbstractStatementInvocationHandler implements InvocationHa
             if (result instanceof ResultSet) {
                 ResultSet proxyRs = getResultSetProxy((ResultSet) result, getSQL(), Utils.getExecClass(proxy));
 
-                if (proxyRs instanceof Checkable) {
+                if (proxyRs instanceof ProxyResultSet) {
                     synchronized (mResultSets) {
                         mResultSets.add(proxyRs);
                     }
@@ -419,7 +424,7 @@ public abstract class AbstractStatementInvocationHandler implements InvocationHa
             }
         }
 
-        boolean infoLevel = dur > mProps.getInt(ClientProperties.DB_STMT_EXECUTE_TIME_THRESHOLD);
+        boolean infoLevel = dur >= mProps.getInt(ClientProperties.DB_STMT_EXECUTE_TIME_THRESHOLD);
 
         if (!infoLevel) {
             infoLevel = (Utils.isTrace(getSQL()) != null);
@@ -500,8 +505,8 @@ public abstract class AbstractStatementInvocationHandler implements InvocationHa
 
         InvocationHandler handler = new ResultSetInvocationHandler(rs, sql, openMethod);
 
-        return (ResultSet) Proxy.newProxyInstance(Checkable.class.getClassLoader(),
-                new Class[]{ResultSet.class, Checkable.class, ResultSetStatistics.class}, handler);
+        return (ResultSet) Proxy.newProxyInstance(ProxyResultSet.class.getClassLoader(),
+                new Class[]{ResultSet.class, ProxyResultSet.class, ResultSetStatistics.class}, handler);
     }
 
     /**

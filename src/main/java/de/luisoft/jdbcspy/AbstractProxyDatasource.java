@@ -7,8 +7,8 @@ import java.lang.reflect.Method;
 
 public abstract class AbstractProxyDatasource {
 
+    protected static ConnectionFactory connFac;
     protected Object uDatasource;
-    protected ConnectionFactory connFac;
 
     public AbstractProxyDatasource(String driver) {
         Class c = null;
@@ -68,39 +68,9 @@ public abstract class AbstractProxyDatasource {
         m.invoke(uDatasource, portNumber);
     }
 
-    public void setCurrentSchema(String currentSchema) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        Class<?> c = uDatasource.getClass();
-        Method m = c.getMethod("setCurrentSchema", String.class);
-        m.invoke(uDatasource, currentSchema);
-    }
-
-    public void setRetrieveMessagesFromServerOnGetMessage(boolean flag) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        Class<?> c = uDatasource.getClass();
-        Method m = c.getMethod("setRetrieveMessagesFromServerOnGetMessage", boolean.class);
-        m.invoke(uDatasource, flag);
-    }
-
-    public void setDeferPrepares(boolean flag) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        Class<?> c = uDatasource.getClass();
-        Method m = c.getMethod("setDeferPrepares", boolean.class);
-        m.invoke(uDatasource, flag);
-    }
-
     public void setTraceLevel(int traceLevel) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         Class<?> c = uDatasource.getClass();
         Method m = c.getMethod("setTraceLevel", int.class);
         m.invoke(uDatasource, traceLevel);
-    }
-
-    public void setProgressiveStreaming(int traceLevel) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        Class<?> c = uDatasource.getClass();
-        Method m = c.getMethod("setProgressiveStreaming", int.class);
-        m.invoke(uDatasource, traceLevel);
-    }
-
-    public void setFullyMaterializeLobData(boolean fullyMaterializeLobData) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        Class<?> c = uDatasource.getClass();
-        Method m = c.getMethod("setFullyMaterializeLobData", boolean.class);
-        m.invoke(uDatasource, fullyMaterializeLobData);
     }
 }

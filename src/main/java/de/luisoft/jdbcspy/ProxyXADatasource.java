@@ -10,7 +10,11 @@ import java.util.logging.Logger;
 public class ProxyXADatasource extends AbstractProxyDatasource implements XADataSource {
 
     public ProxyXADatasource() {
-        super(ClientProperties.DB_XA_DATASOURCE_CLASS);
+        this(ClientProperties.DB_XA_DATASOURCE_CLASS);
+    }
+
+    public ProxyXADatasource(String driverProperty) {
+        super(driverProperty);
     }
 
     @Override

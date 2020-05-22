@@ -1,7 +1,19 @@
 <dbproxy>
-    <property name="DriverClass" value="com.ibm.db2.jcc.DB2Driver"/>
-    <property name="DatasourceClass" value="org.apache.derby.jdbc.EmbeddedDataSource"/>
-    <property name="XADatasourceClass" value="org.apache.derby.jdbc.EmbeddedDataSource"/>
+
+    <property name="Derby_XADatasourceClass" value="org.apache.derby.jdbc.EmbeddedXADataSource"/>
+    <property name="Derby_DatasourceClass" value="org.apache.derby.jdbc.EmbeddedDataSource"/>
+
+    <property name="DB2_XADatasourceClass" value="com.ibm.db2.jcc.DB2XADataSource"/>
+    <property name="DB2_DatasourceClass" value="com.ibm.db2.jcc.DB2SimpleDataSource"/>
+
+    <property name="Mssql_XADatasourceClass" value="com.microsoft.sqlserver.jdbc.SQLServerXADataSource"/>
+    <property name="Mssql_DatasourceClass" value="com.microsoft.sqlserver.jdbc.SQLServerDataSource"/>
+
+    <property name="Mysql_XADatasourceClass" value="com.mysql.jdbc.jdbc2.optional.MysqlXADataSource"/>
+    <property name="Mysql_DatasourceClass" value="com.mysql.cj.jdbc.MysqlDataSource"/>
+
+    <property name="Oracle_XADatasourceClass" value="oracle.jdbc.xa.client.OracleXADataSource"/>
+    <property name="Oracle_DatasourceClass" value="oracle.jdbc.pool.OracleDataSource"/>
 
     <property name="EnableProxyInitially" value="true"/>
 
@@ -10,18 +22,17 @@
     <property name="ResultSetTotalSizeThreshold" value="20000000"/>
 
     <property name="StmtExecuteTimeThreshold" value="3000"/>
-    <property name="StmtTotalTimeThreshold" value="10000"/>
+    <property name="StmtTotalTimeThreshold" value="0"/>
     <property name="StmtTotalSizeThreshold" value="1000000"/>
 
-    <property name="ConnTotalTimeThreshold" value="20000"/>
+    <property name="ConnTotalTimeThreshold" value="0"/>
     <property name="ConnTotalSizeThreshold" value="10000000"/>
 
     <property name="DisplaySqlStringMaxlen" value="0"/>
 
-    <property name="DisplayEntityBeans" value="false"/>
     <property name="RemoveHints" value="false"/>
-    <property name="IgnoreNotClosedObjects" value="false"/>
-    <property name="IgnoreDoubleClosedObjects" value="false"/>
+    <property name="IgnoreNotClosedObjects" value="true"/>
+    <property name="IgnoreDoubleClosedObjects" value="true"/>
     <property name="EnableSizeEvaluation" value="false"/>
 
     <property name="StmtDebugClassExp" value=""/>
@@ -34,8 +45,7 @@
     <property name="DumpAfterShutdown" value="false"/>
     <property name="DumpInterval" value="0"/>
 
-    <property name="DumpAfterCloseConnection" value="true"/>
-    <property name="DumpAfterCloseStatement" value="true"/>
+    <property name="Verbose" value="true"/>
 
     <listeners>
 

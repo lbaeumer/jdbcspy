@@ -18,7 +18,6 @@
 
     <property name="DisplaySqlStringMaxlen" value="0"/>
 
-    <property name="DisplayEntityBeans" value="false"/>
     <property name="RemoveHints" value="false"/>
     <property name="IgnoreNotClosedObjects" value="false"/>
     <property name="IgnoreDoubleClosedObjects" value="false"/>
@@ -35,7 +34,6 @@
     <property name="DumpInterval" value="20"/>
 
     <property name="DumpAfterCloseConnection" value="true"/>
-    <property name="DumpAfterCloseStatement" value="true"/>
 
     <listeners>
 

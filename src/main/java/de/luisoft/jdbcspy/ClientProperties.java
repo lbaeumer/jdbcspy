@@ -46,6 +46,18 @@ public final class ClientProperties {
      * driver class
      */
     public static final String DB_XA_DATASOURCE_CLASS = "XADatasourceClass";
+
+    public static final String DB_DERBY_XA_DATASOURCE_CLASS = "Derby_XADatasourceClass";
+    public static final String DB_DERBY_DATASOURCE_CLASS = "Derby_DatasourceClass";
+    public static final String DB_DB2_XA_DATASOURCE_CLASS = "DB2_XADatasourceClass";
+    public static final String DB_DB2_DATASOURCE_CLASS = "DB2_DatasourceClass";
+    public static final String DB_MSSQL_XA_DATASOURCE_CLASS = "Mssql_XADatasourceClass";
+    public static final String DB_MSSQL_DATASOURCE_CLASS = "Mssql_DatasourceClass";
+    public static final String DB_MYSQL_XA_DATASOURCE_CLASS = "Mysql_XADatasourceClass";
+    public static final String DB_MYSQL_DATASOURCE_CLASS = "Mysql_DatasourceClass";
+    public static final String DB_ORACLE_XA_DATASOURCE_CLASS = "Oracle_XADatasourceClass";
+    public static final String DB_ORACLE_DATASOURCE_CLASS = "Oracle_DatasourceClass";
+
     /**
      * the threshold for the next method
      */
@@ -83,10 +95,6 @@ public final class ClientProperties {
      */
     public static final String DB_DISPLAY_SQL_STRING_MAXLEN = "DisplaySqlStringMaxlen";
     /**
-     * display entity beans
-     */
-    public static final String DB_DISPLAY_ENTITY_BEANS = "DisplayEntityBeans";
-    /**
      * remove hints
      */
     public static final String DB_REMOVE_HINTS = "RemoveHints";
@@ -94,10 +102,6 @@ public final class ClientProperties {
      * ignore not closed objects
      */
     public static final String DB_IGNORE_NOT_CLOSED_OBJECTS = "IgnoreNotClosedObjects";
-    /**
-     * ignore double closed objects
-     */
-    public static final String DB_IGNORE_DOUBLE_CLOSED_OBJECTS = "IgnoreDoubleClosedObjects";
     /**
      * enable size evaluation
      */
@@ -127,17 +131,14 @@ public final class ClientProperties {
      */
     public static final String DB_DUMP_AFTER_SHUTDOWN = "DumpAfterShutdown";
     /**
-     * dump after connection close
-     */
-    public static final String DB_DUMP_AFTER_CLOSE_CONNECTION = "DumpAfterCloseConnection";
-    /**
-     * dump after statement close
-     */
-    public static final String DB_DUMP_AFTER_CLOSE_STATEMENT = "DumpAfterCloseStatement";
-    /**
      * dump interval in s
      */
     public static final String DB_DUMP_INTERVAL = "DumpInterval";
+    /**
+     * dump interval in s
+     */
+    public static final String VERBOSE = "Verbose";
+
     /**
      * A Logger.
      */
@@ -157,12 +158,19 @@ public final class ClientProperties {
      * all boolean values
      */
     private static final List<String> mBoolValues = Arrays.asList(DB_ENABLE_PROXY_INITIALLY, DB_THROW_WARNINGS,
-            DB_DISPLAY_ENTITY_BEANS, DB_REMOVE_HINTS, DB_IGNORE_NOT_CLOSED_OBJECTS, DB_IGNORE_DOUBLE_CLOSED_OBJECTS,
-            DB_ENABLE_SIZE_EVALUATION, DB_DUMP_AFTER_SHUTDOWN, DB_DUMP_AFTER_CLOSE_CONNECTION, DB_DUMP_AFTER_CLOSE_STATEMENT);
+            DB_REMOVE_HINTS, DB_IGNORE_NOT_CLOSED_OBJECTS,
+            DB_ENABLE_SIZE_EVALUATION, DB_DUMP_AFTER_SHUTDOWN, VERBOSE);
     /**
      * all string values
      */
-    private static final List<String> mStringValues = Arrays.asList(DB_DRIVER_CLASS, DB_DATASOURCE_CLASS, DB_XA_DATASOURCE_CLASS);
+    private static final List<String> mStringValues = Arrays.asList(
+            DB_DRIVER_CLASS,
+            DB_DATASOURCE_CLASS, DB_XA_DATASOURCE_CLASS,
+            DB_DB2_DATASOURCE_CLASS, DB_DB2_XA_DATASOURCE_CLASS,
+            DB_MSSQL_DATASOURCE_CLASS, DB_MSSQL_XA_DATASOURCE_CLASS,
+            DB_MYSQL_DATASOURCE_CLASS, DB_MYSQL_XA_DATASOURCE_CLASS,
+            DB_ORACLE_DATASOURCE_CLASS, DB_ORACLE_XA_DATASOURCE_CLASS,
+            DB_DERBY_DATASOURCE_CLASS, DB_DERBY_XA_DATASOURCE_CLASS);
     /**
      * all list values
      */
@@ -411,15 +419,6 @@ public final class ClientProperties {
      */
     public List<String> getBooleanKeys() {
         return mBoolValues;
-    }
-
-    /**
-     * Get the string keys.
-     *
-     * @return String[]
-     */
-    public List<String> getStringKeys() {
-        return mStringValues;
     }
 
     /**

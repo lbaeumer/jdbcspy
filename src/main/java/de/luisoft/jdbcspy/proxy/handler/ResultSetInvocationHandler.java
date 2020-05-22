@@ -3,7 +3,6 @@ package de.luisoft.jdbcspy.proxy.handler;
 import de.luisoft.jdbcspy.ClientProperties;
 import de.luisoft.jdbcspy.proxy.ResultSetStatistics;
 import de.luisoft.jdbcspy.proxy.exception.ProxyException;
-import de.luisoft.jdbcspy.proxy.exception.ResourceAlreadyClosedException;
 import de.luisoft.jdbcspy.proxy.exception.ResourceNotClosedException;
 import de.luisoft.jdbcspy.proxy.listener.ExecutionFailedEvent;
 import de.luisoft.jdbcspy.proxy.listener.ExecutionFailedListener;
@@ -114,7 +113,7 @@ public class ResultSetInvocationHandler implements InvocationHandler, ResultSetS
             // remaining calls
             return method.invoke(uResultSet, args);
         } catch (InvocationTargetException e) {
-            mTrace.log(Level.SEVERE, "result set access failed for " + mSql + " in " + methodName + getArgs(args), e.getCause());
+            mTrace.log(Level.SEVERE, "result set access failed for " + mSql + " in " + Utils.getMethodSignature(method, args), e.getCause());
 
             ExecutionFailedEvent event = new ExecutionFailedEvent(toString(), e.getCause());
 
@@ -136,7 +135,7 @@ public class ResultSetInvocationHandler implements InvocationHandler, ResultSetS
 
             return null;
         } catch (Exception e) {
-            mTrace.log(Level.SEVERE, "result set access failed for " + mSql + " in " + methodName + getArgs(args), e);
+            mTrace.log(Level.SEVERE, "result set access failed for " + mSql + " in " + Utils.getMethodSignature(method, args), e);
 
             ExecutionFailedEvent event = new ExecutionFailedEvent(toString(), e);
 
@@ -152,22 +151,12 @@ public class ResultSetInvocationHandler implements InvocationHandler, ResultSetS
      * Handle the close method.
      *
      * @param proxy the proxy
-     * @throws ProxyException if a resource was not closed or double closed
      */
-    private void handleClose(Object proxy) throws ProxyException {
-        if (!ClientProperties.getInstance().getBoolean(ClientProperties.DB_IGNORE_DOUBLE_CLOSED_OBJECTS) && mIsClosed) {
-
-            String txt = "The ResultSet opened in " + mOpenMethod + " was already closed in "
-                    + Utils.getExecClass(proxy) + ".";
-
-            ResourceAlreadyClosedException proxyExc = new ResourceAlreadyClosedException(txt);
-            proxyExc.setOpenMethod(mOpenMethod);
-            throw proxyExc;
-        }
+    private void handleClose(Object proxy) {
 
         // may be null if next hasn't been called
-        boolean displayTime = mDuration > ClientProperties.getInstance().getInt(ClientProperties.DB_RESULTSET_TOTAL_TIME_THRESHOLD);
-        boolean displaySize = mSize > ClientProperties.getInstance().getInt(ClientProperties.DB_RESULTSET_TOTAL_SIZE_THRESHOLD);
+        boolean displayTime = mDuration >= ClientProperties.getInstance().getInt(ClientProperties.DB_RESULTSET_TOTAL_TIME_THRESHOLD);
+        boolean displaySize = mSize >= ClientProperties.getInstance().getInt(ClientProperties.DB_RESULTSET_TOTAL_SIZE_THRESHOLD);
 
         if (displayTime || displaySize) {
             mTrace.info("iteration of resultset closed in " + Utils.getExecClass(proxy) + " took "
@@ -190,25 +179,9 @@ public class ResultSetInvocationHandler implements InvocationHandler, ResultSetS
             String txt = "The ResultSet opened in " + mOpenMethod + " was not closed in " + Utils.getExecClass(proxy)
                     + ".";
 
-            boolean displayMsg = ClientProperties.getInstance().getBoolean(ClientProperties.DB_DISPLAY_ENTITY_BEANS);
-
-            boolean cmp = false;
-            if (!displayMsg) {
-                StackTraceElement[] el = new Exception().getStackTrace();
-                for (StackTraceElement stackTraceElement : el) {
-                    if (stackTraceElement.getClassName().startsWith("org.jboss.ejb.EntityContainer")) {
-                        cmp = true;
-                        break;
-                    }
-                }
-            }
-
-            if (displayMsg || !cmp) {
-
-                ResourceNotClosedException proxyExc = new ResourceNotClosedException(txt);
-                proxyExc.setOpenMethod(mOpenMethod);
-                throw proxyExc;
-            }
+            ResourceNotClosedException proxyExc = new ResourceNotClosedException(txt);
+            proxyExc.setOpenMethod(mOpenMethod);
+            throw proxyExc;
         }
     }
 
@@ -308,23 +281,5 @@ public class ResultSetInvocationHandler implements InvocationHandler, ResultSetS
     @Override
     public int getItemCount() {
         return mItemCount;
-    }
-
-    /**
-     * Get arguments.
-     *
-     * @param args Object[]
-     * @return String
-     */
-    private String getArgs(Object[] args) {
-        StringBuilder strb = new StringBuilder("(");
-        for (int i = 0; args != null && i < args.length; i++) {
-            if (i > 0) {
-                strb.append(",");
-            }
-            strb.append(args[i]);
-        }
-        strb.append(")");
-        return strb.toString();
     }
 }

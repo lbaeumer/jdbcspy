@@ -1,12 +1,14 @@
 package de.luisoft.jdbcspy.proxy.handler;
 
-import de.luisoft.jdbcspy.proxy.Checkable;
 import de.luisoft.jdbcspy.proxy.ConnectionFactory;
 import de.luisoft.jdbcspy.proxy.ConnectionStatistics;
 import de.luisoft.jdbcspy.proxy.ProxyConnection;
 import de.luisoft.jdbcspy.proxy.ProxyConnectionMetaData;
+import de.luisoft.jdbcspy.proxy.ProxyStatement;
+import de.luisoft.jdbcspy.proxy.util.Utils;
 
 import javax.sql.XAConnection;
+import javax.transaction.xa.XAResource;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.sql.Connection;
@@ -30,9 +32,9 @@ public class XAConnectionInvocationHandler implements InvocationHandler, Connect
      */
     private final XAConnection mConn;
 
-    private List<ProxyConnection> mConnections = new ArrayList<>();
+    private final List<ProxyConnection> mConnections = new ArrayList<>();
 
-    private ConnectionFactory connFac;
+    private final ConnectionFactory connFac;
 
     /**
      * The Constructor.
@@ -57,7 +59,9 @@ public class XAConnectionInvocationHandler implements InvocationHandler, Connect
                 return toString();
             }
 
-            mTrace.info("call " + mConn.getClass() + "." + getMethodSignature(method, args));
+            if (mTrace.isLoggable(Level.FINE)) {
+                mTrace.fine("call " + mConn.getClass() + "." + Utils.getMethodSignature(method, args));
+            }
 
             if ("close".equals(method.getName())) {
                 return handleClose(proxy, method, args);
@@ -66,6 +70,11 @@ public class XAConnectionInvocationHandler implements InvocationHandler, Connect
                 ProxyConnection pc = (ProxyConnection) connFac.getProxyConnection(c);
 
                 mConnections.add(pc);
+
+                return pc;
+            } else if ("getXAResource".equals(method.getName())) {
+                XAResource xa = (XAResource) method.invoke(mConn, args);
+                XAResource pc = connFac.getProxyXAResource(xa, this);
 
                 return pc;
             } else if ("dump".equals(method.getName())) {
@@ -80,23 +89,10 @@ public class XAConnectionInvocationHandler implements InvocationHandler, Connect
         }
     }
 
-    /**
-     * Get the method signature.
-     *
-     * @param method Method
-     * @param args   Object[]
-     * @return String
-     */
-    private String getMethodSignature(Method method, Object[] args) {
-        StringBuilder strb = new StringBuilder(method.getName() + "(");
-        for (int i = 0; args != null && i < args.length; i++) {
-            if (i != 0) {
-                strb.append(", ");
-            }
-            strb.append(args[i]);
+    public void endTx() {
+        for (ProxyConnection c : mConnections) {
+            c.endTx();
         }
-        strb.append(")");
-        return strb.toString();
     }
 
     /**
@@ -129,7 +125,7 @@ public class XAConnectionInvocationHandler implements InvocationHandler, Connect
     }
 
     @Override
-    public List<Checkable> getStatements() {
+    public List<ProxyStatement> getStatements() {
         return null;
     }
 

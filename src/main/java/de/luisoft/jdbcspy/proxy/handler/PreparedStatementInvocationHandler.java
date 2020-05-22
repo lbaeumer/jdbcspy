@@ -72,9 +72,9 @@ public class PreparedStatementInvocationHandler extends AbstractStatementInvocat
      * @throws Throwable on error
      */
     @Override
-    protected Object handleClose(Object proxy, Method method, Object[] args) throws Throwable {
+    protected Object handleClose(Object proxy, Method method, Object[] args, boolean checkClosed) throws Throwable {
 
-        Object obj = super.handleClose(proxy, method, args);
+        Object obj = super.handleClose(proxy, method, args, checkClosed);
         mResultSetItemCount += mBatchedSize;
         return obj;
     }

@@ -79,11 +79,6 @@ import java.util.List;
  * <td>int</td>
  * </tr>
  * <tr>
- * <td>DisplayEntityBeans</td>
- * <td>display entity bean info</td>
- * <td>boolean</td>
- * </tr>
- * <tr>
  * <td>RemoveHints</td>
  * <td>remove the hints from the statement</td>
  * <td>boolean</td>

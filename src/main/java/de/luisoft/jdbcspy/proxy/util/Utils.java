@@ -13,6 +13,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -130,9 +131,11 @@ public class Utils {
                     ).matches(regExp)) {
                         return regExp;
                     } else {
-                        mTrace.fine(el.getClassName() + "." + el.getMethodName()
-                                // + ":" + el.getLineNumber()
-                                + " does not match " + regExp);
+                        if (mTrace.isLoggable(Level.FINE)) {
+                            mTrace.fine(el.getClassName() + "." + el.getMethodName()
+                                    // + ":" + el.getLineNumber()
+                                    + " does not match " + regExp);
+                        }
                     }
                 }
             }
@@ -183,7 +186,7 @@ public class Utils {
      */
     public static String isHistoryTrace(String sql) {
         ClientProperties prop = ClientProperties.getInstance();
-        List debug = prop.getList(ClientProperties.DB_STMT_HISTORIZE_CLASS_EXP);
+        List<String> debug = prop.getList(ClientProperties.DB_STMT_HISTORIZE_CLASS_EXP);
         String regExp = Utils.isTraceClass(debug);
         if (regExp != null) {
             return regExp;
@@ -378,6 +381,27 @@ public class Utils {
         long s = (duration % 60000) / 1000;
 
         return (d != 0 ? d + "d " : "") + (h != 0 ? h + "h " : "") + (m != 0 ? m + "m " : "") + (s != 0 ? s + "s" : "");
+    }
+
+    /**
+     * Get the method signature.
+     *
+     * @param method Method
+     * @param args   Object[]
+     * @return String
+     */
+    public static String getMethodSignature(Method method, Object[] args) {
+        StringBuilder strb = new StringBuilder(
+                (method != null ? method.getName() : "")
+                        + "(");
+        for (int i = 0; args != null && i < args.length; i++) {
+            if (i != 0) {
+                strb.append(", ");
+            }
+            strb.append(args[i]);
+        }
+        strb.append(")");
+        return strb.toString();
     }
 
     /**

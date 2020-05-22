@@ -74,8 +74,8 @@ public class StatementFactory {
         handler.setExecutionFailedListener(ClientProperties.getInstance().getFailedListener());
         handler.setExecutionListener(ClientProperties.getInstance().getListener());
 
-        return (Statement) Proxy.newProxyInstance(Checkable.class.getClassLoader(),
-                new Class[]{Statement.class, Checkable.class, StatementStatistics.class}, handler);
+        return (Statement) Proxy.newProxyInstance(ProxyStatement.class.getClassLoader(),
+                new Class[]{Statement.class, ProxyStatement.class, StatementStatistics.class}, handler);
     }
 
     /**
@@ -94,8 +94,8 @@ public class StatementFactory {
         handler.setExecutionFailedListener(ClientProperties.getInstance().getFailedListener());
         handler.setExecutionListener(ClientProperties.getInstance().getListener());
 
-        return (PreparedStatement) Proxy.newProxyInstance(Checkable.class.getClassLoader(),
-                new Class[]{PreparedStatement.class, Checkable.class, StatementStatistics.class}, handler);
+        return (PreparedStatement) Proxy.newProxyInstance(ProxyStatement.class.getClassLoader(),
+                new Class[]{PreparedStatement.class, ProxyStatement.class, StatementStatistics.class}, handler);
     }
 
     /**
@@ -113,7 +113,7 @@ public class StatementFactory {
         handler.setExecutionFailedListener(ClientProperties.getInstance().getFailedListener());
         handler.setExecutionListener(ClientProperties.getInstance().getListener());
 
-        return (CallableStatement) Proxy.newProxyInstance(Checkable.class.getClassLoader(),
-                new Class[]{CallableStatement.class, Checkable.class, StatementStatistics.class}, handler);
+        return (CallableStatement) Proxy.newProxyInstance(ProxyStatement.class.getClassLoader(),
+                new Class[]{CallableStatement.class, ProxyStatement.class, StatementStatistics.class}, handler);
     }
 }

@@ -3,12 +3,14 @@ package de.luisoft.jdbcspy.proxy;
 import de.luisoft.jdbcspy.ClientProperties;
 import de.luisoft.jdbcspy.proxy.handler.ConnectionInvocationHandler;
 import de.luisoft.jdbcspy.proxy.handler.XAConnectionInvocationHandler;
+import de.luisoft.jdbcspy.proxy.handler.XAResourceInvocationHandler;
 import de.luisoft.jdbcspy.proxy.listener.ConnectionEvent;
 import de.luisoft.jdbcspy.proxy.listener.ConnectionListener;
 import de.luisoft.jdbcspy.proxy.listener.ExecutionFailedListener;
 import de.luisoft.jdbcspy.proxy.listener.ExecutionListener;
 
 import javax.sql.XAConnection;
+import javax.transaction.xa.XAResource;
 import java.lang.reflect.Proxy;
 import java.sql.Connection;
 import java.util.List;
@@ -23,7 +25,8 @@ public class ConnectionFactory implements ProxyConnectionMetaData {
      * A Logger.
      */
     private static final Logger mTrace = Logger.getLogger("jdbcspy.connectionfactory");
-
+    private static Boolean dumpAfterShutdownThread = false;
+    private static Boolean dumpIntervalThread = false;
     /**
      * shall the proxy be enabled
      */
@@ -49,27 +52,37 @@ public class ConnectionFactory implements ProxyConnectionMetaData {
         }
 
         if (ClientProperties.getInstance().getBoolean(ClientProperties.DB_DUMP_AFTER_SHUTDOWN)) {
+            synchronized (dumpAfterShutdownThread) {
+                if (!dumpAfterShutdownThread) {
+                    dumpAfterShutdownThread = true;
 
-            Thread t = new Thread(() -> System.out.println(dumpStatistics()));
-            t.setDaemon(true);
-            Runtime.getRuntime().addShutdownHook(t);
+                    Thread t = new Thread(() -> System.out.println(dumpStatistics()));
+                    t.setDaemon(true);
+                    Runtime.getRuntime().addShutdownHook(t);
+                }
+            }
         }
 
         if (ClientProperties.getInstance().getInt(ClientProperties.DB_DUMP_INTERVAL) > 0) {
+            synchronized (dumpIntervalThread) {
+                if (!dumpIntervalThread) {
+                    dumpIntervalThread = true;
 
-            Thread t = new Thread(() -> {
-                try {
-                    while (true) {
-                        Thread.sleep(
-                                1000 * ClientProperties.getInstance().getInt(ClientProperties.DB_DUMP_INTERVAL));
-                        System.out.println(dumpStatistics());
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    Thread t = new Thread(() -> {
+                        try {
+                            while (true) {
+                                Thread.sleep(
+                                        1000 * ClientProperties.getInstance().getInt(ClientProperties.DB_DUMP_INTERVAL));
+                                System.out.println(dumpStatistics());
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    });
+                    t.setDaemon(true);
+                    t.start();
                 }
-            });
-            t.setDaemon(true);
-            t.start();
+            }
         }
     }
 
@@ -153,6 +166,27 @@ public class ConnectionFactory implements ProxyConnectionMetaData {
 
         return (XAConnection) Proxy.newProxyInstance(ProxyConnection.class.getClassLoader(),
                 new Class[]{ProxyConnection.class}, connHandler);
+    }
+
+    /**
+     * Get the connection.
+     *
+     * @param xaResource the original connection
+     * @return a proxy connection
+     */
+    public final XAResource getProxyXAResource(XAResource xaResource,
+                                               XAConnectionInvocationHandler handler) {
+
+        if (!mEnableProxy) {
+            // get standard connection
+            return xaResource;
+        }
+
+        XAResourceInvocationHandler xaHandler =
+                new XAResourceInvocationHandler(xaResource, handler);
+
+        return (XAResource) Proxy.newProxyInstance(XAResource.class.getClassLoader(),
+                new Class[]{XAResource.class}, xaHandler);
     }
 
     /**

@@ -10,7 +10,11 @@ import java.util.logging.Logger;
 public class ProxyDatasource extends AbstractProxyDatasource implements DataSource {
 
     public ProxyDatasource() {
-        super(ClientProperties.DB_DATASOURCE_CLASS);
+        this(ClientProperties.DB_DATASOURCE_CLASS);
+    }
+
+    public ProxyDatasource(String driverClass) {
+        super(driverClass);
     }
 
     @Override

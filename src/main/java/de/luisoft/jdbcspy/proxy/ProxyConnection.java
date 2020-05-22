@@ -22,4 +22,9 @@ public interface ProxyConnection extends Connection, XAConnection, ConnectionSta
      * @return String
      */
     String dump();
+
+    /**
+     * end tx.
+     */
+    void endTx();
 }

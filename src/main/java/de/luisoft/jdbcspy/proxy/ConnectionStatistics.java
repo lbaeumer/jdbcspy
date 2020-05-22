@@ -19,7 +19,7 @@ public interface ConnectionStatistics extends Statistics {
      *
      * @return The statements.
      */
-    List<Checkable> getStatements();
+    List<ProxyStatement> getStatements();
 
     /**
      * Get the ConnectionFactory.

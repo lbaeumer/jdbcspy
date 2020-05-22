@@ -1,14 +1,13 @@
 package de.luisoft.jdbcspy.proxy.handler;
 
 import de.luisoft.jdbcspy.ClientProperties;
-import de.luisoft.jdbcspy.proxy.Checkable;
 import de.luisoft.jdbcspy.proxy.ConnectionStatistics;
 import de.luisoft.jdbcspy.proxy.ProxyConnectionMetaData;
+import de.luisoft.jdbcspy.proxy.ProxyStatement;
 import de.luisoft.jdbcspy.proxy.StatementFactory;
 import de.luisoft.jdbcspy.proxy.StatementStatistics;
 import de.luisoft.jdbcspy.proxy.Statistics;
 import de.luisoft.jdbcspy.proxy.exception.ProxyException;
-import de.luisoft.jdbcspy.proxy.exception.ResourceAlreadyClosedException;
 import de.luisoft.jdbcspy.proxy.listener.ConnectionEvent;
 import de.luisoft.jdbcspy.proxy.listener.ConnectionListener;
 import de.luisoft.jdbcspy.proxy.listener.ExecutionListener;
@@ -50,7 +49,7 @@ public class ConnectionInvocationHandler implements InvocationHandler, Connectio
     /**
      * all generated statements
      */
-    private final List<Checkable> mStatements = new LinkedList<>();
+    private final List<ProxyStatement> mStatements = new LinkedList<>();
 
     /**
      * result set item count
@@ -69,7 +68,6 @@ public class ConnectionInvocationHandler implements InvocationHandler, Connectio
      * the connection factory
      */
     private final ProxyConnectionMetaData mMetaData;
-    private final Utils utils = new Utils();
     /**
      * stmt count
      */
@@ -116,10 +114,12 @@ public class ConnectionInvocationHandler implements InvocationHandler, Connectio
                 return toString();
             }
 
-            mTrace.info("call " + mConn.getClass() + "." + getMethodSignature(method, args));
+            if (mTrace.isLoggable(Level.FINE)) {
+                mTrace.fine("call " + mConn.getClass() + "." + Utils.getMethodSignature(method, args));
+            }
 
             if ("close".equals(method.getName())) {
-                return handleClose(proxy, method, args);
+                return handleClose(proxy, method, args, true);
             } else if ("getItemCount".equals(method.getName())) {
                 return getItemCount();
             } else if ("getDuration".equals(method.getName())) {
@@ -138,13 +138,27 @@ public class ConnectionInvocationHandler implements InvocationHandler, Connectio
                 return handlePrepare(proxy, method, args);
             } else if (method.getName().startsWith("create")) {
                 return handleCreate(proxy, method, args);
+            } else if (method.getName().equals("endTx")) {
+                synchronized (mStatements) {
+                    mTrace.fine("now closing " + mStatements.size() + " statements");
+                    for (ProxyStatement s : mStatements) {
+                        try {
+                            mTrace.fine("endtx " + s);
+                            s.endTx();
+                        } catch (Exception e) {
+                            mTrace.log(Level.WARNING, "fail " + e, e);
+                        }
+                    }
+                }
+                handleClose(proxy, null, null, false);
+                return null;
             } else if (method.getName().equals("getUnderlyingConnection")) {
                 return mConn;
             }
 
             return method.invoke(mConn, args);
         } catch (InvocationTargetException e) {
-            mTrace.log(Level.SEVERE, getMethodSignature(method, args) + " failed for " + toString(), e.getCause());
+            mTrace.log(Level.SEVERE, Utils.getMethodSignature(method, args) + " failed for " + toString(), e.getCause());
             throw e.getCause();
         } catch (ProxyException e) {
             ResourceEvent event = new ResourceEvent(e, e.getOpenMethod(), Utils.getExecClass(proxy));
@@ -159,27 +173,8 @@ public class ConnectionInvocationHandler implements InvocationHandler, Connectio
         } catch (Exception e) {
             mTrace.log(Level.SEVERE, "unknown error in " + mConn.getClass()
                     + "." + method.getName() + " failed for " + toString(), e);
-            throw e.getCause();
+            throw new RuntimeException("failed " + e, e);
         }
-    }
-
-    /**
-     * Get the method signature.
-     *
-     * @param method Method
-     * @param args   Object[]
-     * @return String
-     */
-    private String getMethodSignature(Method method, Object[] args) {
-        StringBuilder strb = new StringBuilder(method.getName() + "(");
-        for (int i = 0; args != null && i < args.length; i++) {
-            if (i != 0) {
-                strb.append(", ");
-            }
-            strb.append(args[i]);
-        }
-        strb.append(")");
-        return strb.toString();
     }
 
     /**
@@ -239,8 +234,8 @@ public class ConnectionInvocationHandler implements InvocationHandler, Connectio
             Statement proxyStmt = StatementFactory.getInstance().getStatement(ClientProperties.getInstance(), (Statement) ob, mMetaData, sql,
                     Utils.getExecClass(proxy));
 
-            if (proxyStmt instanceof Checkable) {
-                addStatement((Checkable) proxyStmt);
+            if (proxyStmt instanceof ProxyStatement) {
+                addStatement((ProxyStatement) proxyStmt);
             }
 
             return proxyStmt;
@@ -265,8 +260,8 @@ public class ConnectionInvocationHandler implements InvocationHandler, Connectio
             Statement proxyStmt = StatementFactory.getInstance().getStatement(ClientProperties.getInstance(), (Statement) ob, mMetaData, null,
                     Utils.getExecClass(proxy));
 
-            if (proxyStmt instanceof Checkable) {
-                addStatement((Checkable) proxyStmt);
+            if (proxyStmt instanceof ProxyStatement) {
+                addStatement((ProxyStatement) proxyStmt);
             }
             return proxyStmt;
         } else {
@@ -280,13 +275,13 @@ public class ConnectionInvocationHandler implements InvocationHandler, Connectio
      *
      * @param stmt Checkable
      */
-    private void addStatement(Checkable stmt) {
+    private void addStatement(ProxyStatement stmt) {
         synchronized (mStatements) {
             int x = mStatements.size() - MAX_STMT_COUNT;
             if (x > 10) {
-                Iterator<Checkable> it = mStatements.iterator();
+                Iterator<ProxyStatement> it = mStatements.iterator();
                 while (it.hasNext()) {
-                    Checkable c = it.next();
+                    ProxyStatement c = it.next();
                     if (c.isClosed()) {
                         StatementStatistics stat = (StatementStatistics) c;
                         mResultSetItemCount.add(stat.getItemCount());
@@ -316,58 +311,67 @@ public class ConnectionInvocationHandler implements InvocationHandler, Connectio
      * @return the return object
      * @throws Throwable on error
      */
-    private Object handleClose(Object proxy, Method method, Object[] args) throws Throwable {
+    private Object handleClose(Object proxy, Method method, Object[] args,
+                               boolean checkClosed) throws Throwable {
 
-        if (!ClientProperties.getInstance().getBoolean(ClientProperties.DB_IGNORE_DOUBLE_CLOSED_OBJECTS) && mIsClosed) {
-            String txt = "The connection " + this + " was already closed in " + Utils.getExecClass(proxy) + ".";
-            ResourceAlreadyClosedException proxyExc = new ResourceAlreadyClosedException(txt);
-
-            proxyExc.setOpenMethod("?");
-            throw proxyExc;
+        if (mIsClosed) {
+            return false;
         }
 
+        Object ret = null;
         synchronized (mStatements) {
-            for (Checkable mStatement : mStatements) {
+            for (ProxyStatement mStatement : mStatements) {
                 Statistics c = (Statistics) mStatement;
                 mResultSetItemCount.add(c.getItemCount());
             }
         }
 
-        Object ret;
         try {
+            mIsClosed = true;
             ConnectionEvent event = new ConnectionEvent(this);
             for (ConnectionListener listener : mConnectionListener) {
                 listener.closeConnection(event);
             }
 
-            ret = method.invoke(mConn, args);
+            if (method != null) {
+                ret = method.invoke(mConn, args);
+            }
 
             synchronized (mStatements) {
-                for (Checkable mStatement : mStatements) {
+                for (ProxyStatement mStatement : mStatements) {
                     Statistics c = (Statistics) mStatement;
                     mDuration += c.getDuration();
                     mSize += c.getSize();
                 }
 
-                for (Checkable c : mStatements) {
-                    c.checkClosed();
+                if (checkClosed) {
+                    for (ProxyStatement c : mStatements) {
+                        c.checkClosed();
+                    }
+                }
+            }
+
+            // print out
+            boolean displayTime = mDuration >= ClientProperties.getInstance().getInt(ClientProperties.DB_CONN_TOTAL_TIME_THRESHOLD);
+            boolean displaySize = mSize >= ClientProperties.getInstance().getInt(ClientProperties.DB_CONN_TOTAL_SIZE_THRESHOLD);
+            boolean verbose = ClientProperties.getInstance().getBoolean(ClientProperties.VERBOSE);
+
+            if (displayTime || displaySize) {
+                if (!verbose) {
+                    mTrace.info((method == null ? "implicitly " : "")
+                            + "closed connection " + this + " in "
+                            + Utils.getExecClass(proxy));
+                } else {
+                    mTrace.info((method == null ? "implicitly " : "")
+                            + "closed connection\n" + this.dump());
                 }
             }
 
         } finally {
-            mIsClosed = true;
             synchronized (mStatements) {
                 mStmtCount += mStatements.size();
                 mStatements.clear();
             }
-        }
-
-        boolean displayTime = mDuration > ClientProperties.getInstance().getInt(ClientProperties.DB_CONN_TOTAL_TIME_THRESHOLD);
-        boolean displaySize = mDuration > ClientProperties.getInstance().getInt(ClientProperties.DB_CONN_TOTAL_SIZE_THRESHOLD);
-        boolean displayAfterClose = ClientProperties.getInstance().getBoolean(ClientProperties.DB_DUMP_AFTER_CLOSE_CONNECTION);
-
-        if (displayTime || displaySize || displayAfterClose) {
-            mTrace.info("closed connection " + this + " in " + Utils.getExecClass(proxy));
         }
 
         return ret;
@@ -400,7 +404,7 @@ public class ConnectionInvocationHandler implements InvocationHandler, Connectio
     public long getDuration() {
         long dur = 0;
         synchronized (mStatements) {
-            for (Checkable mStatement : mStatements) {
+            for (ProxyStatement mStatement : mStatements) {
                 Statistics c = (Statistics) mStatement;
                 dur += c.getDuration();
             }
@@ -417,7 +421,7 @@ public class ConnectionInvocationHandler implements InvocationHandler, Connectio
     public long getSize() {
         long size = 0;
         synchronized (mStatements) {
-            for (Checkable mStatement : mStatements) {
+            for (ProxyStatement mStatement : mStatements) {
                 Statistics c = (Statistics) mStatement;
                 size += c.getSize();
             }
@@ -441,7 +445,7 @@ public class ConnectionInvocationHandler implements InvocationHandler, Connectio
      * @return the statements.
      */
     @Override
-    public List<Checkable> getStatements() {
+    public List<ProxyStatement> getStatements() {
         return new ArrayList<>(mStatements);
     }
 
@@ -476,7 +480,7 @@ public class ConnectionInvocationHandler implements InvocationHandler, Connectio
         int i = mDeletedStmts + 1;
         strb.append("1 .. ").append(mDeletedStmts).append(": ...\n");
         synchronized (mStatements) {
-            for (Checkable s : mStatements) {
+            for (ProxyStatement s : mStatements) {
                 strb.append(i).append(": ");
                 strb.append(s.toString());
                 strb.append("\n");
