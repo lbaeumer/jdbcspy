@@ -116,7 +116,7 @@ public class DBProxyDriver implements Driver {
     static {
         try {
             DBProxyDriver m = new DBProxyDriver();
-            String driverClass = (String) m.connFac.getProperty(ClientProperties.DB_DRIVER_CLASS);
+            String driverClass = (String) ClientProperties.getProperty(ClientProperties.DB_DRIVER_CLASS);
             System.out.println("jdbcspy: trying to register wrapper for driver " + driverClass);
             Class.forName(driverClass);
             Enumeration<Driver> e = DriverManager.getDrivers();
@@ -178,7 +178,7 @@ public class DBProxyDriver implements Driver {
 
     @Override
     public String toString() {
-        return connFac.dumpStatistics();
+        return ConnectionFactory.dumpStatistics();
     }
 
     @Override

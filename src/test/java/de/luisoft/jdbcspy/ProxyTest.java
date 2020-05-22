@@ -31,7 +31,7 @@ public class ProxyTest {
 
     @After
     public void tearDown() {
-        System.out.println(connFac.dumpStatistics());
+        System.out.println(ConnectionFactory.dumpStatistics());
     }
 
     @Test

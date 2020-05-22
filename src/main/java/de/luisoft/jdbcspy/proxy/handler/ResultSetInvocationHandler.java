@@ -117,7 +117,7 @@ public class ResultSetInvocationHandler implements InvocationHandler, ResultSetS
 
             ExecutionFailedEvent event = new ExecutionFailedEvent(toString(), e.getCause());
 
-            for (ExecutionFailedListener listener : ClientProperties.getInstance().getFailedListener()) {
+            for (ExecutionFailedListener listener : ClientProperties.getFailedListener()) {
                 listener.executionFailed(event);
             }
 
@@ -125,11 +125,11 @@ public class ResultSetInvocationHandler implements InvocationHandler, ResultSetS
         } catch (ProxyException e) {
             ResourceEvent event = new ResourceEvent(e, e.getOpenMethod(), Utils.getExecClass(proxy));
 
-            for (ExecutionListener listener : ClientProperties.getInstance().getListener()) {
+            for (ExecutionListener listener : ClientProperties.getListener()) {
                 listener.resourceFailure(event);
             }
 
-            if (ClientProperties.getInstance().getBoolean(ClientProperties.DB_THROW_WARNINGS)) {
+            if (ClientProperties.getBoolean(ClientProperties.DB_THROW_WARNINGS)) {
                 throw e;
             }
 
@@ -139,7 +139,7 @@ public class ResultSetInvocationHandler implements InvocationHandler, ResultSetS
 
             ExecutionFailedEvent event = new ExecutionFailedEvent(toString(), e);
 
-            for (ExecutionFailedListener listener : ClientProperties.getInstance().getFailedListener()) {
+            for (ExecutionFailedListener listener : ClientProperties.getFailedListener()) {
                 listener.executionFailed(event);
             }
 
@@ -155,8 +155,8 @@ public class ResultSetInvocationHandler implements InvocationHandler, ResultSetS
     private void handleClose(Object proxy) {
 
         // may be null if next hasn't been called
-        boolean displayTime = mDuration >= ClientProperties.getInstance().getInt(ClientProperties.DB_RESULTSET_TOTAL_TIME_THRESHOLD);
-        boolean displaySize = mSize >= ClientProperties.getInstance().getInt(ClientProperties.DB_RESULTSET_TOTAL_SIZE_THRESHOLD);
+        boolean displayTime = mDuration >= ClientProperties.getInt(ClientProperties.DB_RESULTSET_TOTAL_TIME_THRESHOLD);
+        boolean displaySize = mSize >= ClientProperties.getInt(ClientProperties.DB_RESULTSET_TOTAL_SIZE_THRESHOLD);
 
         if (displayTime || displaySize) {
             mTrace.info("iteration of resultset closed in " + Utils.getExecClass(proxy) + " took "
@@ -174,7 +174,7 @@ public class ResultSetInvocationHandler implements InvocationHandler, ResultSetS
      * @throws ProxyException if a resource was not closed or double closed
      */
     private void handleCheckClosed(Object proxy) throws ProxyException {
-        if (!mIsClosed && !ClientProperties.getInstance().getBoolean(ClientProperties.DB_IGNORE_NOT_CLOSED_OBJECTS)) {
+        if (!mIsClosed && !ClientProperties.getBoolean(ClientProperties.DB_IGNORE_NOT_CLOSED_OBJECTS)) {
 
             String txt = "The ResultSet opened in " + mOpenMethod + " was not closed in " + Utils.getExecClass(proxy)
                     + ".";
@@ -207,7 +207,7 @@ public class ResultSetInvocationHandler implements InvocationHandler, ResultSetS
             long dur = (System.currentTimeMillis() - startTime);
 
             mDuration += dur;
-            if (dur > ClientProperties.getInstance().getInt(ClientProperties.DB_RESULTSET_NEXT_TIME_THRESHOLD)) {
+            if (dur > ClientProperties.getInt(ClientProperties.DB_RESULTSET_NEXT_TIME_THRESHOLD)) {
                 String txt = "finished next in " + dur + "ms. (loop " + mItemCount + ")";
 
                 mTrace.info(txt);
@@ -228,7 +228,7 @@ public class ResultSetInvocationHandler implements InvocationHandler, ResultSetS
         Object ret;
         try {
             ret = method.invoke(uResultSet, args);
-            if (ClientProperties.getInstance().getBoolean(ClientProperties.DB_ENABLE_SIZE_EVALUATION)) {
+            if (ClientProperties.getBoolean(ClientProperties.DB_ENABLE_SIZE_EVALUATION)) {
                 if (ret instanceof String) {
                     mSize += 2 * ((String) ret).length();
                 } else if (ret instanceof Integer || ret instanceof Float) {
@@ -281,5 +281,10 @@ public class ResultSetInvocationHandler implements InvocationHandler, ResultSetS
     @Override
     public int getItemCount() {
         return mItemCount;
+    }
+
+
+    public String dump() {
+        return toString();
     }
 }

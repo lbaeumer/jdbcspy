@@ -1,5 +1,4 @@
 <dbproxy>
-
     <property name="Derby_XADatasourceClass" value="org.apache.derby.jdbc.EmbeddedXADataSource"/>
     <property name="Derby_DatasourceClass" value="org.apache.derby.jdbc.EmbeddedDataSource"/>
 
@@ -40,6 +39,7 @@
     <property name="StmtHistorizeSQLExp" value=""/>
 
     <property name="TraceDepth" value="3"/>
+    <property name="TraceClassIgnoreRegExp" value="(org\.jboss|org\.jbpm|org\.junit|org\.hibernate|org\.springframework|com\.ibm|com\.sun|jdk\.internal|java|sun)\..*"/>
 
     <property name="DumpAfterShutdown" value="false"/>
     <property name="DumpInterval" value="0"/>
@@ -55,18 +55,9 @@
             <property name="lastStatementMaxHistory" value="3"/>
             <property name="lastStatementExecutionThreshold" value="500"/>
         </executionlistener>
-        <executionlistener class="de.luisoft.jdbcspy.proxy.listener.impl.ExecutionRepeatCountListener"/>
-        <executionlistener class="de.luisoft.jdbcspy.proxy.listener.impl.ExecutionResourceListener">
-            <property name="ThrowWarnings" value="false"/>
-        </executionlistener>
         <executionlistener class="de.luisoft.jdbcspy.proxy.listener.impl.ExecutionStatisticListener"/>
         <executionlistener class="de.luisoft.jdbcspy.proxy.listener.impl.SpecialStatementListener"/>
 
-        <executionfailedlistener class="de.luisoft.jdbcspy.proxy.listener.impl.ExecutionFailedHistoryListener"/>
-
-        <connectionlistener class="de.luisoft.jdbcspy.proxy.listener.impl.ConnectionDumpListener">
-            <property name="connDumpCloseClassExp" value=""/>
-        </connectionlistener>
         <connectionlistener class="de.luisoft.jdbcspy.proxy.listener.impl.ConnectionStatisticListener"/>
     </listeners>
 </dbproxy>

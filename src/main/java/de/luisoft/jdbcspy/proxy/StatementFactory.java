@@ -40,39 +40,37 @@ public class StatementFactory {
     /**
      * Get a statement.
      *
-     * @param props the client properties
-     * @param ps    the original statement
-     * @param sql   the sql code
+     * @param ps  the original statement
+     * @param sql the sql code
      * @return Statement the proxy statement
      */
-    public Statement getStatement(ClientProperties props, Statement ps, ProxyConnectionMetaData metaData, String sql,
+    public Statement getStatement(Statement ps, String sql,
                                   String method) {
         StatementFactory factory = getInstance();
         if (ps instanceof CallableStatement) {
-            return factory.getCallableStatementProxy(props, (CallableStatement) ps, metaData, sql,
+            return factory.getCallableStatementProxy((CallableStatement) ps, sql,
                     method);
         } else if (ps instanceof PreparedStatement) {
-            return factory.getPreparedStatementProxy(props, (PreparedStatement) ps, metaData, sql, method);
+            return factory.getPreparedStatementProxy((PreparedStatement) ps, sql, method);
         } else {
-            return factory.getStatementProxy(props, ps, metaData, sql, method);
+            return factory.getStatementProxy(ps, sql, method);
         }
     }
 
     /**
      * Get a statement proxy.
      *
-     * @param props the client properties
-     * @param ps    the original statement
-     * @param sql   the sql code
+     * @param ps  the original statement
+     * @param sql the sql code
      * @return the proxy statement
      */
-    private Statement getStatementProxy(ClientProperties props, Statement ps, ProxyConnectionMetaData metaData,
+    private Statement getStatementProxy(Statement ps,
                                         String sql, String method) {
 
-        StatementInvocationHandler handler = new StatementInvocationHandler(props, ps, metaData, sql, method);
+        StatementInvocationHandler handler = new StatementInvocationHandler(ps, sql, method);
 
-        handler.setExecutionFailedListener(ClientProperties.getInstance().getFailedListener());
-        handler.setExecutionListener(ClientProperties.getInstance().getListener());
+        handler.setExecutionFailedListener(ClientProperties.getFailedListener());
+        handler.setExecutionListener(ClientProperties.getListener());
 
         return (Statement) Proxy.newProxyInstance(ProxyStatement.class.getClassLoader(),
                 new Class[]{Statement.class, ProxyStatement.class, StatementStatistics.class}, handler);
@@ -81,18 +79,17 @@ public class StatementFactory {
     /**
      * Get a statement proxy.
      *
-     * @param props the client properties
-     * @param ps    the original statement
-     * @param sql   the sql code
+     * @param ps  the original statement
+     * @param sql the sql code
      * @return the proxy statement
      */
-    private PreparedStatement getPreparedStatementProxy(ClientProperties props, PreparedStatement ps,
-                                                        ProxyConnectionMetaData metaData, String sql, String method) {
+    private PreparedStatement getPreparedStatementProxy(PreparedStatement ps,
+                                                        String sql, String method) {
 
-        PreparedStatementInvocationHandler handler = new PreparedStatementInvocationHandler(props, ps, metaData, sql, method);
+        PreparedStatementInvocationHandler handler = new PreparedStatementInvocationHandler(ps, sql, method);
 
-        handler.setExecutionFailedListener(ClientProperties.getInstance().getFailedListener());
-        handler.setExecutionListener(ClientProperties.getInstance().getListener());
+        handler.setExecutionFailedListener(ClientProperties.getFailedListener());
+        handler.setExecutionListener(ClientProperties.getListener());
 
         return (PreparedStatement) Proxy.newProxyInstance(ProxyStatement.class.getClassLoader(),
                 new Class[]{PreparedStatement.class, ProxyStatement.class, StatementStatistics.class}, handler);
@@ -101,17 +98,16 @@ public class StatementFactory {
     /**
      * Get a statement proxy.
      *
-     * @param props the client properties
-     * @param ps    the original statement
-     * @param sql   the sql code
+     * @param ps  the original statement
+     * @param sql the sql code
      * @return the proxy statement
      */
-    private CallableStatement getCallableStatementProxy(ClientProperties props, CallableStatement ps,
-                                                        ProxyConnectionMetaData metaData, String sql, String method) {
-        PreparedStatementInvocationHandler handler = new PreparedStatementInvocationHandler(props, ps, metaData, sql, method);
+    private CallableStatement getCallableStatementProxy(CallableStatement ps,
+                                                        String sql, String method) {
+        PreparedStatementInvocationHandler handler = new PreparedStatementInvocationHandler(ps, sql, method);
 
-        handler.setExecutionFailedListener(ClientProperties.getInstance().getFailedListener());
-        handler.setExecutionListener(ClientProperties.getInstance().getListener());
+        handler.setExecutionFailedListener(ClientProperties.getFailedListener());
+        handler.setExecutionListener(ClientProperties.getListener());
 
         return (CallableStatement) Proxy.newProxyInstance(ProxyStatement.class.getClassLoader(),
                 new Class[]{CallableStatement.class, ProxyStatement.class, StatementStatistics.class}, handler);

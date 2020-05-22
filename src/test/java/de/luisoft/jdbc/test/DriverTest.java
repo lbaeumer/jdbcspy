@@ -1,5 +1,6 @@
 package de.luisoft.jdbc.test;
 
+import de.luisoft.jdbcspy.proxy.ConnectionFactory;
 import de.luisoft.jdbcspy.proxy.ConnectionStatistics;
 import de.luisoft.jdbcspy.proxy.ResultSetStatistics;
 import de.luisoft.jdbcspy.proxy.StatementStatistics;
@@ -12,7 +13,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-public class MyTest {
+public class DriverTest {
 
     @Test
     public void testStmtWith100000rsa() throws Exception {
@@ -40,7 +41,7 @@ public class MyTest {
         StatementStatistics sstat = (StatementStatistics) p;
         Assert.assertEquals(cnt, sstat.getItemCount());
         Assert.assertEquals("select * from test", sstat.getSQL());
-        Assert.assertTrue(sstat.getExecuteCaller().contains("MyTest.testStmtWith100000rs"));
+        Assert.assertTrue(sstat.getExecuteCaller().contains("DriverTest.testStmtWith100000rs"));
         Assert.assertTrue(sstat.getDuration() > 1500 && sstat.getDuration() < 1700);
         Assert.assertTrue("exec time=" + sstat.getExecutionTime(),
                 sstat.getExecutionTime() >= 500 && sstat.getExecutionTime() < 520);
@@ -50,7 +51,7 @@ public class MyTest {
         sstat = (StatementStatistics) p;
         Assert.assertEquals(cnt, sstat.getItemCount());
         Assert.assertEquals("select * from test", sstat.getSQL());
-        Assert.assertTrue(sstat.getExecuteCaller().contains("MyTest.testStmtWith100000rs"));
+        Assert.assertTrue(sstat.getExecuteCaller().contains("DriverTest.testStmtWith100000rs"));
         Assert.assertTrue(sstat.getDuration() > 1500 && sstat.getDuration() < 1700);
         Assert.assertTrue("exec time=" + sstat.getExecutionTime(),
                 sstat.getExecutionTime() >= 500 && sstat.getExecutionTime() < 520);
@@ -59,7 +60,7 @@ public class MyTest {
         Assert.assertEquals(1, stat.getItemCount());
         Assert.assertTrue("s=" + stat.getStatements().get(0),
                 stat.getStatements().get(0).toString().startsWith("\"select * from test\""));
-        Assert.assertTrue(stat.getCaller().contains("MyTest.testStmtWith100000rs"));
+        Assert.assertTrue(stat.getCaller().contains("DriverTest.testStmtWith100000rs"));
         Assert.assertTrue(stat.getDuration() > 1500 && stat.getDuration() < 1700);
 
         c.close();
@@ -71,8 +72,7 @@ public class MyTest {
         stat = (ConnectionStatistics) c;
         Assert.assertEquals(1, stat.getItemCount());
         Assert.assertEquals(0, stat.getStatements().size());
-        Assert.assertTrue(stat.getCaller().contains("MyTest.testStmtWith100000rs"));
-        Assert.assertTrue(stat.getDuration() > 1500 && stat.getDuration() < 1700);
+        Assert.assertTrue(stat.getCaller().contains("DriverTest.testStmtWith100000rs"));
 
     }
 
@@ -90,6 +90,9 @@ public class MyTest {
         rs.close();
         p.close();
         c.close();
+
+        System.out.println("connection dump:\n"
+                + ConnectionFactory.dumpStatistics());
     }
 
     @Test
@@ -113,7 +116,7 @@ public class MyTest {
         ConnectionStatistics stat = (ConnectionStatistics) c;
         Assert.assertEquals(1, stat.getItemCount());
         Assert.assertEquals(0, stat.getStatements().size());
-        Assert.assertTrue(stat.getCaller().contains("MyTest.testStmtWith1000000rs"));
+        Assert.assertTrue(stat.getCaller(), stat.getCaller().contains("DriverTest.testStmtWith1000000rs"));
 
         long end = (System.currentTimeMillis() - start);
         System.out.println("reading " + cnt + " rs; " + cnt / (end - 1500) + "rs/ms; finished in " + end + "ms");
@@ -140,7 +143,7 @@ public class MyTest {
         ConnectionStatistics stat = (ConnectionStatistics) c;
         Assert.assertEquals(1, stat.getItemCount());
         Assert.assertEquals(0, stat.getStatements().size());
-        Assert.assertTrue(stat.getCaller().contains("MyTest.testStmtWith100000rs"));
+        Assert.assertTrue(stat.getCaller().contains("DriverTest.testStmtWith100000rs"));
 
         long end = (System.currentTimeMillis() - start);
         System.out.println("reading " + cnt + " rs; " + cnt / (end - 1500) + "rs/ms; finished in " + end + "ms");
@@ -226,7 +229,7 @@ public class MyTest {
         ConnectionStatistics stat = (ConnectionStatistics) c;
         Assert.assertEquals(cnt, stat.getItemCount());
         Assert.assertEquals(0, stat.getStatements().size());
-        Assert.assertTrue(stat.getCaller().contains("MyTest.test100StmtWith1rs"));
+        Assert.assertTrue(stat.getCaller().contains("DriverTest.test100StmtWith1rs"));
     }
 
     @Ignore
@@ -258,7 +261,7 @@ public class MyTest {
         ConnectionStatistics stat = (ConnectionStatistics) c;
         Assert.assertEquals(cnt, stat.getItemCount());
         Assert.assertEquals(0, stat.getStatements().size());
-        Assert.assertTrue(stat.getCaller().contains("MyTest.test10000StmtWith1rs"));
+        Assert.assertTrue(stat.getCaller().contains("DriverTest.test10000StmtWith1rs"));
     }
 
     @Ignore
@@ -291,7 +294,7 @@ public class MyTest {
         ConnectionStatistics stat = (ConnectionStatistics) c;
         Assert.assertEquals(cnt, stat.getItemCount());
         Assert.assertEquals(0, stat.getStatements().size());
-        Assert.assertTrue(stat.getCaller().contains("MyTest.test10000StmtWith1rs2"));
+        Assert.assertTrue(stat.getCaller().contains("DriverTest.test10000StmtWith1rs2"));
     }
 
     @Test
@@ -328,6 +331,6 @@ public class MyTest {
         ConnectionStatistics stat = (ConnectionStatistics) c;
         Assert.assertEquals(cnt, stat.getItemCount());
         Assert.assertEquals(0, stat.getStatements().size());
-        Assert.assertTrue(stat.getCaller().contains("MyTest.test10000StmtWith1rs3"));
+        Assert.assertTrue(stat.getCaller().contains("DriverTest.test10000StmtWith1rs3"));
     }
 }

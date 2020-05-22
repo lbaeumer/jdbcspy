@@ -53,20 +53,13 @@ public class Utils {
         StackTraceElement[] e = t.getStackTrace();
         StringBuilder execClass = new StringBuilder();
 
+        String ignorePath = (String) ClientProperties.getProperty(ClientProperties.DB_TRACE_CLASS_IGNORE_REGEXP);
         int j = 1;
         for (int i = 0; i < e.length; i++) {
             StackTraceElement el = e[i];
             if (el.getClassName().startsWith("de.luisoft.jdbcspy.proxy")
                     || proxy.getClass().getName().equals(el.getClassName())
-                    || el.getClassName().startsWith("org.jboss.")
-                    || el.getClassName().startsWith("org.junit")
-                    || el.getClassName().startsWith("org.hibernate")
-                    || el.getClassName().startsWith("org.springframework")
-                    || el.getClassName().startsWith("com.ibm.")
-                    || el.getClassName().startsWith("com.sun.")
-                    || el.getClassName().startsWith("jdk.internal.")
-                    || el.getClassName().startsWith("java.")
-                    || el.getClassName().startsWith("sun.")) {
+                    || el.getClassName().matches(ignorePath)) {
                 continue;
             }
 
@@ -80,7 +73,7 @@ public class Utils {
                 execClass.append("|");
             }
             execClass.append(getPrintClass(el));
-            if (j >= ClientProperties.getInstance().getInt(ClientProperties.DB_TRACE_DEPTH)) {
+            if (j >= ClientProperties.getInt(ClientProperties.DB_TRACE_DEPTH)) {
                 break;
             }
 
@@ -167,13 +160,12 @@ public class Utils {
      * @return the reg Exp
      */
     public static String isTrace(String sql) {
-        ClientProperties prop = ClientProperties.getInstance();
-        List<String> debug = prop.getList(ClientProperties.DB_STMT_DEBUG_CLASS_EXP);
+        List<String> debug = ClientProperties.getList(ClientProperties.DB_STMT_DEBUG_CLASS_EXP);
         String regExp = Utils.isTraceClass(debug);
         if (regExp != null) {
             return regExp;
         } else {
-            debug = prop.getList(ClientProperties.DB_STMT_DEBUG_SQL_EXP);
+            debug = ClientProperties.getList(ClientProperties.DB_STMT_DEBUG_SQL_EXP);
             return Utils.isTraceSql(debug, sql);
         }
     }
@@ -185,13 +177,12 @@ public class Utils {
      * @return boolean
      */
     public static String isHistoryTrace(String sql) {
-        ClientProperties prop = ClientProperties.getInstance();
-        List<String> debug = prop.getList(ClientProperties.DB_STMT_HISTORIZE_CLASS_EXP);
+        List<String> debug = ClientProperties.getList(ClientProperties.DB_STMT_HISTORIZE_CLASS_EXP);
         String regExp = Utils.isTraceClass(debug);
         if (regExp != null) {
             return regExp;
         } else {
-            debug = prop.getList(ClientProperties.DB_STMT_HISTORIZE_SQL_EXP);
+            debug = ClientProperties.getList(ClientProperties.DB_STMT_HISTORIZE_SQL_EXP);
             return Utils.isTraceSql(debug, sql);
         }
     }

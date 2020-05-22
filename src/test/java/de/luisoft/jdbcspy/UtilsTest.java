@@ -1,4 +1,4 @@
-package de.luisoft.jdbc.test;
+package de.luisoft.jdbcspy;
 
 import de.luisoft.jdbcspy.proxy.listener.ConnectionListener;
 import de.luisoft.jdbcspy.proxy.listener.impl.ConnectionDumpListener;

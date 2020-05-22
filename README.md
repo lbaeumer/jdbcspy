@@ -21,9 +21,37 @@ The jdbcspy is a lightweight profiling and monitoring proxy for your jdbc connec
 
 The installation is quite easy. 
 
-1. copy the file jdbcspy.jar into your classpath 
-1. copy the dbproxy.xml file into your home drive and edit the driver class name of the underlying jdbc driver. In addition you may want to configure the driver. Detailed information is here. 
-1. To the normal database url, you have to add the prefix **proxy**: 
+1. Copy the file jdbcspy.jar into your classpath 
+1. Optional: copy the dbproxy.xml file into your home drive and edit the properties to customize the jdbcspy's behaviour.
+1. Choose one of the following options dependent on the way your database is configured:
+    1. Driver URL: If you are using a database url, you only have a add the prefix  **proxy**:
+    
+       Example:
+       diver url: 
+       
+       jdbc:db2://myhost:5021/DATABASE
+
+       then just change the url to: 
+       
+       proxy:jdbc:db2://myhost:5021/DATABASE
+    1.  java.sql.Datasource: Either use one of the predefined vendor specific database drivers of define your one one.
+
+        Some predefined driver classes are:
+        
+        de.luisoft.jdbcspy.vendor.DB2ProxyDatasource
+        de.luisoft.jdbcspy.vendor.MssqlProxyDatasource
+        de.luisoft.jdbcspy.vendor.MysqlProxyDatasource
+        de.luisoft.jdbcspy.vendor.OracleProxyDatasource
+
+    1.  java.sql.XADatasource: Either use one of the predefined vendor specific database drivers of define your one one.
+    
+        Some predefined driver classes are:
+        
+        de.luisoft.jdbcspy.vendor.DB2ProxyXADatasource
+        de.luisoft.jdbcspy.vendor.MssqlProxyXADatasource
+        de.luisoft.jdbcspy.vendor.MysqlProxyXADatasource
+        de.luisoft.jdbcspy.vendor.OracleProxyXADatasource
+    
 1. Now you can start your application as usual. The proxy will be activated and gather information about your jdbc connection.
 
 # User Guide (5min)

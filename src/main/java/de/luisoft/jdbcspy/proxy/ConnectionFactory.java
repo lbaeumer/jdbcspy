@@ -13,18 +13,18 @@ import javax.sql.XAConnection;
 import javax.transaction.xa.XAResource;
 import java.lang.reflect.Proxy;
 import java.sql.Connection;
-import java.util.List;
 import java.util.logging.Logger;
 
 /**
  * Title: ConnectionFactory
  */
-public class ConnectionFactory implements ProxyConnectionMetaData {
+public class ConnectionFactory {
 
     /**
      * A Logger.
      */
     private static final Logger mTrace = Logger.getLogger("jdbcspy.connectionfactory");
+
     private static Boolean dumpAfterShutdownThread = false;
     private static Boolean dumpIntervalThread = false;
     /**
@@ -41,17 +41,15 @@ public class ConnectionFactory implements ProxyConnectionMetaData {
      */
     public ConnectionFactory() {
 
-        ClientProperties props = ClientProperties.getInstance();
-        mInitiallyEnableProxy = props.isInitiallyEnabled();
+        mInitiallyEnableProxy = ClientProperties.isInitiallyEnabled();
 
         if (mInitiallyEnableProxy) {
             mEnableProxy = true;
-            mTrace.info("settings=" + props);
         } else {
             mTrace.info("Disable the ProxyConnectionFactory initially. " + "Using standard connection.");
         }
 
-        if (ClientProperties.getInstance().getBoolean(ClientProperties.DB_DUMP_AFTER_SHUTDOWN)) {
+        if (ClientProperties.getBoolean(ClientProperties.DB_DUMP_AFTER_SHUTDOWN)) {
             synchronized (dumpAfterShutdownThread) {
                 if (!dumpAfterShutdownThread) {
                     dumpAfterShutdownThread = true;
@@ -63,7 +61,7 @@ public class ConnectionFactory implements ProxyConnectionMetaData {
             }
         }
 
-        if (ClientProperties.getInstance().getInt(ClientProperties.DB_DUMP_INTERVAL) > 0) {
+        if (ClientProperties.getInt(ClientProperties.DB_DUMP_INTERVAL) > 0) {
             synchronized (dumpIntervalThread) {
                 if (!dumpIntervalThread) {
                     dumpIntervalThread = true;
@@ -72,7 +70,7 @@ public class ConnectionFactory implements ProxyConnectionMetaData {
                         try {
                             while (true) {
                                 Thread.sleep(
-                                        1000 * ClientProperties.getInstance().getInt(ClientProperties.DB_DUMP_INTERVAL));
+                                        1000 * ClientProperties.getInt(ClientProperties.DB_DUMP_INTERVAL));
                                 System.out.println(dumpStatistics());
                             }
                         } catch (Exception e) {
@@ -87,34 +85,31 @@ public class ConnectionFactory implements ProxyConnectionMetaData {
     }
 
     /**
-     * Is proxy enabled?
+     * Dump the statistics.
      *
-     * @return boolean
+     * @return String
      */
-    @Override
-    public final boolean isInitiallyEnabled() {
-        return mInitiallyEnableProxy;
-    }
-
-    /**
-     * Is proxy enabled?
-     *
-     * @return boolean
-     */
-    @Override
-    public final boolean isEnabled() {
-        return mEnableProxy;
-    }
-
-    /**
-     * Enable the proxy.
-     *
-     * @param enableProxy boolean
-     */
-    @Override
-    public final void enableProxy(boolean enableProxy) {
-        mTrace.info((enableProxy ? "Enable the Connection proxy." : "Disable the Connection proxy."));
-        mEnableProxy = enableProxy;
+    public static final String dumpStatistics() {
+        StringBuilder strb = new StringBuilder();
+        for (ExecutionListener obj : ClientProperties.getListener()) {
+            if (obj.toString() != null) {
+                strb.append(obj.toString());
+                strb.append("\n");
+            }
+        }
+        for (ConnectionListener obj : ClientProperties.getConnectionListener()) {
+            if (obj.toString() != null) {
+                strb.append(obj.toString());
+                strb.append("\n");
+            }
+        }
+        for (ExecutionFailedListener obj : ClientProperties.getFailedListener()) {
+            if (obj.toString() != null) {
+                strb.append(obj.toString());
+                strb.append("\n");
+            }
+        }
+        return strb.toString();
     }
 
     /**
@@ -131,9 +126,9 @@ public class ConnectionFactory implements ProxyConnectionMetaData {
         }
 
         ConnectionInvocationHandler connHandler =
-                new ConnectionInvocationHandler(conn, this);
+                new ConnectionInvocationHandler(conn);
 
-        for (ConnectionListener listener : ClientProperties.getInstance().getConnectionListener()) {
+        for (ConnectionListener listener : ClientProperties.getConnectionListener()) {
             connHandler.addConnectionListener(listener);
         }
 
@@ -141,7 +136,7 @@ public class ConnectionFactory implements ProxyConnectionMetaData {
                 new Class[]{ProxyConnection.class}, connHandler);
 
         ConnectionEvent event = new ConnectionEvent(connHandler);
-        for (ConnectionListener listener : ClientProperties.getInstance().getConnectionListener()) {
+        for (ConnectionListener listener : ClientProperties.getConnectionListener()) {
             listener.openConnection(event);
         }
 
@@ -187,102 +182,5 @@ public class ConnectionFactory implements ProxyConnectionMetaData {
 
         return (XAResource) Proxy.newProxyInstance(XAResource.class.getClassLoader(),
                 new Class[]{XAResource.class}, xaHandler);
-    }
-
-    /**
-     * Dump the statistics.
-     *
-     * @return String
-     */
-    @Override
-    public final String dumpStatistics() {
-        StringBuilder strb = new StringBuilder();
-        for (ExecutionListener obj : ClientProperties.getInstance().getListener()) {
-            if (obj.toString() != null) {
-                strb.append(obj.toString());
-                strb.append("\n");
-            }
-        }
-        for (ConnectionListener obj : ClientProperties.getInstance().getConnectionListener()) {
-            if (obj.toString() != null) {
-                strb.append(obj.toString());
-                strb.append("\n");
-            }
-        }
-        for (ExecutionFailedListener obj : ClientProperties.getInstance().getFailedListener()) {
-            if (obj.toString() != null) {
-                strb.append(obj.toString());
-                strb.append("\n");
-            }
-        }
-        return strb.toString();
-    }
-
-    /**
-     * Clear the statistics.
-     */
-    @Override
-    public final void clearStatistics() {
-        for (ExecutionListener ex : ClientProperties.getInstance().getListener()) {
-            ex.clearStatistics();
-        }
-        for (ConnectionListener cl : ClientProperties.getInstance().getConnectionListener()) {
-            cl.clearStatistics();
-        }
-        for (ExecutionFailedListener ef : ClientProperties.getInstance().getFailedListener()) {
-            ef.clearStatistics();
-        }
-    }
-
-    /**
-     * Get the int keys.
-     *
-     * @return String[]
-     */
-    @Override
-    public final List<String> getIntKeys() {
-        return ClientProperties.getInstance().getIntKeys();
-    }
-
-    /**
-     * Get the boolean keys.
-     *
-     * @return String[]
-     */
-    @Override
-    public final List<String> getBooleanKeys() {
-        return ClientProperties.getInstance().getBooleanKeys();
-    }
-
-    /**
-     * Get the list keys.
-     *
-     * @return String[]
-     */
-    @Override
-    public final List<String> getListKeys() {
-        return ClientProperties.getInstance().getListKeys();
-    }
-
-    /**
-     * Set an int value.
-     *
-     * @param property String
-     * @param value    int
-     */
-    @Override
-    public final void setProperty(String property, Object value) {
-        ClientProperties.getInstance().setProperty(property, value);
-    }
-
-    /**
-     * Get a property.
-     *
-     * @param property String
-     * @return the int value
-     */
-    @Override
-    public final Object getProperty(String property) {
-        return ClientProperties.getInstance().getProperty(property);
     }
 }
