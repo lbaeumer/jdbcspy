@@ -16,6 +16,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -62,6 +63,9 @@ public class ConnectionInvocationHandler implements InvocationHandler, Connectio
      */
     private int mDeletedStmts;
 
+    private int isolationLevel;
+    private String url;
+
     /**
      * The Constructor.
      *
@@ -69,6 +73,14 @@ public class ConnectionInvocationHandler implements InvocationHandler, Connectio
      */
     public ConnectionInvocationHandler(Connection theConn) {
         uConnection = theConn;
+        try {
+            isolationLevel = uConnection.getTransactionIsolation();
+            if (uConnection.getMetaData() != null) {
+                url = uConnection.getMetaData().getURL();
+            }
+        } catch (SQLException e) {
+            mTrace.log(Level.INFO, "failed" + e);
+        }
         mConnectionListener = new LinkedList<>();
         mCaller = Utils.getExecClass(this);
     }
@@ -101,6 +113,8 @@ public class ConnectionInvocationHandler implements InvocationHandler, Connectio
                 return getCaller();
             } else if ("getStatements".equals(method.getName())) {
                 return getStatements();
+            } else if ("setTransactionIsolation".equals(method.getName())) {
+                isolationLevel = (Integer) args[0];
             } else if ("dump".equals(method.getName())) {
                 return dump();
             } else if (method.getName().startsWith("prepare")) {
@@ -419,10 +433,16 @@ public class ConnectionInvocationHandler implements InvocationHandler, Connectio
     @Override
     public String toString() {
         synchronized (mStatements) {
-            return "Connection[#stmt=" + getItemCount() + "; duration="
-                    + Utils.getTimeString(getDuration())
-                    + (getSize() > 0 ? "; size=" + Utils.getSizeString(getSize()) : "") + ", opened in " + getCaller()
-                    + "]";
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append("Connection[#stmt=" + getItemCount()
+                    + "; duration=" + Utils.getTimeString(getDuration())
+                    + "; isolation=" + Utils.getIsolationLevel(isolationLevel));
+            if (url != null) {
+                stringBuilder.append("; url=" + url);
+            }
+            stringBuilder.append((getSize() > 0 ? "; size=" + Utils.getSizeString(getSize()) : "")
+                    + ", opened in " + getCaller() + "]");
+            return stringBuilder.toString();
         }
     }
 }
