@@ -91,6 +91,7 @@ public class DriverTest {
         p.close();
         c.close();
 
+        Thread.sleep(1000);
         System.out.println("connection dump:\n"
                 + ConnectionFactory.dumpStatistics());
     }

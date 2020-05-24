@@ -20,8 +20,8 @@
     <property name="ResultSetTotalTimeThreshold" value="300000"/>
     <property name="ResultSetTotalSizeThreshold" value="20000000"/>
 
-    <property name="StmtExecuteTimeThreshold" value="3000"/>
-    <property name="StmtTotalTimeThreshold" value="0"/>
+    <property name="StmtExecuteTimeThreshold" value="0"/>
+    <property name="StmtTotalTimeThreshold" value="5000"/>
     <property name="StmtTotalSizeThreshold" value="1000000"/>
 
     <property name="ConnTotalTimeThreshold" value="0"/>
