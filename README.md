@@ -7,13 +7,13 @@ The jdbcspy is a lightweight profiling and monitoring proxy for your jdbc connec
 - log the execution and the iteration time of all SQL statements
 - identify statements that are executed multiple times
 - the stack trace with configurable depth for all listed statements
-- provides statistics for all connections, SQL statements, resultsets
-- provides the size of the resultset
+- reports statistics for all connections, SQL statements, resultsets
+- reports the size of the resultset
 - provides an API to retrieve all statistical information
 - list all statements that are currently being executed
 - list all statements that have been executed, but have not been closed
 - notifies (e.g. via trace) if a statement's execution time exceeds a configurable threshold
-- notifies if you forgot to close a resultset, or a statement before the connection is closed
+- notifies if you forgot to close a resultset or a statement before the connection is closed
 - extendable by custom listeners
 
 # Installation
@@ -21,45 +21,37 @@ The jdbcspy is a lightweight profiling and monitoring proxy for your jdbc connec
 The installation is quite easy.
 
 1. Copy the file jdbcspy.jar into your classpath
-1. Optional: copy the dbproxy.xml file into your home drive and edit the properties to customize the jdbcspy's behaviour.
+1. (Optional) copy the dbproxy.xml file into your home drive and edit the properties to customize the jdbcspy's behaviour.
 1. Choose one of the following options dependent on the way your database is configured:
     1. Driver URL: If you are using a database url, you only have a add the prefix  **proxy**:
-
-       Example:
-       driver url:
-```
+       Example: the driver url
+       ```
        jdbc:db2://myhost:5021/DATABASE
-```
-       then just change the url to:
-
-```
+       ```
+       changes to:
+       ```
        proxy:jdbc:db2://myhost:5021/DATABASE
-```
-    1.  java.sql.Datasource: Either use one of the predefined vendor specific database drivers of define your one one.
-
+       ```
+    1.  java.sql.Datasource: Either use one of the predefined vendor specific database drivers of define your own one.
         Some predefined driver classes are:
-
-```
+        ```
+        de.luisoft.jdbcspy.vendor.DerbyProxyDatasource
         de.luisoft.jdbcspy.vendor.DB2ProxyDatasource
         de.luisoft.jdbcspy.vendor.MssqlProxyDatasource
         de.luisoft.jdbcspy.vendor.MysqlProxyDatasource
         de.luisoft.jdbcspy.vendor.OracleProxyDatasource
-```
-
-    1.  java.sql.XADatasource: Either use one of the predefined vendor specific database drivers of define your one one.
-
+        ```
+    1.  java.sql.XADatasource: Either use one of the predefined vendor specific database drivers of define your own one.
         Some predefined driver classes are:
-
-```
+        ```
+        de.luisoft.jdbcspy.vendor.DerbyProxyXADatasource
         de.luisoft.jdbcspy.vendor.DB2ProxyXADatasource
         de.luisoft.jdbcspy.vendor.MssqlProxyXADatasource
         de.luisoft.jdbcspy.vendor.MysqlProxyXADatasource
         de.luisoft.jdbcspy.vendor.OracleProxyXADatasource
-```
-
+        ```
         You will find an example for WebSphere Liberty below.
-
-1. Now you can start your application as usual. The proxy will be activated and gather information about your jdbc connection.
+1. Now you can start your application as usual. The proxy will be activated automatically and will trace your jdbc connection.
 
 # User Guide Driver URL (5min)
 
@@ -91,7 +83,7 @@ Try the following code (taken from the junit testclass [DriverTest.minimal()](/l
 
 ## Jdbcspy result
 
-All closed statements and connections will be printed to java.util.Logger during the execution. Jdbcspy detects one statement and one connection. The statement's resultset has a size of 100. The initial execution took 503ms while iterating all 100 datasets took additionally 1s.
+All closed statements and connections will be printed to java.util.logging.Logger during the execution. In the above code example Jdbcspy detects one statement and one connection. The statement's resultset has 100 datasets. The initial execution took 503ms and iterating all 100 datasets took additionally 1s.
 
     May 24, 2020 4:40:59 PM de.luisoft.jdbcspy.proxy.handler.AbstractStatementInvocationHandler handleClose
     INFO: closed statement "select * from test" (503ms + 1,0s; #=100) executed since 16:40:57.671 in DriverTest.minimal:85|JUnit4IdeaTestRunner.startRunnerWithArgs:68|IdeaTestRunner$Repeater.startRunnerWithArgs:33 in DriverTest.minimal:91|JUnit4IdeaTestRunner.startRunnerWithArgs:68|IdeaTestRunner$Repeater.startRunnerWithArgs:33
@@ -102,7 +94,7 @@ All closed statements and connections will be printed to java.util.Logger during
         1: "select * from test" (503ms + 1,0s; #=100) executed since 16:40:57.671 in DriverTest.minimal:85|JUnit4IdeaTestRunner.startRunnerWithArgs:68|IdeaTestRunner$Repeater.startRunnerWithArgs:33
     }
 
-The dumpStatistics method will report information gathered by the ExecutionListeners.
+The final dumpStatistics method will report information gathered by the ExecutionListeners.
 
     connection dump:
     [ExecutionTimeListener[
@@ -141,7 +133,6 @@ For each statement the following information is provided:
 * the (simplified) stacktrace (including class, method and line number) to track the statements initiator
 
     [ExecutionTimeListener[
-
       long running history (execTime + iterTime):
         1: "select * from test" (503ms + 1,0s; #=100) executed since 16:40:57.671 in DriverTest.minimal:85|JUnit4IdeaTestRunner.startRunnerWithArgs:68|IdeaTestRunner$Repeater.startRunnerWithArgs:33
     ]]
@@ -205,4 +196,8 @@ The WebSphere Liberty configuration will probably look like the following code s
     </dataSource>
 ```
 
-There are only two entries you have to add. First you need to add the jdbcspy.jar to the classpath and second you have to provide the javax.sql.XADataSource class name.
+There are only two entries you have to add:
+1. you have to add the jdbcspy.jar to the classpath and
+1. you have to provide the javax.sql.XADataSource class name.
+
+
