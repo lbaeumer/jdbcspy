@@ -48,14 +48,19 @@ public final class ClientProperties {
      */
     public static final String DB_XA_DATASOURCE_CLASS = "XADatasourceClass";
 
+    public static final String DB_DERBY_DRIVER_CLASS = "Derby_DriverClass";
     public static final String DB_DERBY_XA_DATASOURCE_CLASS = "Derby_XADatasourceClass";
     public static final String DB_DERBY_DATASOURCE_CLASS = "Derby_DatasourceClass";
+    public static final String DB_DB2_DRIVER_CLASS = "DB2_DriverClass";
     public static final String DB_DB2_XA_DATASOURCE_CLASS = "DB2_XADatasourceClass";
     public static final String DB_DB2_DATASOURCE_CLASS = "DB2_DatasourceClass";
+    public static final String DB_MSSQL_DRIVER_CLASS = "Mssql_DriverClass";
     public static final String DB_MSSQL_XA_DATASOURCE_CLASS = "Mssql_XADatasourceClass";
     public static final String DB_MSSQL_DATASOURCE_CLASS = "Mssql_DatasourceClass";
+    public static final String DB_MYSQL_DRIVER_CLASS = "Mysql_DriverClass";
     public static final String DB_MYSQL_XA_DATASOURCE_CLASS = "Mysql_XADatasourceClass";
     public static final String DB_MYSQL_DATASOURCE_CLASS = "Mysql_DatasourceClass";
+    public static final String DB_ORACLE_DRIVER_CLASS = "Oracle_DriverClass";
     public static final String DB_ORACLE_XA_DATASOURCE_CLASS = "Oracle_XADatasourceClass";
     public static final String DB_ORACLE_DATASOURCE_CLASS = "Oracle_DatasourceClass";
 
@@ -169,11 +174,11 @@ public final class ClientProperties {
     private static final List<String> mStringValues = Arrays.asList(
             DB_DRIVER_CLASS,
             DB_DATASOURCE_CLASS, DB_XA_DATASOURCE_CLASS,
-            DB_DB2_DATASOURCE_CLASS, DB_DB2_XA_DATASOURCE_CLASS,
-            DB_MSSQL_DATASOURCE_CLASS, DB_MSSQL_XA_DATASOURCE_CLASS,
-            DB_MYSQL_DATASOURCE_CLASS, DB_MYSQL_XA_DATASOURCE_CLASS,
-            DB_ORACLE_DATASOURCE_CLASS, DB_ORACLE_XA_DATASOURCE_CLASS,
-            DB_DERBY_DATASOURCE_CLASS, DB_DERBY_XA_DATASOURCE_CLASS,
+            DB_DB2_DRIVER_CLASS, DB_DB2_DATASOURCE_CLASS, DB_DB2_XA_DATASOURCE_CLASS,
+            DB_MSSQL_DRIVER_CLASS, DB_MSSQL_DATASOURCE_CLASS, DB_MSSQL_XA_DATASOURCE_CLASS,
+            DB_MYSQL_DRIVER_CLASS, DB_MYSQL_DATASOURCE_CLASS, DB_MYSQL_XA_DATASOURCE_CLASS,
+            DB_ORACLE_DRIVER_CLASS, DB_ORACLE_DATASOURCE_CLASS, DB_ORACLE_XA_DATASOURCE_CLASS,
+            DB_DERBY_DRIVER_CLASS, DB_DERBY_DATASOURCE_CLASS, DB_DERBY_XA_DATASOURCE_CLASS,
             DB_TRACE_CLASS_IGNORE_REGEXP);
     /**
      * all list values

@@ -1,16 +1,21 @@
 <dbproxy>
+    <property name="Derby_DriverClass" value="org.apache.derby.jdbc.AutoloadedDriver"/>
     <property name="Derby_XADatasourceClass" value="org.apache.derby.jdbc.EmbeddedXADataSource"/>
     <property name="Derby_DatasourceClass" value="org.apache.derby.jdbc.EmbeddedDataSource"/>
 
+    <property name="DB2_DriverClass" value=""/>
     <property name="DB2_XADatasourceClass" value="com.ibm.db2.jcc.DB2XADataSource"/>
     <property name="DB2_DatasourceClass" value="com.ibm.db2.jcc.DB2SimpleDataSource"/>
 
+    <property name="Mssql_DriverClass" value=""/>
     <property name="Mssql_XADatasourceClass" value="com.microsoft.sqlserver.jdbc.SQLServerXADataSource"/>
     <property name="Mssql_DatasourceClass" value="com.microsoft.sqlserver.jdbc.SQLServerDataSource"/>
 
+    <property name="Mysql_DriverClass" value=""/>
     <property name="Mysql_XADatasourceClass" value="com.mysql.jdbc.jdbc2.optional.MysqlXADataSource"/>
     <property name="Mysql_DatasourceClass" value="com.mysql.cj.jdbc.MysqlDataSource"/>
 
+    <property name="Oracle_DriverClass" value=""/>
     <property name="Oracle_XADatasourceClass" value="oracle.jdbc.xa.client.OracleXADataSource"/>
     <property name="Oracle_DatasourceClass" value="oracle.jdbc.pool.OracleDataSource"/>
 

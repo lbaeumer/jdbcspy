@@ -39,7 +39,7 @@ public class XADatasourceTest {
     }
 
     @Test
-    public void minimal() throws Exception {
+    public void minimalXA() throws Exception {
 
         XADataSource datasource = new DerbyProxyXADatasource();
         ((DerbyProxyXADatasource) datasource).setDatabaseName("booksdb");
@@ -76,5 +76,25 @@ public class XADatasourceTest {
 
         System.out.println("connection dump:\n"
                 + ConnectionFactory.dumpStatistics());
+    }
+
+    @Test
+    public void minimalDriverURL() throws Exception {
+
+        Class.forName("de.luisoft.jdbcspy.vendor.DerbyProxyDriver");
+
+        System.out.println("starting ...");
+        Connection c = DriverManager.getConnection("proxy:jdbc:derby:booksdb;create=true");
+        PreparedStatement p = c.prepareStatement("select * from book");
+        ResultSet rs = p.executeQuery();
+        int x = 0;
+        while (rs.next()) {
+            int nb = rs.getInt(1);
+            System.out.println(rs.getInt(1) + "/" + rs.getString(2));
+            Assert.assertEquals(nb, ++x);
+        }
+        rs.close();
+
+        Assert.assertEquals(x, 2);
     }
 }

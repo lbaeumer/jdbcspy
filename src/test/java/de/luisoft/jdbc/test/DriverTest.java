@@ -18,7 +18,7 @@ public class DriverTest {
     @Test
     public void testStmtWith100000rsa() throws Exception {
         int cnt = 100000;
-        Class.forName("de.luisoft.jdbcspy.DBProxyDriver");
+        Class.forName("de.luisoft.jdbcspy.ProxyDriver");
         System.out.println("starting ...");
         Connection c = DriverManager.getConnection("proxy:db:xxy&rscnt=" + cnt + "&itertime=1000&exectime=500");
         long start = System.currentTimeMillis();
@@ -78,7 +78,7 @@ public class DriverTest {
 
     @Test
     public void minimal() throws Exception {
-        Class.forName("de.luisoft.jdbcspy.DBProxyDriver");
+        Class.forName("de.luisoft.jdbcspy.ProxyDriver");
         Connection c = DriverManager.getConnection("proxy:mytestdb&rscnt=100&itertime=1000&exectime=500");
 
         PreparedStatement p = c.prepareStatement("select * from test");
@@ -99,7 +99,7 @@ public class DriverTest {
     @Test
     public void testStmtWith1000000rs() throws Exception {
         int cnt = 1000000;
-        Class.forName("de.luisoft.jdbcspy.DBProxyDriver");
+        Class.forName("de.luisoft.jdbcspy.ProxyDriver");
         System.out.println("starting " + cnt + " rs...");
         Connection c = DriverManager.getConnection("proxy:db:xxy&rscnt=" + cnt + "&itertime=1000&exectime=500");
         long start = System.currentTimeMillis();
@@ -126,7 +126,7 @@ public class DriverTest {
     @Test
     public void testStmtWith100000rs() throws Exception {
         int cnt = 100000;
-        Class.forName("de.luisoft.jdbcspy.DBProxyDriver");
+        Class.forName("de.luisoft.jdbcspy.AbstractProxyDriver");
         System.out.println("starting " + cnt + " rs...");
         Connection c = DriverManager.getConnection("proxy:db:xxy&rscnt=" + cnt + "&itertime=1000&exectime=500");
         long start = System.currentTimeMillis();
@@ -153,7 +153,7 @@ public class DriverTest {
     @Test
     public void testStmtWith10000rs() throws Exception {
         int cnt = 10000;
-        Class.forName("de.luisoft.jdbcspy.DBProxyDriver");
+        Class.forName("de.luisoft.jdbcspy.AbstractProxyDriver");
         System.out.println("starting " + cnt + " rs...");
         Connection c = DriverManager.getConnection("proxy:db:xxy&rscnt=" + cnt + "&itertime=1000&exectime=500");
         long start = System.currentTimeMillis();
@@ -179,7 +179,7 @@ public class DriverTest {
     @Test
     public void testStmtWith100rs() throws Exception {
         int cnt = 100;
-        Class.forName("de.luisoft.jdbcspy.DBProxyDriver");
+        Class.forName("de.luisoft.jdbcspy.AbstractProxyDriver");
         System.out.println("starting " + cnt + " rs...");
         Connection c = DriverManager.getConnection("proxy:db:xxy&rscnt=" + cnt + "&itertime=1000&exectime=500");
         long start = System.currentTimeMillis();
@@ -204,7 +204,7 @@ public class DriverTest {
 
     @Test
     public void test100StmtWith1rs() throws Exception {
-        Class.forName("de.luisoft.jdbcspy.DBProxyDriver");
+        Class.forName("de.luisoft.jdbcspy.AbstractProxyDriver");
         Connection c = DriverManager.getConnection("proxy:db:xxy&rscnt=1&itertime=0&exectime=0");
         long start = System.currentTimeMillis();
         int cnt = 10000;
@@ -236,7 +236,7 @@ public class DriverTest {
     @Ignore
     @Test
     public void test10000StmtWith1rs() throws Exception {
-        Class.forName("de.luisoft.jdbcspy.DBProxyDriver");
+        Class.forName("de.luisoft.jdbcspy.AbstractProxyDriver");
         Connection c = DriverManager.getConnection("proxy:db:xxy&rscnt=1&itertime=0&exectime=0");
         long start = System.currentTimeMillis();
         int cnt = 100000;
@@ -268,7 +268,7 @@ public class DriverTest {
     @Ignore
     @Test
     public void test10000StmtWith1rs2() throws Exception {
-        Class.forName("de.luisoft.jdbcspy.DBProxyDriver");
+        Class.forName("de.luisoft.jdbcspy.AbstractProxyDriver");
         Connection c = DriverManager.getConnection("proxy:db:xxy&rscnt=1&itertime=0&exectime=0");
         long start = System.currentTimeMillis();
         int cnt = 100000;
@@ -300,7 +300,7 @@ public class DriverTest {
 
     @Test
     public void test10000StmtWith1rs3() throws Exception {
-        Class.forName("de.luisoft.jdbcspy.DBProxyDriver");
+        Class.forName("de.luisoft.jdbcspy.AbstractProxyDriver");
         Connection c = DriverManager.getConnection("proxy:db:xxy&rscnt=5&itertime=0&exectime=0");
         long start = System.currentTimeMillis();
         int cnt = 1000;

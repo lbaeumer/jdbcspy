@@ -61,7 +61,7 @@ Try the following code (taken from the junit testclass [DriverTest.minimal()](/l
 
 ```java
     // instanciate the driver
-    Class.forName("de.luisoft.jdbcspy.DBProxyDriver");
+    Class.forName("de.luisoft.jdbcspy.AbstractProxyDriver");
 
     // add the prefix 'proxy:' to the usual url
     Connection c = DriverManager.getConnection("proxy:mytestdb&rscnt=100&itertime=1000&exectime=500");
@@ -132,6 +132,7 @@ For each statement the following information is provided:
 * and the size of the resultset (100) * the time when the execution/query has been started
 * the (simplified) stacktrace (including class, method and line number) to track the statements initiator
 
+
     [ExecutionTimeListener[
       long running history (execTime + iterTime):
         1: "select * from test" (503ms + 1,0s; #=100) executed since 16:40:57.671 in DriverTest.minimal:85|JUnit4IdeaTestRunner.startRunnerWithArgs:68|IdeaTestRunner$Repeater.startRunnerWithArgs:33
@@ -156,6 +157,7 @@ You get the following information:
 * the maximum and the average length (serialized all resultset attributes) of the resultset is 18byte
 * there is one statement in the execution time range from 1 to 3 seconds
 
+
     [ExecutionStatisticListener[online since 16:40:57 (2,89s)
       #stmt=1; #rs=100; duration=1,51s; avgDuration=1,51s; maxLength=18; avgLength=18;
       time={1-3s}=1;
@@ -170,6 +172,7 @@ You get the following information:
 * 1 connection has been opened
 * maximum 1 connection has been open concurrently
 * maximum 1 statement has been opened per connection
+
 
     [ConnectionStatisticListener[
       #conn=1; #max open conns=1; #max stmts/conn=1
