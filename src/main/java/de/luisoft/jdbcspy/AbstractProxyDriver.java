@@ -111,34 +111,34 @@ import java.util.logging.Logger;
  *
  * </pre>
  */
-public class DBProxyDriver implements Driver {
-
-    static {
-        try {
-            DBProxyDriver m = new DBProxyDriver();
-            String driverClass = (String) m.connFac.getProperty(ClientProperties.DB_DRIVER_CLASS);
-            System.out.println("jdbcspy: trying to register wrapper for driver " + driverClass);
-            Class.forName(driverClass);
-            Enumeration<Driver> e = DriverManager.getDrivers();
-            while (e.hasMoreElements()) {
-                Driver d = e.nextElement();
-                if (d.getClass().getName().equals(driverClass)) {
-                    DriverManager.deregisterDriver(d);
-                    m.uDriver = d;
-                    DriverManager.registerDriver(m);
-                }
-            }
-        } catch (Exception e) {
-            System.err.println("jdbcspy: exception in the DBProxyDriver occurred");
-            e.printStackTrace();
-        }
-    }
+public class AbstractProxyDriver implements Driver {
 
     private Driver uDriver;
     private ConnectionFactory connFac;
 
-    private DBProxyDriver() {
-        connFac = new ConnectionFactory();
+    protected AbstractProxyDriver(String driverClass) {
+        System.out.println("jdbcspy: register wrapper for driver " + driverClass);
+        try {
+            Class.forName(driverClass);
+
+            Enumeration<Driver> e = DriverManager.getDrivers();
+            while (e.hasMoreElements()) {
+                Driver d = e.nextElement();
+                if (d.getClass().getName().equals(driverClass)) {
+                    uDriver = d;
+                    System.out.println("register " + d);
+                    DriverManager.registerDriver(this);
+                }
+            }
+
+            if (uDriver == null) {
+                throw new IllegalArgumentException("did not find the driver " + driverClass);
+            }
+
+            connFac = new ConnectionFactory();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -178,7 +178,7 @@ public class DBProxyDriver implements Driver {
 
     @Override
     public String toString() {
-        return connFac.dumpStatistics();
+        return ConnectionFactory.dumpStatistics();
     }
 
     @Override

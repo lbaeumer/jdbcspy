@@ -1,10 +1,13 @@
-package de.luisoft.jdbcspy;
+package de.luisoft.jdbc.test;
 
-import de.luisoft.jdbcspy.proxy.ProxyConnection;
+import de.luisoft.jdbcspy.proxy.ConnectionFactory;
+import de.luisoft.jdbcspy.vendor.DerbyProxyXADatasource;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import javax.sql.XAConnection;
+import javax.sql.XADataSource;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -28,7 +31,6 @@ public class XADatasourceTest {
         try {
             statement.execute(sql);
 
-
             sql = "INSERT INTO book VALUES (1, 'Effective Java'), (2, 'Core Java')";
             statement.execute(sql);
         } catch (SQLException e) {
@@ -37,22 +39,13 @@ public class XADatasourceTest {
     }
 
     @Test
-    public void testDumpXA() throws Exception {
+    public void minimalXA() throws Exception {
 
-        ProxyXADatasource proxy = new ProxyXADatasource();
-        //EmbeddedXADataSource proxy = new EmbeddedXADataSource();
-        //org.apache.derby.jdbc.EmbedXAConnection c;
+        XADataSource datasource = new DerbyProxyXADatasource();
+        ((DerbyProxyXADatasource) datasource).setDatabaseName("booksdb");
 
-
-        //org.apache.derby.jdbc.EmbedPooledConnection c;
-        javax.sql.PooledConnection p;
-        org.apache.derby.iapi.jdbc.BrokeredConnection42 f;
-        proxy.setDatabaseName("booksdb");
-
-        ProxyConnection c = (ProxyConnection) proxy.getXAConnection();
-        Connection con = c.getConnection();
-        System.out.println("con=" + con);
-        con.isReadOnly();
+        XAConnection xaConnection = datasource.getXAConnection();
+        Connection con = xaConnection.getConnection();
         PreparedStatement s = con.prepareStatement("select * from book");
         ResultSet rs = s.executeQuery();
 
@@ -60,18 +53,16 @@ public class XADatasourceTest {
         while (rs.next()) {
             i++;
         }
+
         Assert.assertEquals(i, 2);
         rs.close();
         s.close();
         con.close();
-        System.out.println("c=" + c);
 
         // again
-        con = c.getConnection();
-        System.out.println("con=" + con);
-        con.isReadOnly();
+        con = xaConnection.getConnection();
         i = 0;
-        s = con.prepareStatement("select * from book");
+        s = con.prepareStatement("select book_id, title from book");
         rs = s.executeQuery();
 
         while (rs.next()) {
@@ -82,11 +73,28 @@ public class XADatasourceTest {
         rs.close();
         s.close();
         con.close();
-        System.out.println("c=" + c);
 
-        c.close();
-
-        System.out.println("dump" + c.dump());
+        System.out.println("connection dump:\n"
+                + ConnectionFactory.dumpStatistics());
     }
 
+    @Test
+    public void minimalDriverURL() throws Exception {
+
+        Class.forName("de.luisoft.jdbcspy.vendor.DerbyProxyDriver");
+
+        System.out.println("starting ...");
+        Connection c = DriverManager.getConnection("proxy:jdbc:derby:booksdb;create=true");
+        PreparedStatement p = c.prepareStatement("select * from book");
+        ResultSet rs = p.executeQuery();
+        int x = 0;
+        while (rs.next()) {
+            int nb = rs.getInt(1);
+            System.out.println(rs.getInt(1) + "/" + rs.getString(2));
+            Assert.assertEquals(nb, ++x);
+        }
+        rs.close();
+
+        Assert.assertEquals(x, 2);
+    }
 }

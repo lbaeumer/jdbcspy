@@ -11,6 +11,7 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,14 +48,19 @@ public final class ClientProperties {
      */
     public static final String DB_XA_DATASOURCE_CLASS = "XADatasourceClass";
 
+    public static final String DB_DERBY_DRIVER_CLASS = "Derby_DriverClass";
     public static final String DB_DERBY_XA_DATASOURCE_CLASS = "Derby_XADatasourceClass";
     public static final String DB_DERBY_DATASOURCE_CLASS = "Derby_DatasourceClass";
+    public static final String DB_DB2_DRIVER_CLASS = "DB2_DriverClass";
     public static final String DB_DB2_XA_DATASOURCE_CLASS = "DB2_XADatasourceClass";
     public static final String DB_DB2_DATASOURCE_CLASS = "DB2_DatasourceClass";
+    public static final String DB_MSSQL_DRIVER_CLASS = "Mssql_DriverClass";
     public static final String DB_MSSQL_XA_DATASOURCE_CLASS = "Mssql_XADatasourceClass";
     public static final String DB_MSSQL_DATASOURCE_CLASS = "Mssql_DatasourceClass";
+    public static final String DB_MYSQL_DRIVER_CLASS = "Mysql_DriverClass";
     public static final String DB_MYSQL_XA_DATASOURCE_CLASS = "Mysql_XADatasourceClass";
     public static final String DB_MYSQL_DATASOURCE_CLASS = "Mysql_DatasourceClass";
+    public static final String DB_ORACLE_DRIVER_CLASS = "Oracle_DriverClass";
     public static final String DB_ORACLE_XA_DATASOURCE_CLASS = "Oracle_XADatasourceClass";
     public static final String DB_ORACLE_DATASOURCE_CLASS = "Oracle_DatasourceClass";
 
@@ -126,6 +132,8 @@ public final class ClientProperties {
      * the trace depth
      */
     public static final String DB_TRACE_DEPTH = "TraceDepth";
+    public static final String DB_TRACE_CLASS_IGNORE_REGEXP = "TraceClassIgnoreRegExp";
+
     /**
      * dump after shutdown
      */
@@ -166,16 +174,18 @@ public final class ClientProperties {
     private static final List<String> mStringValues = Arrays.asList(
             DB_DRIVER_CLASS,
             DB_DATASOURCE_CLASS, DB_XA_DATASOURCE_CLASS,
-            DB_DB2_DATASOURCE_CLASS, DB_DB2_XA_DATASOURCE_CLASS,
-            DB_MSSQL_DATASOURCE_CLASS, DB_MSSQL_XA_DATASOURCE_CLASS,
-            DB_MYSQL_DATASOURCE_CLASS, DB_MYSQL_XA_DATASOURCE_CLASS,
-            DB_ORACLE_DATASOURCE_CLASS, DB_ORACLE_XA_DATASOURCE_CLASS,
-            DB_DERBY_DATASOURCE_CLASS, DB_DERBY_XA_DATASOURCE_CLASS);
+            DB_DB2_DRIVER_CLASS, DB_DB2_DATASOURCE_CLASS, DB_DB2_XA_DATASOURCE_CLASS,
+            DB_MSSQL_DRIVER_CLASS, DB_MSSQL_DATASOURCE_CLASS, DB_MSSQL_XA_DATASOURCE_CLASS,
+            DB_MYSQL_DRIVER_CLASS, DB_MYSQL_DATASOURCE_CLASS, DB_MYSQL_XA_DATASOURCE_CLASS,
+            DB_ORACLE_DRIVER_CLASS, DB_ORACLE_DATASOURCE_CLASS, DB_ORACLE_XA_DATASOURCE_CLASS,
+            DB_DERBY_DRIVER_CLASS, DB_DERBY_DATASOURCE_CLASS, DB_DERBY_XA_DATASOURCE_CLASS,
+            DB_TRACE_CLASS_IGNORE_REGEXP);
     /**
      * all list values
      */
     private static final List<String> mListValues = Arrays.asList(DB_STMT_DEBUG_CLASS_EXP,
             DB_STMT_HISTORIZE_CLASS_EXP, DB_STMT_DEBUG_SQL_EXP, DB_STMT_HISTORIZE_SQL_EXP);
+
     /**
      * the instance
      */
@@ -213,18 +223,18 @@ public final class ClientProperties {
                 if (connectionListener == null && executionFailedListener == null && executionListener == null) {
                     boolean found = false;
                     if (mBoolValues.contains(name)) {
-                        setProperty(name, Boolean.valueOf(value));
+                        values.put(name, Boolean.parseBoolean(value));
                         found = true;
                     } else if (mIntValues.contains(name)) {
-                        setProperty(name, Integer.valueOf(value));
+                        values.put(name, Integer.parseInt(value));
                         found = true;
                     } else if (mStringValues.contains(name)) {
-                        setProperty(name, value);
+                        values.put(name, value);
                         found = true;
                     } else if (mListValues.contains(name)) {
                         String[] s = value.split(",");
                         List<String> l = new ArrayList<>(Arrays.asList(s));
-                        setProperty(name, l);
+                        values.put(name, l);
                         found = true;
                     }
 
@@ -295,6 +305,14 @@ public final class ClientProperties {
     private ClientProperties() {
 
         values = new LinkedHashMap<>();
+        Properties p = new Properties();
+        try {
+            p.load(ClientProperties.class.getResourceAsStream("/spyversion.properties"));
+        } catch (IOException e) {
+            // ignore
+        }
+
+        mTrace.info("init jdbcspy " + p.get("version"));
 
         InputStream input = ClientProperties.class.getResourceAsStream(DBINIT_FILE);
 
@@ -305,6 +323,7 @@ public final class ClientProperties {
         } catch (Exception ex) {
             throw new IllegalStateException("something's wrong here with dbinit.xml");
         }
+        mTrace.info("initialized " + values);
     }
 
     /**
@@ -312,12 +331,139 @@ public final class ClientProperties {
      *
      * @return instance
      */
-    public static ClientProperties getInstance() {
+    private static ClientProperties getInstance() {
         if (instance == null) {
             instance = new ClientProperties();
             instance.init();
         }
         return instance;
+    }
+
+    /**
+     * Get the int value.
+     *
+     * @param flag the flag
+     * @return the value
+     */
+    public static int getInt(String flag) {
+        return (Integer) getInstance().values.get(flag);
+    }
+
+    /**
+     * Get the boolean value.
+     *
+     * @param flag the flag
+     * @return the value
+     */
+    public static boolean getBoolean(String flag) {
+        return (Boolean) getInstance().values.get(flag);
+    }
+
+    /**
+     * Get the list value.
+     *
+     * @param flag the flag
+     * @return the value
+     */
+    public static List<String> getList(String flag) {
+        return (List<String>) getInstance().values.get(flag);
+    }
+
+    /**
+     * Get the property.
+     *
+     * @param flag the flag
+     * @return the value
+     */
+    public static Object getProperty(String flag) {
+        return getInstance().values.get(flag);
+    }
+
+    /**
+     * Get the int keys.
+     *
+     * @return String[]
+     */
+    public static List<String> getIntKeys() {
+        return getInstance().mIntValues;
+    }
+
+    /**
+     * Get the boolean keys.
+     *
+     * @return String[]
+     */
+    public static List<String> getBooleanKeys() {
+        return getInstance().mBoolValues;
+    }
+
+    /**
+     * Get the list keys.
+     *
+     * @return String[]
+     */
+    public static List<String> getListKeys() {
+        return getInstance().mListValues;
+    }
+
+    /**
+     * Is the proxy enabled?
+     *
+     * @return boolean
+     */
+    public static boolean isInitiallyEnabled() {
+        return (Boolean) getInstance().values.get(DB_ENABLE_PROXY_INITIALLY);
+    }
+
+    /**
+     * Set am integer property.
+     *
+     * @param property String
+     * @param value    the value
+     */
+    public static void setProperty(String property, Object value) {
+        if (value instanceof Boolean) {
+            if (!mBoolValues.contains(property)) {
+                throw new IllegalArgumentException("the boolean property " + property + " does not exist.");
+            }
+            getInstance().values.put(property, value);
+            return;
+        }
+        if (value instanceof Integer) {
+            if (!mIntValues.contains(property)) {
+                throw new IllegalArgumentException("the int property " + property + " does not exist.");
+            }
+            getInstance().values.put(property, value);
+            return;
+        }
+        if (value instanceof String) {
+            if (!mStringValues.contains(property)) {
+                throw new IllegalArgumentException("the string property " + property + " does not exist.");
+            }
+            getInstance().values.put(property, value);
+            return;
+        }
+        if (value instanceof List) {
+            if (!mListValues.contains(property)) {
+                throw new IllegalArgumentException("the list property " + property + " does not exist.");
+            }
+            getInstance().values.put(property, value);
+            return;
+        }
+
+        throw new IllegalArgumentException("the argument " + value + " is illegal");
+    }
+
+    public static List<ExecutionListener> getListener() {
+        return getInstance().mListener;
+    }
+
+    public static List<ExecutionFailedListener> getFailedListener() {
+        return getInstance().mFailedListener;
+    }
+
+    public static List<ConnectionListener> getConnectionListener() {
+        return getInstance().mConnectionListener;
     }
 
     /**
@@ -331,7 +477,7 @@ public final class ClientProperties {
         try {
             input = ClientProperties.class.getResourceAsStream("/dbproxy.xml");
             if (input != null) {
-                System.out.println("jdbcspy: reading dbproxy.xml configuration from classpath.");
+                mTrace.info("jdbcspy: reading dbproxy.xml configuration from classpath.");
                 SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
                 parser.parse(input, mHandler);
                 input.close();
@@ -343,7 +489,7 @@ public final class ClientProperties {
 
         File f = new File(System.getProperty("user.home") + "/dbproxy.xml");
         if (f.exists()) {
-            System.out.println("jdbcspy: reading properties from " + f);
+            mTrace.info("jdbcspy: reading properties from " + f);
             try {
                 SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
                 parser.parse(f, mHandler);
@@ -364,126 +510,11 @@ public final class ClientProperties {
     }
 
     /**
-     * Get the int value.
-     *
-     * @param flag the flag
-     * @return the value
-     */
-    public int getInt(String flag) {
-        return (Integer) values.get(flag);
-    }
-
-    /**
-     * Get the boolean value.
-     *
-     * @param flag the flag
-     * @return the value
-     */
-    public boolean getBoolean(String flag) {
-        return (Boolean) values.get(flag);
-    }
-
-    /**
-     * Get the list value.
-     *
-     * @param flag the flag
-     * @return the value
-     */
-    public List<String> getList(String flag) {
-        return (List<String>) values.get(flag);
-    }
-
-    /**
-     * Get the property.
-     *
-     * @param flag the flag
-     * @return the value
-     */
-    public Object getProperty(String flag) {
-        return values.get(flag);
-    }
-
-    /**
-     * Get the int keys.
-     *
-     * @return String[]
-     */
-    public List<String> getIntKeys() {
-        return mIntValues;
-    }
-
-    /**
-     * Get the boolean keys.
-     *
-     * @return String[]
-     */
-    public List<String> getBooleanKeys() {
-        return mBoolValues;
-    }
-
-    /**
-     * Get the list keys.
-     *
-     * @return String[]
-     */
-    public List<String> getListKeys() {
-        return mListValues;
-    }
-
-    /**
      * @see java.lang.Object
      */
     @Override
     public String toString() {
         return values.toString();
-    }
-
-    /**
-     * Is the proxy enabled?
-     *
-     * @return boolean
-     */
-    public boolean isInitiallyEnabled() {
-        return (Boolean) values.get(DB_ENABLE_PROXY_INITIALLY);
-    }
-
-    /**
-     * Set am integer property.
-     *
-     * @param property String
-     * @param value    the value
-     */
-    public void setProperty(String property, Object value) {
-        if (value instanceof Boolean) {
-            if (!mBoolValues.contains(property)) {
-                throw new IllegalArgumentException("the boolean property " + property + " does not exist.");
-            }
-            values.put(property, value);
-            return;
-        }
-        if (value instanceof Integer) {
-            if (!mIntValues.contains(property)) {
-                throw new IllegalArgumentException("the int property " + property + " does not exist.");
-            }
-            values.put(property, value);
-            return;
-        }
-        if (value instanceof String) {
-            if (!mStringValues.contains(property)) {
-                throw new IllegalArgumentException("the string property " + property + " does not exist.");
-            }
-            values.put(property, value);
-            return;
-        }
-        if (value instanceof List) {
-            if (!mListValues.contains(property)) {
-                throw new IllegalArgumentException("the list property " + property + " does not exist.");
-            }
-            values.put(property, value);
-            return;
-        }
-
-        throw new IllegalArgumentException("the argument " + value + " is illegal");
     }
 
     private void readSystemProperties() {
@@ -514,17 +545,5 @@ public final class ClientProperties {
                 values.put(key, obj);
             }
         }
-    }
-
-    public List<ExecutionListener> getListener() {
-        return mListener;
-    }
-
-    public List<ExecutionFailedListener> getFailedListener() {
-        return mFailedListener;
-    }
-
-    public List<ConnectionListener> getConnectionListener() {
-        return mConnectionListener;
     }
 }

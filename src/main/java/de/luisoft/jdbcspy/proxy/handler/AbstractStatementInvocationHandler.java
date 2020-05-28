@@ -1,7 +1,6 @@
 package de.luisoft.jdbcspy.proxy.handler;
 
 import de.luisoft.jdbcspy.ClientProperties;
-import de.luisoft.jdbcspy.proxy.ProxyConnectionMetaData;
 import de.luisoft.jdbcspy.proxy.ProxyResultSet;
 import de.luisoft.jdbcspy.proxy.ResultSetStatistics;
 import de.luisoft.jdbcspy.proxy.StatementStatistics;
@@ -67,15 +66,11 @@ public abstract class AbstractStatementInvocationHandler implements InvocationHa
      * the generated result sets
      */
     private final Set<Object> mResultSets = new HashSet<>();
-    /**
-     * the properties
-     */
-    private final ClientProperties mProps;
+
     /**
      * the open method
      */
     private final String mOpenMethod;
-    private final ProxyConnectionMetaData mMetaData;
     private final Utils utils = new Utils();
     /**
      * result set item count
@@ -121,19 +116,16 @@ public abstract class AbstractStatementInvocationHandler implements InvocationHa
     /**
      * Constructor.
      *
-     * @param props   the client properties
      * @param theStmt the original statement
      * @param theSql  the sql string
      * @param method  the method
      */
-    public AbstractStatementInvocationHandler(ClientProperties props, Statement theStmt, ProxyConnectionMetaData metaData,
+    public AbstractStatementInvocationHandler(Statement theStmt,
                                               String theSql, String method) {
         uStatement = theStmt;
         mSql = theSql;
-        mProps = props;
         mOpenMethod = method;
         mState = OPEN;
-        mMetaData = metaData;
     }
 
     public void setExecutionListener(List<ExecutionListener> listener) {
@@ -156,7 +148,7 @@ public abstract class AbstractStatementInvocationHandler implements InvocationHa
             }
 
             if (mTrace.isLoggable(Level.FINE)) {
-                mTrace.fine("call method: " + method.getName() + "(" + (args != null ? "#=" + args.length : "") + ")");
+                mTrace.fine("call method: " + uStatement.getClass() + "." + Utils.getMethodSignature(method, args));
             }
 
             if ("close".equals(method.getName())) {
@@ -202,7 +194,7 @@ public abstract class AbstractStatementInvocationHandler implements InvocationHa
 
             String txt = "execution " + method.getName() + getArgs(args) + " failed for " + getSQL() +
                     " in method " + Utils.getExecClass(proxy);
-            mTrace.log(Level.SEVERE, "failed " + e.getCause(), e);
+            mTrace.log(Level.SEVERE, txt, e);
 
             ExecutionFailedEvent event = new ExecutionFailedEvent(toString(), e.getCause());
 
@@ -218,7 +210,7 @@ public abstract class AbstractStatementInvocationHandler implements InvocationHa
             for (ExecutionListener listener : mExecListeners) {
                 listener.resourceFailure(event);
             }
-            if (mProps.getBoolean(ClientProperties.DB_THROW_WARNINGS)) {
+            if (ClientProperties.getBoolean(ClientProperties.DB_THROW_WARNINGS)) {
                 throw e;
             }
             return null;
@@ -240,7 +232,7 @@ public abstract class AbstractStatementInvocationHandler implements InvocationHa
         try {
             if (cmd.startsWith("get ")) {
                 String key = cmd.substring(4);
-                Object value = mMetaData.getProperty(key);
+                Object value = ClientProperties.getProperty(key);
                 mTrace.info("Proxy property " + key + "=" + value);
                 if (value == null) {
                     return Boolean.FALSE;
@@ -250,27 +242,16 @@ public abstract class AbstractStatementInvocationHandler implements InvocationHa
                 int pos = cmd.indexOf(" ");
                 String key = cmd.substring(0, pos);
                 String value = cmd.substring(pos + 1);
-                if (mMetaData.getBooleanKeys().contains(key)) {
-                    mMetaData.setProperty(key, Boolean.valueOf(value));
-                } else if (mMetaData.getIntKeys().contains(key)) {
-                    mMetaData.setProperty(key, Integer.valueOf(value));
-                } else if (mMetaData.getListKeys().contains(key)) {
-                    mMetaData.setProperty(key, value);
+                if (ClientProperties.getBooleanKeys().contains(key)) {
+                    ClientProperties.setProperty(key, Boolean.valueOf(value));
+                } else if (ClientProperties.getIntKeys().contains(key)) {
+                    ClientProperties.setProperty(key, Integer.valueOf(value));
+                } else if (ClientProperties.getListKeys().contains(key)) {
+                    ClientProperties.setProperty(key, value);
                 } else {
                     mTrace.info("key " + key + " does not exist.");
                     return Boolean.FALSE;
                 }
-            } else if (cmd.equals("dump")) {
-                mTrace.info("Proxy Statistics: " + mMetaData.dumpStatistics());
-            } else if (cmd.equals("enable")) {
-                mTrace.info("Proxy enabled.");
-                mMetaData.enableProxy(true);
-            } else if (cmd.equals("disable")) {
-                mTrace.info("Proxy disabled.");
-                mMetaData.enableProxy(false);
-            } else if (cmd.equals("clear")) {
-                mTrace.info("Proxy Statistics cleared.");
-                mMetaData.clearStatistics();
             }
 
             if (method.equals("executeQuery")) {
@@ -341,8 +322,8 @@ public abstract class AbstractStatementInvocationHandler implements InvocationHa
             }
         }
 
-        boolean displayStmt = mDuration >= mProps.getInt(ClientProperties.DB_STMT_TOTAL_TIME_THRESHOLD)
-                || mSize >= mProps.getInt(ClientProperties.DB_STMT_TOTAL_SIZE_THRESHOLD);
+        boolean displayStmt = mDuration >= ClientProperties.getInt(ClientProperties.DB_STMT_TOTAL_TIME_THRESHOLD)
+                || mSize >= ClientProperties.getInt(ClientProperties.DB_STMT_TOTAL_SIZE_THRESHOLD);
 
         if (displayStmt) {
             mTrace.info(
@@ -371,7 +352,7 @@ public abstract class AbstractStatementInvocationHandler implements InvocationHa
 
         try {
             if (method.getName().startsWith("execute") && args != null && args.length > 0) {
-                args[0] = (mProps.getBoolean(ClientProperties.DB_REMOVE_HINTS) ? Utils.removeHints(args[0].toString())
+                args[0] = (ClientProperties.getBoolean(ClientProperties.DB_REMOVE_HINTS) ? Utils.removeHints(args[0].toString())
                         : args[0].toString());
                 mDirectSql = (String) args[0];
             }
@@ -424,7 +405,7 @@ public abstract class AbstractStatementInvocationHandler implements InvocationHa
             }
         }
 
-        boolean infoLevel = dur >= mProps.getInt(ClientProperties.DB_STMT_EXECUTE_TIME_THRESHOLD);
+        boolean infoLevel = dur >= ClientProperties.getInt(ClientProperties.DB_STMT_EXECUTE_TIME_THRESHOLD);
 
         if (!infoLevel) {
             infoLevel = (Utils.isTrace(getSQL()) != null);
@@ -541,7 +522,7 @@ public abstract class AbstractStatementInvocationHandler implements InvocationHa
      */
     private void handleCheckClosed(Object proxy) throws ProxyException {
 
-        if (!mProps.getBoolean(ClientProperties.DB_IGNORE_NOT_CLOSED_OBJECTS) && mState != CLOSED) {
+        if (!ClientProperties.getBoolean(ClientProperties.DB_IGNORE_NOT_CLOSED_OBJECTS) && mState != CLOSED) {
 
             String txt = "The statement \"" + getSQL() + "\" opened in " + mOpenMethod + " (connection closed in "
                     + Utils.getExecClass(proxy) + ") was not closed.";
@@ -600,7 +581,7 @@ public abstract class AbstractStatementInvocationHandler implements InvocationHa
             sql = mSql;
         }
 
-        int maxLen = mProps.getInt(ClientProperties.DB_DISPLAY_SQL_STRING_MAXLEN);
+        int maxLen = ClientProperties.getInt(ClientProperties.DB_DISPLAY_SQL_STRING_MAXLEN);
         if (maxLen > 0 && sql.length() > maxLen) {
 
             sql = sql.substring(0, maxLen) + "...";
@@ -691,5 +672,9 @@ public abstract class AbstractStatementInvocationHandler implements InvocationHa
         }
         strb.append(")");
         return strb.toString();
+    }
+
+    public String dump() {
+        return toString();
     }
 }

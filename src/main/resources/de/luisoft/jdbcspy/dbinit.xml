@@ -1,17 +1,21 @@
 <dbproxy>
-
+    <property name="Derby_DriverClass" value="org.apache.derby.jdbc.AutoloadedDriver"/>
     <property name="Derby_XADatasourceClass" value="org.apache.derby.jdbc.EmbeddedXADataSource"/>
     <property name="Derby_DatasourceClass" value="org.apache.derby.jdbc.EmbeddedDataSource"/>
 
+    <property name="DB2_DriverClass" value=""/>
     <property name="DB2_XADatasourceClass" value="com.ibm.db2.jcc.DB2XADataSource"/>
     <property name="DB2_DatasourceClass" value="com.ibm.db2.jcc.DB2SimpleDataSource"/>
 
+    <property name="Mssql_DriverClass" value=""/>
     <property name="Mssql_XADatasourceClass" value="com.microsoft.sqlserver.jdbc.SQLServerXADataSource"/>
     <property name="Mssql_DatasourceClass" value="com.microsoft.sqlserver.jdbc.SQLServerDataSource"/>
 
+    <property name="Mysql_DriverClass" value=""/>
     <property name="Mysql_XADatasourceClass" value="com.mysql.jdbc.jdbc2.optional.MysqlXADataSource"/>
     <property name="Mysql_DatasourceClass" value="com.mysql.cj.jdbc.MysqlDataSource"/>
 
+    <property name="Oracle_DriverClass" value=""/>
     <property name="Oracle_XADatasourceClass" value="oracle.jdbc.xa.client.OracleXADataSource"/>
     <property name="Oracle_DatasourceClass" value="oracle.jdbc.pool.OracleDataSource"/>
 
@@ -21,8 +25,8 @@
     <property name="ResultSetTotalTimeThreshold" value="300000"/>
     <property name="ResultSetTotalSizeThreshold" value="20000000"/>
 
-    <property name="StmtExecuteTimeThreshold" value="3000"/>
-    <property name="StmtTotalTimeThreshold" value="0"/>
+    <property name="StmtExecuteTimeThreshold" value="0"/>
+    <property name="StmtTotalTimeThreshold" value="5000"/>
     <property name="StmtTotalSizeThreshold" value="1000000"/>
 
     <property name="ConnTotalTimeThreshold" value="0"/>
@@ -40,6 +44,7 @@
     <property name="StmtHistorizeSQLExp" value=""/>
 
     <property name="TraceDepth" value="3"/>
+    <property name="TraceClassIgnoreRegExp" value="(org\.jboss|org\.jbpm|org\.junit|org\.hibernate|org\.springframework|com\.ibm|com\.sun|jdk\.internal|java|sun)\..*"/>
 
     <property name="DumpAfterShutdown" value="false"/>
     <property name="DumpInterval" value="0"/>
@@ -55,18 +60,9 @@
             <property name="lastStatementMaxHistory" value="3"/>
             <property name="lastStatementExecutionThreshold" value="500"/>
         </executionlistener>
-        <executionlistener class="de.luisoft.jdbcspy.proxy.listener.impl.ExecutionRepeatCountListener"/>
-        <executionlistener class="de.luisoft.jdbcspy.proxy.listener.impl.ExecutionResourceListener">
-            <property name="ThrowWarnings" value="false"/>
-        </executionlistener>
         <executionlistener class="de.luisoft.jdbcspy.proxy.listener.impl.ExecutionStatisticListener"/>
         <executionlistener class="de.luisoft.jdbcspy.proxy.listener.impl.SpecialStatementListener"/>
 
-        <executionfailedlistener class="de.luisoft.jdbcspy.proxy.listener.impl.ExecutionFailedHistoryListener"/>
-
-        <connectionlistener class="de.luisoft.jdbcspy.proxy.listener.impl.ConnectionDumpListener">
-            <property name="connDumpCloseClassExp" value=""/>
-        </connectionlistener>
         <connectionlistener class="de.luisoft.jdbcspy.proxy.listener.impl.ConnectionStatisticListener"/>
     </listeners>
 </dbproxy>

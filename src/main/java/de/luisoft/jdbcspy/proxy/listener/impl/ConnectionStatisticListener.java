@@ -95,7 +95,7 @@ public class ConnectionStatisticListener implements ConnectionListener {
 
         int i = 0;
         synchronized (mConns) {
-            for (Iterator it = mConns.iterator(); it.hasNext(); i++) {
+            for (Iterator<ConnectionStatistics> it = mConns.iterator(); it.hasNext(); i++) {
                 ConnectionInvocationHandler hndlr = (ConnectionInvocationHandler) it.next();
                 Object c = hndlr.getUnderlyingConnection();
 

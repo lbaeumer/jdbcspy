@@ -3,7 +3,6 @@ package de.luisoft.jdbcspy.proxy.handler;
 import de.luisoft.jdbcspy.proxy.ConnectionFactory;
 import de.luisoft.jdbcspy.proxy.ConnectionStatistics;
 import de.luisoft.jdbcspy.proxy.ProxyConnection;
-import de.luisoft.jdbcspy.proxy.ProxyConnectionMetaData;
 import de.luisoft.jdbcspy.proxy.ProxyStatement;
 import de.luisoft.jdbcspy.proxy.util.Utils;
 
@@ -131,11 +130,6 @@ public class XAConnectionInvocationHandler implements InvocationHandler, Connect
 
     @Override
     public String getCaller() {
-        return null;
-    }
-
-    @Override
-    public ProxyConnectionMetaData getProxyConnectionMetaData() {
         return null;
     }
 

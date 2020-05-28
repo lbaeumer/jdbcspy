@@ -20,9 +20,4 @@ public interface ConnectionStatistics extends Statistics {
      * @return The statements.
      */
     List<ProxyStatement> getStatements();
-
-    /**
-     * Get the ConnectionFactory.
-     */
-    ProxyConnectionMetaData getProxyConnectionMetaData();
 }

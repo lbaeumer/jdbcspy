@@ -15,7 +15,7 @@ public abstract class AbstractProxyDatasource {
         Exception e = null;
         try {
             connFac = new ConnectionFactory();
-            String driverClass = (String) connFac.getProperty(driver);
+            String driverClass = (String) ClientProperties.getProperty(driver);
             c = Class.forName(driverClass);
             uDatasource = c.getDeclaredConstructor().newInstance();
         } catch (Exception ex) {
@@ -72,5 +72,10 @@ public abstract class AbstractProxyDatasource {
         Class<?> c = uDatasource.getClass();
         Method m = c.getMethod("setTraceLevel", int.class);
         m.invoke(uDatasource, traceLevel);
+    }
+
+    @Override
+    public String toString() {
+        return ConnectionFactory.dumpStatistics();
     }
 }

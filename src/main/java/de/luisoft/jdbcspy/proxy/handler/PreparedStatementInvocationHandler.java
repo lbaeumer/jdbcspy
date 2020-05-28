@@ -1,7 +1,6 @@
 package de.luisoft.jdbcspy.proxy.handler;
 
 import de.luisoft.jdbcspy.ClientProperties;
-import de.luisoft.jdbcspy.proxy.ProxyConnectionMetaData;
 import de.luisoft.jdbcspy.proxy.util.Utils;
 
 import java.lang.reflect.Method;
@@ -28,7 +27,7 @@ public class PreparedStatementInvocationHandler extends AbstractStatementInvocat
      * the batch bind variables
      */
     private final Map<Object, Object> mBatchBindVariables = new HashMap<>();
-    private final ClientProperties mProps;
+
     private final String mSql;
     /**
      * the batched element size
@@ -38,15 +37,13 @@ public class PreparedStatementInvocationHandler extends AbstractStatementInvocat
     /**
      * Constructor.
      *
-     * @param props   the client properties
      * @param theStmt the original statement
      * @param theSql  the sql string
      * @param method  the method
      */
-    public PreparedStatementInvocationHandler(ClientProperties props, Statement theStmt, ProxyConnectionMetaData metaData,
+    public PreparedStatementInvocationHandler(Statement theStmt,
                                               String theSql, String method) {
-        super(props, theStmt, metaData, theSql, method);
-        mProps = props;
+        super(theStmt, theSql, method);
         mSql = theSql;
     }
 
@@ -106,7 +103,7 @@ public class PreparedStatementInvocationHandler extends AbstractStatementInvocat
         }
         String sql = result.toString();
 
-        int maxLen = mProps.getInt(ClientProperties.DB_DISPLAY_SQL_STRING_MAXLEN);
+        int maxLen = ClientProperties.getInt(ClientProperties.DB_DISPLAY_SQL_STRING_MAXLEN);
         if (maxLen > 0 && sql.length() > maxLen) {
 
             sql = sql.substring(0, maxLen) + "...";

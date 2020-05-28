@@ -2,10 +2,8 @@ package de.luisoft.jdbcspy.proxy.handler;
 
 import de.luisoft.jdbcspy.ClientProperties;
 import de.luisoft.jdbcspy.proxy.ConnectionStatistics;
-import de.luisoft.jdbcspy.proxy.ProxyConnectionMetaData;
 import de.luisoft.jdbcspy.proxy.ProxyStatement;
 import de.luisoft.jdbcspy.proxy.StatementFactory;
-import de.luisoft.jdbcspy.proxy.StatementStatistics;
 import de.luisoft.jdbcspy.proxy.Statistics;
 import de.luisoft.jdbcspy.proxy.exception.ProxyException;
 import de.luisoft.jdbcspy.proxy.listener.ConnectionEvent;
@@ -18,6 +16,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -44,18 +43,12 @@ public class ConnectionInvocationHandler implements InvocationHandler, Connectio
     /**
      * the underlying connection
      */
-    private final Connection mConn;
+    private final Connection uConnection;
 
     /**
      * all generated statements
      */
     private final List<ProxyStatement> mStatements = new LinkedList<>();
-
-    /**
-     * result set item count
-     */
-    private final List<Integer> mResultSetItemCount = new ArrayList<>();
-
     /**
      * the connection listener list
      */
@@ -64,24 +57,30 @@ public class ConnectionInvocationHandler implements InvocationHandler, Connectio
      * the caller
      */
     private final String mCaller;
-    /**
-     * the connection factory
-     */
-    private final ProxyConnectionMetaData mMetaData;
+    private int itemCount;
     /**
      * is closed
      */
     private int mDeletedStmts;
+
+    private int isolationLevel;
+    private String url;
 
     /**
      * The Constructor.
      *
      * @param theConn the original connection
      */
-    public ConnectionInvocationHandler(Connection theConn,
-                                       ProxyConnectionMetaData metaData) {
-        mConn = theConn;
-        mMetaData = metaData;
+    public ConnectionInvocationHandler(Connection theConn) {
+        uConnection = theConn;
+        try {
+            isolationLevel = uConnection.getTransactionIsolation();
+            if (uConnection.getMetaData() != null) {
+                url = uConnection.getMetaData().getURL();
+            }
+        } catch (SQLException e) {
+            mTrace.log(Level.INFO, "failed" + e);
+        }
         mConnectionListener = new LinkedList<>();
         mCaller = Utils.getExecClass(this);
     }
@@ -99,7 +98,7 @@ public class ConnectionInvocationHandler implements InvocationHandler, Connectio
             }
 
             if (mTrace.isLoggable(Level.FINE)) {
-                mTrace.fine("call " + mConn.getClass() + "." + Utils.getMethodSignature(method, args));
+                mTrace.fine("call " + uConnection.getClass() + "." + Utils.getMethodSignature(method, args));
             }
 
             if ("close".equals(method.getName())) {
@@ -114,10 +113,10 @@ public class ConnectionInvocationHandler implements InvocationHandler, Connectio
                 return getCaller();
             } else if ("getStatements".equals(method.getName())) {
                 return getStatements();
+            } else if ("setTransactionIsolation".equals(method.getName())) {
+                isolationLevel = (Integer) args[0];
             } else if ("dump".equals(method.getName())) {
                 return dump();
-            } else if ("getProxyConnectionMetaData".equals(method.getName())) {
-                return getProxyConnectionMetaData();
             } else if (method.getName().startsWith("prepare")) {
                 return handlePrepare(proxy, method, args);
             } else if (method.getName().startsWith("create")) {
@@ -137,66 +136,28 @@ public class ConnectionInvocationHandler implements InvocationHandler, Connectio
                 handleClose(proxy, null, null, false);
                 return null;
             } else if (method.getName().equals("getUnderlyingConnection")) {
-                return mConn;
+                return uConnection;
             }
 
-            return method.invoke(mConn, args);
+            return method.invoke(uConnection, args);
         } catch (InvocationTargetException e) {
             mTrace.log(Level.SEVERE, Utils.getMethodSignature(method, args) + " failed for " + toString(), e.getCause());
             throw e.getCause();
         } catch (ProxyException e) {
             ResourceEvent event = new ResourceEvent(e, e.getOpenMethod(), Utils.getExecClass(proxy));
 
-            for (ExecutionListener listener : ClientProperties.getInstance().getListener()) {
+            for (ExecutionListener listener : ClientProperties.getListener()) {
                 listener.resourceFailure(event);
             }
-            if (ClientProperties.getInstance().getBoolean(ClientProperties.DB_THROW_WARNINGS)) {
+            if (ClientProperties.getBoolean(ClientProperties.DB_THROW_WARNINGS)) {
                 throw e;
             }
             return null;
         } catch (Exception e) {
-            mTrace.log(Level.SEVERE, "unknown error in " + mConn.getClass()
+            mTrace.log(Level.SEVERE, "unknown error in " + uConnection.getClass()
                     + "." + method.getName() + " failed for " + toString(), e);
             throw new RuntimeException("failed " + e, e);
         }
-    }
-
-    /**
-     * Print the list.
-     *
-     * @param l List
-     * @return String
-     */
-    private String printList(List<Integer> l) {
-        if (l == null || l.isEmpty()) {
-            return "-";
-        }
-        StringBuilder strb = new StringBuilder();
-        int i = 0;
-        int sum = 0;
-        boolean shortCut = false;
-        for (Integer cnt : l) {
-            sum += cnt;
-
-            if (i == 5 && l.size() > 10) {
-                strb.append("+...");
-                shortCut = true;
-            }
-
-            if (!shortCut) {
-                if (i > 0) {
-                    strb.append("+");
-                }
-                strb.append(cnt);
-            }
-            i++;
-        }
-
-        if (shortCut) {
-            strb.append("=").append(sum);
-        }
-
-        return strb.toString();
     }
 
     /**
@@ -210,12 +171,12 @@ public class ConnectionInvocationHandler implements InvocationHandler, Connectio
      */
     private Object handlePrepare(Object proxy, Method method, Object[] args) throws Throwable {
 
-        String sql = (ClientProperties.getInstance().getBoolean(ClientProperties.DB_REMOVE_HINTS) ? Utils.removeHints(args[0].toString())
+        String sql = (ClientProperties.getBoolean(ClientProperties.DB_REMOVE_HINTS) ? Utils.removeHints(args[0].toString())
                 : args[0].toString());
 
-        Object ob = method.invoke(mConn, args);
+        Object ob = method.invoke(uConnection, args);
         if (ob instanceof Statement) {
-            Statement proxyStmt = StatementFactory.getInstance().getStatement(ClientProperties.getInstance(), (Statement) ob, mMetaData, sql,
+            Statement proxyStmt = StatementFactory.getInstance().getStatement((Statement) ob, sql,
                     Utils.getExecClass(proxy));
 
             if (proxyStmt instanceof ProxyStatement) {
@@ -239,9 +200,9 @@ public class ConnectionInvocationHandler implements InvocationHandler, Connectio
      * @throws Throwable on error
      */
     private Object handleCreate(Object proxy, Method method, Object[] args) throws Throwable {
-        Object ob = method.invoke(mConn, args);
+        Object ob = method.invoke(uConnection, args);
         if (ob instanceof Statement) {
-            Statement proxyStmt = StatementFactory.getInstance().getStatement(ClientProperties.getInstance(), (Statement) ob, mMetaData, null,
+            Statement proxyStmt = StatementFactory.getInstance().getStatement((Statement) ob, null,
                     Utils.getExecClass(proxy));
 
             if (proxyStmt instanceof ProxyStatement) {
@@ -267,8 +228,6 @@ public class ConnectionInvocationHandler implements InvocationHandler, Connectio
                 while (it.hasNext()) {
                     ProxyStatement c = it.next();
                     if (c.isClosed()) {
-                        StatementStatistics stat = (StatementStatistics) c;
-                        mResultSetItemCount.add(stat.getItemCount());
                         it.remove();
                         x--;
                         mDeletedStmts++;
@@ -278,8 +237,8 @@ public class ConnectionInvocationHandler implements InvocationHandler, Connectio
                     }
                 }
             }
-
             mStatements.add(stmt);
+            itemCount = mStatements.size();
         }
     }
 
@@ -296,13 +255,6 @@ public class ConnectionInvocationHandler implements InvocationHandler, Connectio
                                boolean checkClosed) throws Throwable {
 
         Object ret = null;
-        synchronized (mStatements) {
-            for (ProxyStatement mStatement : mStatements) {
-                Statistics c = (Statistics) mStatement;
-                mResultSetItemCount.add(c.getItemCount());
-            }
-        }
-
         try {
             ConnectionEvent event = new ConnectionEvent(this);
             for (ConnectionListener listener : mConnectionListener) {
@@ -310,16 +262,16 @@ public class ConnectionInvocationHandler implements InvocationHandler, Connectio
             }
 
             if (method != null) {
-                ret = method.invoke(mConn, args);
+                ret = method.invoke(uConnection, args);
             }
 
-            int mDuration = 0;
-            int mSize = 0;
+            int duration = 0;
+            int size = 0;
             synchronized (mStatements) {
                 for (ProxyStatement mStatement : mStatements) {
                     Statistics c = (Statistics) mStatement;
-                    mDuration += c.getDuration();
-                    mSize += c.getSize();
+                    duration += c.getDuration();
+                    size += c.getSize();
                 }
 
                 if (checkClosed) {
@@ -330,23 +282,25 @@ public class ConnectionInvocationHandler implements InvocationHandler, Connectio
             }
 
             // print out
-            boolean displayTime = mDuration >= ClientProperties.getInstance().getInt(ClientProperties.DB_CONN_TOTAL_TIME_THRESHOLD);
-            boolean displaySize = mSize >= ClientProperties.getInstance().getInt(ClientProperties.DB_CONN_TOTAL_SIZE_THRESHOLD);
-            boolean verbose = ClientProperties.getInstance().getBoolean(ClientProperties.VERBOSE);
+            boolean displayTime = duration >= ClientProperties.getInt(ClientProperties.DB_CONN_TOTAL_TIME_THRESHOLD);
+            boolean displaySize = size >= ClientProperties.getInt(ClientProperties.DB_CONN_TOTAL_SIZE_THRESHOLD);
+            boolean verbose = ClientProperties.getBoolean(ClientProperties.VERBOSE);
 
             if (displayTime || displaySize) {
+                Level l = (mStatements.size() > 0 ? Level.INFO : Level.FINE);
                 if (!verbose) {
-                    mTrace.info((method == null ? "implicitly " : "")
+                    mTrace.log(l, (method == null ? "implicitly " : "")
                             + "closed connection " + this + " in "
                             + Utils.getExecClass(proxy));
                 } else {
-                    mTrace.info((method == null ? "implicitly " : "")
+                    mTrace.log(l, (method == null ? "implicitly " : "")
                             + "closed connection\n" + this.dump());
                 }
             }
 
         } finally {
             synchronized (mStatements) {
+                itemCount = mStatements.size();
                 mStatements.clear();
             }
         }
@@ -413,7 +367,7 @@ public class ConnectionInvocationHandler implements InvocationHandler, Connectio
      */
     @Override
     public int getItemCount() {
-        return mDeletedStmts + mStatements.size();
+        return itemCount + mDeletedStmts;
     }
 
     /**
@@ -442,7 +396,7 @@ public class ConnectionInvocationHandler implements InvocationHandler, Connectio
      * @return Connection
      */
     public Object getUnderlyingConnection() {
-        return mConn;
+        return uConnection;
     }
 
     /**
@@ -472,14 +426,6 @@ public class ConnectionInvocationHandler implements InvocationHandler, Connectio
     }
 
     /**
-     * @see de.luisoft.jdbcspy.proxy.ConnectionStatistics#getProxyConnectionMetaData
-     */
-    @Override
-    public ProxyConnectionMetaData getProxyConnectionMetaData() {
-        return mMetaData;
-    }
-
-    /**
      * Dump the connection.
      *
      * @return String
@@ -487,10 +433,16 @@ public class ConnectionInvocationHandler implements InvocationHandler, Connectio
     @Override
     public String toString() {
         synchronized (mStatements) {
-            return "Connection[#stmt=" + getItemCount() + "; #rs=" + printList(mResultSetItemCount) + "; duration="
-                    + Utils.getTimeString(getDuration())
-                    + (getSize() > 0 ? "; size=" + Utils.getSizeString(getSize()) : "") + ", opened in " + getCaller()
-                    + "]";
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append("Connection[#stmt=" + getItemCount()
+                    + "; duration=" + Utils.getTimeString(getDuration())
+                    + "; isolation=" + Utils.getIsolationLevel(isolationLevel));
+            if (url != null) {
+                stringBuilder.append("; url=" + url);
+            }
+            stringBuilder.append((getSize() > 0 ? "; size=" + Utils.getSizeString(getSize()) : "")
+                    + ", opened in " + getCaller() + "]");
+            return stringBuilder.toString();
         }
     }
 }

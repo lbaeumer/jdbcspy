@@ -26,4 +26,6 @@ public interface Statistics {
      * @return long
      */
     long getDuration();
+
+    String dump();
 }
