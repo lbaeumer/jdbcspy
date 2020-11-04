@@ -19,6 +19,10 @@
     <property name="Oracle_XADatasourceClass" value="oracle.jdbc.xa.client.OracleXADataSource"/>
     <property name="Oracle_DatasourceClass" value="oracle.jdbc.pool.OracleDataSource"/>
 
+    <property name="PostgreSql_DriverClass" value="org.postgresql.Driver"/>
+    <property name="PostgreSql_XADatasourceClass" value="org.postgresql.xa.PGXADataSource"/>
+    <property name="PostgreSql_DatasourceClass" value="org.postgresql.ds.PGSimpleDataSource"/>
+
     <property name="EnableProxyInitially" value="true"/>
 
     <property name="ResultSetNextTimeThreshold" value="120000"/>
