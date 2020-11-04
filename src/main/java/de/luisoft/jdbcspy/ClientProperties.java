@@ -60,6 +60,9 @@ public final class ClientProperties {
     public static final String DB_MYSQL_DRIVER_CLASS = "Mysql_DriverClass";
     public static final String DB_MYSQL_XA_DATASOURCE_CLASS = "Mysql_XADatasourceClass";
     public static final String DB_MYSQL_DATASOURCE_CLASS = "Mysql_DatasourceClass";
+    public static final String DB_POSTGRESQL_DRIVER_CLASS = "PostgreSql_DriverClass";
+    public static final String DB_POSTGRESQL_XA_DATASOURCE_CLASS = "PostgreSql_XADatasourceClass";
+    public static final String DB_POSTGRESQL_DATASOURCE_CLASS = "PostgreSql_DatasourceClass";
     public static final String DB_ORACLE_DRIVER_CLASS = "Oracle_DriverClass";
     public static final String DB_ORACLE_XA_DATASOURCE_CLASS = "Oracle_XADatasourceClass";
     public static final String DB_ORACLE_DATASOURCE_CLASS = "Oracle_DatasourceClass";

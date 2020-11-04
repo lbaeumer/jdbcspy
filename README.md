@@ -40,6 +40,7 @@ The installation is quite easy.
         de.luisoft.jdbcspy.vendor.MssqlProxyDatasource
         de.luisoft.jdbcspy.vendor.MysqlProxyDatasource
         de.luisoft.jdbcspy.vendor.OracleProxyDatasource
+        de.luisoft.jdbcspy.vendor.PostgreSqlProxyDatasource
         ```
     1.  java.sql.XADatasource: Either use one of the predefined vendor specific database drivers of define your own one.
         Some predefined driver classes are:
@@ -49,6 +50,7 @@ The installation is quite easy.
         de.luisoft.jdbcspy.vendor.MssqlProxyXADatasource
         de.luisoft.jdbcspy.vendor.MysqlProxyXADatasource
         de.luisoft.jdbcspy.vendor.OracleProxyXADatasource
+        de.luisoft.jdbcspy.vendor.PostgreSqlProxyXADatasource
         ```
         You will find an example for WebSphere Liberty below.
 1. Now you can start your application as usual. The proxy will be activated automatically and will trace your jdbc connection.
