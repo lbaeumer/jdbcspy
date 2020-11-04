@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>jdbcspy</artifactId>
     <groupId>de.luisoft</groupId>
-    <version>3.0.1</version>
+    <version>3.0.2</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
