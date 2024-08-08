@@ -83,7 +83,7 @@ public class XAConnectionInvocationHandler implements InvocationHandler, Connect
             return method.invoke(mConn, args);
         } catch (Exception e) {
             mTrace.log(Level.SEVERE, "unknown error in " + mConn.getClass()
-                    + "." + method.getName() + " failed for " + toString(), e);
+                    + "." + method.getName() + " failed for " + this, e);
             throw e.getCause();
         }
     }

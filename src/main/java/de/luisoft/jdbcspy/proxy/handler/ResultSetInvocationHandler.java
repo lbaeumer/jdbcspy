@@ -230,7 +230,7 @@ public class ResultSetInvocationHandler implements InvocationHandler, ResultSetS
             ret = method.invoke(uResultSet, args);
             if (ClientProperties.getBoolean(ClientProperties.DB_ENABLE_SIZE_EVALUATION)) {
                 if (ret instanceof String) {
-                    mSize += 2 * ((String) ret).length();
+                    mSize += 2L * ((String) ret).length();
                 } else if (ret instanceof Integer || ret instanceof Float) {
                     mSize += 4;
                 } else if (ret instanceof Boolean || ret instanceof Byte) {

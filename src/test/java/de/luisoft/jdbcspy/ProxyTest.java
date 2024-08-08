@@ -3,9 +3,9 @@ package de.luisoft.jdbcspy;
 import de.luisoft.jdbc.testdriver.MyConnection;
 import de.luisoft.jdbcspy.proxy.ConnectionFactory;
 import de.luisoft.jdbcspy.proxy.ProxyConnection;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -22,14 +22,14 @@ public class ProxyTest {
     ProxyConnection proxyConn;
     ConnectionFactory connFac;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         conn = new MyConnection(10000, 0, 0);
         connFac = new ConnectionFactory();
         proxyConn = (ProxyConnection) connFac.getProxyConnection(conn);
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         System.out.println(ConnectionFactory.dumpStatistics());
     }

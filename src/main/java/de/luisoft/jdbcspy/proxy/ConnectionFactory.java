@@ -70,7 +70,7 @@ public class ConnectionFactory {
                         try {
                             while (true) {
                                 Thread.sleep(
-                                        1000 * ClientProperties.getInt(ClientProperties.DB_DUMP_INTERVAL));
+                                        1000L * ClientProperties.getInt(ClientProperties.DB_DUMP_INTERVAL));
                                 System.out.println(dumpStatistics());
                             }
                         } catch (Exception e) {
@@ -89,23 +89,23 @@ public class ConnectionFactory {
      *
      * @return String
      */
-    public static final String dumpStatistics() {
+    public static String dumpStatistics() {
         StringBuilder strb = new StringBuilder();
         for (ExecutionListener obj : ClientProperties.getListener()) {
             if (obj.toString() != null) {
-                strb.append(obj.toString());
+                strb.append(obj);
                 strb.append("\n");
             }
         }
         for (ConnectionListener obj : ClientProperties.getConnectionListener()) {
             if (obj.toString() != null) {
-                strb.append(obj.toString());
+                strb.append(obj);
                 strb.append("\n");
             }
         }
         for (ExecutionFailedListener obj : ClientProperties.getFailedListener()) {
             if (obj.toString() != null) {
-                strb.append(obj.toString());
+                strb.append(obj);
                 strb.append("\n");
             }
         }

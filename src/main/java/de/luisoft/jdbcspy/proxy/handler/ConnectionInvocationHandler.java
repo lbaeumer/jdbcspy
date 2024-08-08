@@ -141,7 +141,7 @@ public class ConnectionInvocationHandler implements InvocationHandler, Connectio
 
             return method.invoke(uConnection, args);
         } catch (InvocationTargetException e) {
-            mTrace.log(Level.SEVERE, Utils.getMethodSignature(method, args) + " failed for " + toString(), e.getCause());
+            mTrace.log(Level.SEVERE, Utils.getMethodSignature(method, args) + " failed for " + this, e.getCause());
             throw e.getCause();
         } catch (ProxyException e) {
             ResourceEvent event = new ResourceEvent(e, e.getOpenMethod(), Utils.getExecClass(proxy));
@@ -155,7 +155,7 @@ public class ConnectionInvocationHandler implements InvocationHandler, Connectio
             return null;
         } catch (Exception e) {
             mTrace.log(Level.SEVERE, "unknown error in " + uConnection.getClass()
-                    + "." + method.getName() + " failed for " + toString(), e);
+                    + "." + method.getName() + " failed for " + this, e);
             throw new RuntimeException("failed " + e, e);
         }
     }
@@ -406,7 +406,7 @@ public class ConnectionInvocationHandler implements InvocationHandler, Connectio
      */
     public String dump() {
         StringBuilder strb = new StringBuilder();
-        strb.append(toString()).append(" {").append("\n");
+        strb.append(this).append(" {").append("\n");
 
         int i = mDeletedStmts + 1;
         if (mDeletedStmts > 0) {

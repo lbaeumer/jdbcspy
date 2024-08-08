@@ -1,11 +1,13 @@
 package de.luisoft.jdbc.testdriver;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Some simple tests.
@@ -32,8 +34,8 @@ public class MyConnectionTest {
         rs.close();
         s.close();
 
-        Assert.assertEquals(i, 100);
-        Assert.assertTrue("t=" + (afterExec - start), afterExec - start >= 3000 && afterExec - start < 3050);
-        Assert.assertTrue("t=" + (afterIter - afterExec), afterIter - afterExec >= 1000 && afterIter - afterExec < 1050);
+        assertEquals(i, 100);
+        assertTrue(afterExec - start >= 3000 && afterExec - start < 3050, "t=" + (afterExec - start));
+        assertTrue(afterIter - afterExec >= 1000 && afterIter - afterExec < 1050, "t=" + (afterIter - afterExec));
     }
 }

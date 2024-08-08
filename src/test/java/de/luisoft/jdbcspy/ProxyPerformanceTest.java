@@ -4,13 +4,15 @@ import de.luisoft.jdbc.testdriver.MyConnection;
 import de.luisoft.jdbcspy.proxy.ConnectionFactory;
 import de.luisoft.jdbcspy.proxy.ProxyConnection;
 import de.luisoft.jdbcspy.proxy.StatementStatistics;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Some simple tests.
@@ -20,7 +22,7 @@ public class ProxyPerformanceTest {
     private static final boolean debug = false;
     protected Connection conn;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         Connection uconn = new MyConnection(10000, 0, 0);
         ConnectionFactory connFac = new ConnectionFactory();
@@ -41,11 +43,11 @@ public class ProxyPerformanceTest {
             if ((debug || i < 2 || i > cnt - 3) && conn instanceof ProxyConnection) {
                 StatementStatistics st = (StatementStatistics) s;
                 System.out.println(i + ":" + s);
-                Assert.assertTrue("exec time must be 0 != " + st.getExecutionTime(),
-                        Math.abs(st.getExecutionTime()) < 20);
-                Assert.assertEquals("#items must be 0!=" + st.getItemCount(), 0, st.getItemCount());
-                Assert.assertEquals("duration must be equal execution time " + st.getExecutionTime() + "!=" + st.getDuration(),
-                        st.getExecutionTime(), st.getDuration());
+                assertTrue(Math.abs(st.getExecutionTime()) < 20,
+                        "exec time must be 0 != " + st.getExecutionTime());
+                assertEquals(0, st.getItemCount(), "#items must be 0!=" + st.getItemCount());
+                assertEquals(st.getExecutionTime(), st.getDuration(),
+                        "duration must be equal execution time " + st.getExecutionTime() + "!=" + st.getDuration());
             }
         }
 
@@ -73,12 +75,11 @@ public class ProxyPerformanceTest {
 
             if ((debug || i < 2 || i > cnt - 3) && conn instanceof ProxyConnection) {
                 StatementStatistics st = (StatementStatistics) s;
-                Assert.assertTrue("exec time must be 1000 !=" + st.getExecutionTime(),
-                        Math.abs(st.getExecutionTime()) < 25);
-                Assert.assertEquals("#items must be " + 10000 + "!=" + st.getItemCount(), st.getItemCount(), 10000);
-                Assert.assertTrue(
-                        "duration must be greater execution time " + st.getExecutionTime() + "!=" + st.getDuration(),
-                        st.getDuration() - st.getExecutionTime() <= 50);
+                assertTrue(Math.abs(st.getExecutionTime()) < 25,
+                        "exec time must be 1000 !=" + st.getExecutionTime());
+                assertEquals(st.getItemCount(), 10000, "#items must be " + 10000 + "!=" + st.getItemCount());
+                assertTrue(st.getDuration() - st.getExecutionTime() <= 50,
+                        "duration must be greater execution time " + st.getExecutionTime() + "!=" + st.getDuration());
             }
         }
 
