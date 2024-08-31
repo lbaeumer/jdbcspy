@@ -52,7 +52,7 @@ public class XAResourceInvocationHandler implements InvocationHandler {
             return method.invoke(uXa, args);
         } catch (Exception e) {
             mTrace.log(Level.SEVERE, "unknown error in " + uXa.getClass()
-                    + "." + method.getName() + " failed for " + toString(), e);
+                    + "." + method.getName() + " failed for " + this, e);
             throw new RuntimeException(e.getMessage(), e);
         }
     }

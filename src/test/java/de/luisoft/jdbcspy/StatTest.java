@@ -3,12 +3,13 @@ package de.luisoft.jdbcspy;
 import de.luisoft.jdbc.testdriver.MyConnection;
 import de.luisoft.jdbcspy.proxy.ConnectionFactory;
 import de.luisoft.jdbcspy.proxy.ProxyConnection;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
 import java.sql.Statement;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
  * Some simple tests.
@@ -19,7 +20,7 @@ public class StatTest {
     ProxyConnection proxyConn;
     ConnectionFactory connFac;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         conn = new MyConnection(10000, 1000, 5000);
         connFac = new ConnectionFactory();
@@ -85,8 +86,8 @@ public class StatTest {
         System.out.println("testSetPropertyFailed()");
 
         Statement s = proxyConn.createStatement();
-        Assert.assertFalse("set does not exist", s.execute("dbproxy set xxxxxxxxx 100"));
-        Assert.assertFalse("get does not exist", s.execute("dbproxy get xxx"));
+        assertFalse(s.execute("dbproxy set xxxxxxxxx 100"), "set does not exist");
+        assertFalse(s.execute("dbproxy get xxx"), "get does not exist");
         s.close();
         proxyConn.close();
         System.out.println("\n*****************************************");

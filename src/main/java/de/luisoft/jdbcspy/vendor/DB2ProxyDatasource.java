@@ -41,4 +41,16 @@ public class DB2ProxyDatasource extends ProxyDatasource {
         Method m = c.getMethod("setCurrentSchema", String.class);
         m.invoke(uDatasource, currentSchema);
     }
+
+    public void setSecurityMechanism(short securityMechanism) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        Class<?> c = uDatasource.getClass();
+        Method m = c.getMethod("setSecurityMechanism", short.class);
+        m.invoke(uDatasource, securityMechanism);
+    }
+
+    public void setEncryptionAlgorithm(int encryptionAlgorithm) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        Class<?> c = uDatasource.getClass();
+        Method m = c.getMethod("setEncryptionAlgorithm", int.class);
+        m.invoke(uDatasource, encryptionAlgorithm);
+    }
 }

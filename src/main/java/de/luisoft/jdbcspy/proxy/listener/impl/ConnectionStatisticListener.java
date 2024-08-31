@@ -103,7 +103,7 @@ public class ConnectionStatisticListener implements ConnectionListener {
                     strb.append("; current:");
                 }
                 strb.append("\n  ").append(i).append(": ");
-                strb.append(hndlr.toString());
+                strb.append(hndlr);
 
                 try {
                     if (c instanceof Connection && ((Connection) c).getAutoCommit()

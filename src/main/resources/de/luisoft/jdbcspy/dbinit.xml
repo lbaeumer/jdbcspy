@@ -1,5 +1,5 @@
 <dbproxy>
-    <property name="Derby_DriverClass" value="org.apache.derby.jdbc.AutoloadedDriver"/>
+    <property name="Derby_DriverClass" value="org.apache.derby.jdbc.EmbeddedDriver"/>
     <property name="Derby_XADatasourceClass" value="org.apache.derby.jdbc.EmbeddedXADataSource"/>
     <property name="Derby_DatasourceClass" value="org.apache.derby.jdbc.EmbeddedDataSource"/>
 

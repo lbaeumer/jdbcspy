@@ -134,7 +134,7 @@ public class ExecutionTimeListener extends ExecutionAdapter {
                             }
 
                             long execTime = (now.getTime() - stmt.getExecutionStartTime());
-                            if (execTime > longExecutionThreshold * wait) {
+                            if (execTime > (long) longExecutionThreshold * wait) {
                                 entry.setValue(loop + 1);
                                 printMessage(stmt.getSQL(), loop, execTime, false, stmt.getExecuteCaller());
                             }

@@ -4,14 +4,16 @@ import de.luisoft.jdbcspy.proxy.ConnectionFactory;
 import de.luisoft.jdbcspy.proxy.ConnectionStatistics;
 import de.luisoft.jdbcspy.proxy.ResultSetStatistics;
 import de.luisoft.jdbcspy.proxy.StatementStatistics;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class DriverTest {
 
@@ -27,41 +29,40 @@ public class DriverTest {
         int x = 1;
         while (rs.next()) {
             int nb = rs.getInt(1);
-            Assert.assertEquals(nb, x++);
+            assertEquals(nb, x++);
         }
         ResultSetStatistics rstat = (ResultSetStatistics) rs;
-        Assert.assertEquals(cnt, rstat.getItemCount());
-        Assert.assertTrue("rs=" + rstat.getDuration(), rstat.getDuration() > 1000 && rstat.getDuration() < 1200);
+        assertEquals(cnt, rstat.getItemCount());
+        assertTrue(rstat.getDuration() > 1000 && rstat.getDuration() < 1200, "rs=" + rstat.getDuration());
 
         rs.close();
         rstat = (ResultSetStatistics) rs;
-        Assert.assertEquals(cnt, rstat.getItemCount());
-        Assert.assertTrue("rs=" + rstat.getDuration(), rstat.getDuration() > 1000 && rstat.getDuration() < 1200);
+        assertEquals(cnt, rstat.getItemCount());
+        assertTrue(rstat.getDuration() > 1000 && rstat.getDuration() < 1200, "rs=" + rstat.getDuration());
 
         StatementStatistics sstat = (StatementStatistics) p;
-        Assert.assertEquals(cnt, sstat.getItemCount());
-        Assert.assertEquals("select * from test", sstat.getSQL());
-        Assert.assertTrue(sstat.getExecuteCaller().contains("DriverTest.testStmtWith100000rs"));
-        Assert.assertTrue(sstat.getDuration() > 1500 && sstat.getDuration() < 1700);
-        Assert.assertTrue("exec time=" + sstat.getExecutionTime(),
-                sstat.getExecutionTime() >= 500 && sstat.getExecutionTime() < 520);
+        assertEquals(cnt, sstat.getItemCount());
+        assertEquals("select * from test", sstat.getSQL());
+        assertTrue(sstat.getExecuteCaller().contains("DriverTest.testStmtWith100000rs"));
+        assertTrue(sstat.getDuration() > 1500 && sstat.getDuration() < 1700);
+        assertTrue(sstat.getExecutionTime() >= 500 && sstat.getExecutionTime() < 520, "exec time=" + sstat.getExecutionTime());
 
         p.close();
 
         sstat = (StatementStatistics) p;
-        Assert.assertEquals(cnt, sstat.getItemCount());
-        Assert.assertEquals("select * from test", sstat.getSQL());
-        Assert.assertTrue(sstat.getExecuteCaller().contains("DriverTest.testStmtWith100000rs"));
-        Assert.assertTrue(sstat.getDuration() > 1500 && sstat.getDuration() < 1700);
-        Assert.assertTrue("exec time=" + sstat.getExecutionTime(),
-                sstat.getExecutionTime() >= 500 && sstat.getExecutionTime() < 520);
+        assertEquals(cnt, sstat.getItemCount());
+        assertEquals("select * from test", sstat.getSQL());
+        assertTrue(sstat.getExecuteCaller().contains("DriverTest.testStmtWith100000rs"));
+        assertTrue(sstat.getDuration() > 1500 && sstat.getDuration() < 1700);
+        assertTrue(sstat.getExecutionTime() >= 500 && sstat.getExecutionTime() < 520,
+                "exec time=" + sstat.getExecutionTime());
 
         ConnectionStatistics stat = (ConnectionStatistics) c;
-        Assert.assertEquals(1, stat.getItemCount());
-        Assert.assertTrue("s=" + stat.getStatements().get(0),
-                stat.getStatements().get(0).toString().startsWith("\"select * from test\""));
-        Assert.assertTrue(stat.getCaller().contains("DriverTest.testStmtWith100000rs"));
-        Assert.assertTrue(stat.getDuration() > 1500 && stat.getDuration() < 1700);
+        assertEquals(1, stat.getItemCount());
+        assertTrue(stat.getStatements().get(0).toString().startsWith("\"select * from test\""),
+                "s=" + stat.getStatements().get(0));
+        assertTrue(stat.getCaller().contains("DriverTest.testStmtWith100000rs"));
+        assertTrue(stat.getDuration() > 1500 && stat.getDuration() < 1700);
 
         c.close();
         long end = (System.currentTimeMillis() - start);
@@ -70,9 +71,9 @@ public class DriverTest {
         // 100000/100
 
         stat = (ConnectionStatistics) c;
-        Assert.assertEquals(1, stat.getItemCount());
-        Assert.assertEquals(0, stat.getStatements().size());
-        Assert.assertTrue(stat.getCaller().contains("DriverTest.testStmtWith100000rs"));
+        assertEquals(1, stat.getItemCount());
+        assertEquals(0, stat.getStatements().size());
+        assertTrue(stat.getCaller().contains("DriverTest.testStmtWith100000rs"));
 
     }
 
@@ -108,16 +109,17 @@ public class DriverTest {
         int x = 1;
         while (rs.next()) {
             int nb = rs.getInt(1);
-            Assert.assertEquals(nb, x++);
+            assertEquals(nb, x++);
         }
         rs.close();
         p.close();
         c.close();
 
         ConnectionStatistics stat = (ConnectionStatistics) c;
-        Assert.assertEquals(1, stat.getItemCount());
-        Assert.assertEquals(0, stat.getStatements().size());
-        Assert.assertTrue(stat.getCaller(), stat.getCaller().contains("DriverTest.testStmtWith1000000rs"));
+        assertEquals(1, stat.getItemCount());
+        assertEquals(0, stat.getStatements().size());
+        assertTrue(stat.getCaller().contains("DriverTest.testStmtWith1000000rs"),
+                stat.getCaller());
 
         long end = (System.currentTimeMillis() - start);
         System.out.println("reading " + cnt + " rs; " + cnt / (end - 1500) + "rs/ms; finished in " + end + "ms");
@@ -135,16 +137,16 @@ public class DriverTest {
         int x = 1;
         while (rs.next()) {
             int nb = rs.getInt(1);
-            Assert.assertEquals(nb, x++);
+            assertEquals(nb, x++);
         }
         rs.close();
         p.close();
         c.close();
 
         ConnectionStatistics stat = (ConnectionStatistics) c;
-        Assert.assertEquals(1, stat.getItemCount());
-        Assert.assertEquals(0, stat.getStatements().size());
-        Assert.assertTrue(stat.getCaller().contains("DriverTest.testStmtWith100000rs"));
+        assertEquals(1, stat.getItemCount());
+        assertEquals(0, stat.getStatements().size());
+        assertTrue(stat.getCaller().contains("DriverTest.testStmtWith100000rs"));
 
         long end = (System.currentTimeMillis() - start);
         System.out.println("reading " + cnt + " rs; " + cnt / (end - 1500) + "rs/ms; finished in " + end + "ms");
@@ -162,15 +164,15 @@ public class DriverTest {
         int x = 1;
         while (rs.next()) {
             int nb = rs.getInt(1);
-            Assert.assertEquals(nb, x++);
+            assertEquals(nb, x++);
         }
         rs.close();
         p.close();
         c.close();
 
         ConnectionStatistics stat = (ConnectionStatistics) c;
-        Assert.assertEquals(1, stat.getItemCount());
-        Assert.assertEquals(0, stat.getStatements().size());
+        assertEquals(1, stat.getItemCount());
+        assertEquals(0, stat.getStatements().size());
 
         long end = (System.currentTimeMillis() - start);
         System.out.println("reading " + cnt + " rs; " + cnt / (end - 1500) + "rs/ms; finished in " + end + "ms");
@@ -188,15 +190,15 @@ public class DriverTest {
         int x = 1;
         while (rs.next()) {
             int nb = rs.getInt(1);
-            Assert.assertEquals(nb, x++);
+            assertEquals(nb, x++);
         }
         rs.close();
         p.close();
         c.close();
 
         ConnectionStatistics stat = (ConnectionStatistics) c;
-        Assert.assertEquals(1, stat.getItemCount());
-        Assert.assertEquals(0, stat.getStatements().size());
+        assertEquals(1, stat.getItemCount());
+        assertEquals(0, stat.getStatements().size());
 
         long end = (System.currentTimeMillis() - start);
         System.out.println("reading " + cnt + " rs; " + cnt / (end - 1500) + "rs/ms; finished in " + end + "ms");
@@ -215,7 +217,7 @@ public class DriverTest {
             int x = 1;
             while (rs.next()) {
                 int nb = rs.getInt(1);
-                Assert.assertEquals(nb, x++);
+                assertEquals(nb, x++);
             }
             rs.close();
             p.close();
@@ -228,12 +230,12 @@ public class DriverTest {
                 .println("reading " + cnt + " pstmts; " + 1000 * cnt / (end) + "pstmts/s; finished in " + end + "ms");
 
         ConnectionStatistics stat = (ConnectionStatistics) c;
-        Assert.assertEquals(cnt, stat.getItemCount());
-        Assert.assertEquals(0, stat.getStatements().size());
-        Assert.assertTrue(stat.getCaller().contains("DriverTest.test100StmtWith1rs"));
+        assertEquals(cnt, stat.getItemCount());
+        assertEquals(0, stat.getStatements().size());
+        assertTrue(stat.getCaller().contains("DriverTest.test100StmtWith1rs"));
     }
 
-    @Ignore
+    @Disabled
     @Test
     public void test10000StmtWith1rs() throws Exception {
         Class.forName("de.luisoft.jdbcspy.AbstractProxyDriver");
@@ -247,7 +249,7 @@ public class DriverTest {
             int x = 1;
             while (rs.next()) {
                 int nb = rs.getInt(1);
-                Assert.assertEquals(nb, x++);
+                assertEquals(nb, x++);
             }
             rs.close();
             p.close();
@@ -260,12 +262,12 @@ public class DriverTest {
                 .println("reading " + cnt + " pstmts; " + 1000 * cnt / (end) + "pstmts/s; finished in " + end + "ms");
 
         ConnectionStatistics stat = (ConnectionStatistics) c;
-        Assert.assertEquals(cnt, stat.getItemCount());
-        Assert.assertEquals(0, stat.getStatements().size());
-        Assert.assertTrue(stat.getCaller().contains("DriverTest.test10000StmtWith1rs"));
+        assertEquals(cnt, stat.getItemCount());
+        assertEquals(0, stat.getStatements().size());
+        assertTrue(stat.getCaller().contains("DriverTest.test10000StmtWith1rs"));
     }
 
-    @Ignore
+    @Disabled
     @Test
     public void test10000StmtWith1rs2() throws Exception {
         Class.forName("de.luisoft.jdbcspy.AbstractProxyDriver");
@@ -280,7 +282,7 @@ public class DriverTest {
             int x = 1;
             while (rs.next()) {
                 int nb = rs.getInt(1);
-                Assert.assertEquals(nb, x++);
+                assertEquals(nb, x++);
             }
             rs.close();
             p.close();
@@ -293,9 +295,9 @@ public class DriverTest {
                 .println("reading " + cnt + " pstmts; " + 1000 * cnt / (end) + "pstmts/s; finished in " + end + "ms");
 
         ConnectionStatistics stat = (ConnectionStatistics) c;
-        Assert.assertEquals(cnt, stat.getItemCount());
-        Assert.assertEquals(0, stat.getStatements().size());
-        Assert.assertTrue(stat.getCaller().contains("DriverTest.test10000StmtWith1rs2"));
+        assertEquals(cnt, stat.getItemCount());
+        assertEquals(0, stat.getStatements().size());
+        assertTrue(stat.getCaller().contains("DriverTest.test10000StmtWith1rs2"));
     }
 
     @Test
@@ -312,13 +314,13 @@ public class DriverTest {
             int x = 1;
             while (rs.next()) {
                 int nb = rs.getInt(1);
-                Assert.assertEquals(nb, x++);
+                assertEquals(nb, x++);
             }
             rs.close();
 
             StatementStatistics sstat = (StatementStatistics) p;
-            Assert.assertEquals(5, sstat.getItemCount());
-            Assert.assertEquals("select * from test where x = " + i, sstat.getSQL());
+            assertEquals(5, sstat.getItemCount());
+            assertEquals("select * from test where x = " + i, sstat.getSQL());
 
             p.close();
 
@@ -330,8 +332,8 @@ public class DriverTest {
                 .println("reading " + cnt + " pstmts; " + 1000 * cnt / (end) + "pstmts/s; finished in " + end + "ms");
 
         ConnectionStatistics stat = (ConnectionStatistics) c;
-        Assert.assertEquals(cnt, stat.getItemCount());
-        Assert.assertEquals(0, stat.getStatements().size());
-        Assert.assertTrue(stat.getCaller().contains("DriverTest.test10000StmtWith1rs3"));
+        assertEquals(cnt, stat.getItemCount());
+        assertEquals(0, stat.getStatements().size());
+        assertTrue(stat.getCaller().contains("DriverTest.test10000StmtWith1rs3"));
     }
 }

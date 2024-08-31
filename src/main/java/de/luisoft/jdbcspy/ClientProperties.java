@@ -388,7 +388,8 @@ public final class ClientProperties {
      * @return String[]
      */
     public static List<String> getIntKeys() {
-        return getInstance().mIntValues;
+        getInstance();
+        return mIntValues;
     }
 
     /**
@@ -397,7 +398,8 @@ public final class ClientProperties {
      * @return String[]
      */
     public static List<String> getBooleanKeys() {
-        return getInstance().mBoolValues;
+        getInstance();
+        return mBoolValues;
     }
 
     /**
@@ -406,7 +408,8 @@ public final class ClientProperties {
      * @return String[]
      */
     public static List<String> getListKeys() {
-        return getInstance().mListValues;
+        getInstance();
+        return mListValues;
     }
 
     /**

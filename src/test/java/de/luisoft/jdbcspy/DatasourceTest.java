@@ -1,8 +1,7 @@
 package de.luisoft.jdbcspy;
 
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -11,13 +10,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 /**
  * Some simple tests.
  */
 public class DatasourceTest {
 
-    @BeforeClass
-    public static void setUp() throws SQLException {
+    @BeforeEach
+    public void setUp() throws SQLException {
         String databaseURL = "jdbc:derby:booksdb;create=true";
 
         Connection conn = DriverManager.getConnection(databaseURL);
@@ -31,7 +32,7 @@ public class DatasourceTest {
             sql = "INSERT INTO book VALUES (1, 'Effective Java'), (2, 'Core Java')";
             statement.execute(sql);
         } catch (SQLException e) {
-            Assert.assertEquals(e.getSQLState(), e.getSQLState(), "X0Y32");
+            assertEquals(e.getSQLState(), e.getSQLState(), "X0Y32");
         }
     }
 
@@ -49,7 +50,7 @@ public class DatasourceTest {
         while (rs.next()) {
             i++;
         }
-        Assert.assertEquals(i, 2);
+        assertEquals(i, 2);
         rs.close();
         s.close();
         c.close();

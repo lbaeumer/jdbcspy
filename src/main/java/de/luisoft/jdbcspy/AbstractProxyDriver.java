@@ -8,7 +8,6 @@ import java.sql.DriverManager;
 import java.sql.DriverPropertyInfo;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
-import java.util.Enumeration;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -117,19 +116,12 @@ public class AbstractProxyDriver implements Driver {
     private ConnectionFactory connFac;
 
     protected AbstractProxyDriver(String driverClass) {
-        System.out.println("jdbcspy: register wrapper for driver " + driverClass);
+        System.out.println("jdbcspy: register " + this.getClass().getName()
+                + " as wrapper for driver " + driverClass);
         try {
-            Class.forName(driverClass);
-
-            Enumeration<Driver> e = DriverManager.getDrivers();
-            while (e.hasMoreElements()) {
-                Driver d = e.nextElement();
-                if (d.getClass().getName().equals(driverClass)) {
-                    uDriver = d;
-                    System.out.println("register " + d);
-                    DriverManager.registerDriver(this);
-                }
-            }
+            Class<?> c = Class.forName(driverClass);
+            uDriver = (Driver) c.newInstance();
+            DriverManager.registerDriver(this);
 
             if (uDriver == null) {
                 throw new IllegalArgumentException("did not find the driver " + driverClass);
