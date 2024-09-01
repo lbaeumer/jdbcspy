@@ -53,5 +53,4 @@ public class ProxyXADatasource extends AbstractProxyDatasource implements XAData
     public Logger getParentLogger() throws SQLFeatureNotSupportedException {
         return ((XADataSource) uDatasource).getParentLogger();
     }
-
 }

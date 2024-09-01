@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>jdbcspy</artifactId>
     <groupId>de.luisoft</groupId>
-    <version>3.0.3</version>
+    <version>3.0.4</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -36,6 +36,13 @@
             <groupId>org.apache.derby</groupId>
             <artifactId>derbytools</artifactId>
             <version>10.17.1.0</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.ibm.db2.jcc</groupId>
+            <artifactId>db2jcc</artifactId>
+            <version>db2jcc4</version>
             <scope>test</scope>
         </dependency>
 
